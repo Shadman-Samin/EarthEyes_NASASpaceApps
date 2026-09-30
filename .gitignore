@@ -1,0 +1,11 @@
+# Block all media/production files — docs and code only in this repo.
+*.mp4
+*.mkv
+*.mov
+*.avi
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.svg
+*.log
