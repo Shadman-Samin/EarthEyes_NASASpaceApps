@@ -1,0 +1,75 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", sans-serif;
+  --font-display: "Manrope", sans-serif;
+  --color-canvas: #f3f7f7;
+  --color-panel: #ffffff;
+  --color-brand: #0a2730;
+  --color-brand-mid: #315b66;
+  --color-ink: #122e36;
+  --color-muted: #6a7f84;
+  --color-line: #dbe5e8;
+  --color-accent: #087e8b;
+  --color-accent-light: #6ee7f2;
+  --color-accent-soft: #e6f6f7;
+  --color-success: #217a57;
+  --color-success-soft: #e7f5ee;
+  --color-danger: #b44943;
+  --color-danger-soft: #fbeceb;
+  --color-sand: #c3a465;
+  --shadow-card: 0 1px 2px rgba(10, 39, 48, 0.04), 0 8px 24px rgba(10, 39, 48, 0.045);
+  --shadow-map: 0 18px 50px rgba(10, 39, 48, 0.18);
+  --shadow-chat: 0 24px 70px rgba(10, 39, 48, 0.24);
+}
+
+:root {
+  color-scheme: light;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--color-canvas);
+}
+
+button,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.bg-map-overlay {
+  background:
+    linear-gradient(180deg, rgba(5, 30, 38, 0.5), rgba(5, 30, 38, 0.05) 43%, rgba(5, 30, 38, 0.65)),
+    linear-gradient(90deg, rgba(5, 30, 38, 0.18), transparent 55%);
+}
+
+.bg-sea-overlay {
+  background:
+    linear-gradient(180deg, rgba(5, 30, 38, 0.38), rgba(5, 30, 38, 0.04) 48%, rgba(5, 30, 38, 0.6)),
+    linear-gradient(90deg, rgba(8, 126, 139, 0.2), transparent 65%);
+}
+
+.map-grid {
+  background-image:
+    linear-gradient(rgba(110, 231, 242, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(110, 231, 242, 0.18) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  button,
+  select {
+    transition-duration: 180ms;
+  }
+}
