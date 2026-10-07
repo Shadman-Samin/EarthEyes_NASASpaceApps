@@ -255,8 +255,8 @@ function InfoPage({
           </div>
           <div className="mt-4 max-w-2xl text-base leading-7 text-muted">
             {methodology
-              ? "Eyes of Argus turns repeat satellite observations into comparable measurements of ice motion, mass change and sea-level contribution."
-              : "Understand the missions, coverage, update cadence and limits behind every visualization in Eyes of Argus."}
+              ? "EarthEyes turns repeat satellite observations into comparable measurements of ice motion, mass change and sea-level contribution."
+              : "Understand the missions, coverage, update cadence and limits behind every visualization in EarthEyes."}
           </div>
         </div>
         <div className="rounded-2xl bg-brand p-5 text-white">
@@ -585,7 +585,7 @@ function App() {
             </div>
             <div>
               <div className="font-display text-lg font-semibold leading-none tracking-tight text-brand">
-                Eyes of Argus
+                EarthEyes
               </div>
               <div className="mt-1 hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-muted sm:block">
                 Earth observation intelligence
@@ -939,7 +939,7 @@ function App() {
       )}
 
       <footer className="mx-auto flex max-w-screen-2xl flex-col gap-2 border-t border-line px-6 py-5 text-[10px] text-muted sm:flex-row sm:items-center sm:justify-between">
-        <div>Eyes of Argus · Research visualization prototype</div>
+        <div>EarthEyes · Research visualization prototype</div>
         <div>Imagery by Bernd Dittrich and USGS on Unsplash · Data references: NASA, ASF DAAC, Sentinel-1</div>
       </footer>
       <DataAssistant location={location} metric={metric} />
