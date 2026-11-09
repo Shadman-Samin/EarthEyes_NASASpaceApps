@@ -1,0 +1,42 @@
+:root {
+  color-scheme: light;
+  --font-display: "Manrope Variable", "Arial Narrow", sans-serif;
+  --font-sans: "DM Sans Variable", Arial, sans-serif;
+  --font-mono: "DM Mono", Consolas, monospace;
+
+  --canvas: #f1efe5;
+  --canvas-deep: #e8e5d8;
+  --panel: #fffef8;
+  --panel-muted: #f8f6ed;
+  --forest-950: #102824;
+  --forest-900: #18332e;
+  --forest-800: #26463f;
+  --forest-700: #3f655b;
+  --ink: #1e312d;
+  --muted: #5b6b66;
+  --faint: #7d8984;
+  --line: #d5d9cf;
+  --line-strong: #b9c1b7;
+  --lime: #cce86e;
+  --lime-dark: #52743d;
+  --lime-soft: #edf4d8;
+  --coral: #eb7658;
+  --coral-dark: #99422f;
+  --coral-soft: #fae7e0;
+  --aqua: #3ca9ad;
+  --aqua-dark: #24757a;
+  --aqua-soft: #e0f1ef;
+  --gold: #c49a55;
+  --warning: #b45335;
+  --error: #a33c35;
+  --focus: #176f73;
+
+  --shadow-card: 0 1px 2px rgb(16 40 36 / 5%), 0 14px 34px rgb(16 40 36 / 7%);
+  --shadow-map: 0 24px 64px rgb(16 40 36 / 18%);
+  --shadow-float: 0 28px 86px rgb(10 30 27 / 29%);
+  --header-height: 67px;
+  --signal-height: 4px;
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+}

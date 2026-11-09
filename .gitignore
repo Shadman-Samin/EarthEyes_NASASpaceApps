@@ -1,5 +1,10 @@
 node_modules/
 dist/
+storybook-static/
+playwright-report/
+test-results/
+.lighthouseci/
+coverage/
 .npm-cache/
 .DS_Store
 *.local

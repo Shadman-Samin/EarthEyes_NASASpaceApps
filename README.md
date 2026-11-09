@@ -1,40 +1,49 @@
 # EarthEyes
 
-**See ice change. See sea rise.**
+EarthEyes is a map-first environmental field atlas for the NASA Space Apps “Dancing with the SARs” challenge. It supports place search, dated observation comparison, coastal and ice evidence modules, GLOF review context, GroundLine warning governance, and the contextual Argus guide.
 
-EarthEyes is a browser-based visualization concept for the NASA Space Apps Challenge 2026, challenge “Dancing with the SARs.” The current download contains the React interface and sample visual content. It is a static frontend; it does not include a server, NASA data pipeline, or hosted AI/chat service.
+The current application uses typed fixtures behind the same HTTP boundary intended for future services. Fixture imagery and values are visibly labeled and must not be used for navigation, evacuation, or safety decisions.
 
 ## Run locally
 
-Requires Node.js 22 (or a compatible current LTS release) and npm.
+Requires Node.js 22 or a compatible current release.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Vite prints the local development URL. To make a production build locally:
+MSW serves fixture endpoints such as `/api/places/search`, `/api/observations`, `/api/layers`, `/api/metrics`, and `/api/alerts`. Set `VITE_API_BASE_URL` to replace the fixture API. Set `VITE_DATA_ORIGIN=live` only when that service returns authoritative connected records; otherwise the UI conservatively retains fixture labeling.
+
+## Verification
 
 ```sh
+npm run lint
+npm run typecheck
+npm test
 npm run build
-npm run preview
+npm run build-storybook
+npm run test:e2e
+npm run lighthouse
 ```
 
-## Publish on GitHub Pages
+Playwright covers Chromium, Firefox, a 360px mobile viewport, WCAG checks, responsive overflow, core explorer journeys, Argus, GroundLine, and visual snapshots.
 
-The workflow in `.github/workflows/deploy.yml` builds and deploys the site whenever code is pushed to `main`.
+## Architecture
 
-1. Push this project to the `main` branch of `Shadman-Samin/EarthEyes_NASASpaceApps`.
-2. On GitHub, open **Settings → Pages** and set **Build and deployment → Source** to **GitHub Actions**.
-3. Open the **Actions** tab and wait for “Deploy EarthEyes to GitHub Pages” to finish.
-4. The site will be available at `https://shadman-samin.github.io/EarthEyes_NASASpaceApps/`.
+- `src/app`: providers, routed shell, route announcements, and error handling.
+- `src/routes`: landing, explorer, stories, methodology, data sources, GroundLine, and about.
+- `src/features`: map, search, comparison, timeline, evidence, explorer controls, and Argus.
+- `src/domain`: Zod contracts and the coastal/ice/GLOF module registry.
+- `src/data`: fixture and HTTP repository adapters plus query hooks.
+- `src/mocks`: validated fixtures and MSW endpoint handlers.
+- `src/shared`: UI primitives, formatting, and responsive utilities.
+- `src/styles`: design tokens and route, explorer, shell, and Argus styles.
 
-## What is included
+## GitHub Pages
 
-- React 19 interface built with Vite and Tailwind CSS.
-- GitHub Actions deployment workflow for GitHub Pages.
-- Relative asset paths configured for the repository’s Pages URL.
+The deployment workflow sets `VITE_BASE_PATH=/EarthEyes_NASASpaceApps/`. The build emits `404.html` as an SPA fallback so shared explorer URLs survive direct reloads on GitHub Pages.
 
-## Current limits
+## Integration Boundary
 
-The included UI uses externally hosted sample imagery and does not fetch or process NASA/NISAR datasets. Any buttons or visualizations that depend on real data, an API, or a model need those services and configuration added before they can provide production data.
+Real integration still requires confirmed STAC or tile endpoints, geospatial processing products, authentication and usage policies, authoritative alert ownership, and backend services. NISAR SAR observations must never be presented as direct sea-level measurements, and automated GLOF candidates must never become public warnings without analyst review and authority approval.
