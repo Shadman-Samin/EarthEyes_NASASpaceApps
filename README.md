@@ -2,7 +2,7 @@
 
 EarthEyes is a map-first environmental field atlas for the NASA Space Apps “Dancing with the SARs” challenge. It supports place search, dated observation comparison, coastal and ice evidence modules, GLOF review context, GroundLine warning governance, and the contextual Argus guide.
 
-The existing `/explore` workspace now loads real NASA NISAR GCOV acquisitions and official per-polarization L-band browse images by default, with an OPERA Sentinel-1 RTC switch for the historical C-band archive. Its map, footprint selector, timeline, polarization switch, swipe, side-by-side, single and fade views use those records. Calibrated change measurements are explicitly unavailable, not replaced with fixtures. GroundLine remains a clearly labelled demonstration and must not be used for safety decisions.
+The existing `/explore` workspace now loads real NASA NISAR GCOV acquisitions and official per-polarization L-band browse images by default, with an OPERA Sentinel-1 RTC switch for the historical C-band archive. Its map, footprint selector, timeline, polarization switch, swipe, side-by-side, single and fade views use those records. Browse previews remain explicitly uncalibrated. For two flagship investigations (Kuakata, Bangladesh and Jakobshavn Isbrae, Greenland), EarthEyes also ships calibrated NISAR GCOV change bundles: L-band HV/HH gamma-0 rasters, water-area time series, changed-area clusters, and plain-language explanations with provenance. Other places keep live archive discovery and honest browse-only comparison. GroundLine remains a clearly labelled demonstration and must not be used for safety decisions.
 
 ## Run locally
 
@@ -54,7 +54,26 @@ The deployment workflow sets `VITE_BASE_PATH=/EarthEyes_NASASpaceApps/`. The bui
 
 ## Integration Boundary
 
-Real acquisition discovery and public SAR preview comparison are connected inside the explorer. Calibrated georeferenced imagery, quantitative difference, shoreline/ice metrics and hazard analysis still require metered raster access, processing, QA and published products. Those controls/results are not fabricated. NISAR SAR observations must never be presented as direct sea-level measurements, and GLOF candidates must never become public warnings without analyst review and authority approval.
+Real acquisition discovery and public SAR preview comparison are connected inside the explorer. Calibrated georeferenced change analysis is available for two flagship investigations from precomputed NISAR GCOV bundles; other places remain browse-only. Quantitative claims are tied to granule IDs and stated limitations. NISAR SAR observations must never be presented as direct sea-level measurements, and GLOF candidates must never become public warnings without analyst review and authority approval.
+
+## Computed change analysis
+
+Flagship change bundles live under `public/analysis/<place>/` and are generated offline
+by `tools/analysis` from real NISAR GCOV granules (Earthdata bearer token required,
+never committed). The pipeline reads only the needed HDF5 windows, computes calibrated
+dB change, water-area time series, clusters and a plain-language story for every date
+pair, then writes Int16 rasters plus a JSON manifest. Each pair names its own delta
+raster and its own story, so the prose always matches the selected comparison. Re-run:
+
+```sh
+cd tools/analysis
+python extract.py --site kuakata-bangladesh
+python extract.py --site jakobshavn-glacier
+python analyze.py --site kuakata-bangladesh
+python analyze.py --site jakobshavn-glacier
+```
+
+See `tools/analysis/README.md` for authentication, ROI and reproducibility details.
 
 ## Worldwide Catalogue Backend
 

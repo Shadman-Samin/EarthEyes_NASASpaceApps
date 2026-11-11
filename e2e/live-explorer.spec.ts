@@ -33,7 +33,7 @@ test("the existing explorer loads real NISAR source images and keeps its compari
   await expect(viewer.locator('img[src*="nisar.asf.earthdatacloud.nasa.gov"]')).toHaveCount(2)
   await expect(viewer.locator("img").first()).toHaveCSS("filter", "none")
   await expect(page.getByRole("button", { name: "Difference", exact: true })).toBeEnabled()
-  await expect(page.getByLabel("Evidence drawer").getByText("Measurements unavailable", { exact: true })).toBeVisible()
+  await expect(page.getByLabel("Evidence drawer").getByText("Calibrated change", { exact: true })).toBeVisible()
   await page.getByLabel("Explorer controls").getByRole("button", { name: "Difference", exact: true }).click()
   await expect(page.getByRole("heading", { name: "Exploratory difference" })).toBeVisible()
   await expect(page.locator(".live-difference canvas")).toBeVisible()

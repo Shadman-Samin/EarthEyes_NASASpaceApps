@@ -1,0 +1,3903 @@
+{
+  "site": "jakobshavn-glacier",
+  "placeId": "jakobshavn-glacier",
+  "label": "Jakobshavn Isbrae, Greenland",
+  "module": "ice",
+  "phenomenon": "ice-surface-change",
+  "generated_at": "2026-11-11T17:56:33.079404Z",
+  "algorithm_version": "1.0.0",
+  "grid": {
+    "width": 512,
+    "height": 512,
+    "spacing_m": 40.0,
+    "epsg": 3413,
+    "corners": [
+      [
+        -50.38115,
+        69.25298
+      ],
+      [
+        -49.8669,
+        69.26932
+      ],
+      [
+        -49.82346,
+        69.08704
+      ],
+      [
+        -50.33318,
+        69.07085
+      ]
+    ]
+  },
+  "raster": {
+    "format": "int16_le",
+    "unit": "dB",
+    "scale": 0.01,
+    "invalid": -32768,
+    "urls": {
+      "2026-08-10": "rasters/2026-08-10.db.i16",
+      "2026-08-22": "rasters/2026-08-22.db.i16",
+      "2026-09-03": "rasters/2026-09-03.db.i16",
+      "2026-09-15": "rasters/2026-09-15.db.i16",
+      "2026-09-27": "rasters/2026-09-27.db.i16",
+      "2026-10-09": "rasters/2026-10-09.db.i16",
+      "2026-10-21": "rasters/2026-10-21.db.i16"
+    }
+  },
+  "dates": [
+    {
+      "date": "2026-08-10",
+      "acquired_at": "2026-08-10T06:47:32.000000Z",
+      "granule": "NISAR_L2_PR_GCOV_027_131_A_037_7700_SHNA_A_20260810T064732_20260810T064813_P05023_N_P_J_001",
+      "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_027_131_A_037_7700_SHNA_A_20260810T064732_20260810T064813_P05023_N_P_J_001/NISAR_L2_PR_GCOV_027_131_A_037_7700_SHNA_A_20260810T064732_20260810T064813_P05023_N_P_J_001.h5",
+      "polarization": "HH",
+      "valid_fraction": 0.9998245239257812,
+      "mean_db": -9.353867530822754,
+      "p2_db": -17.851606369018555,
+      "p98_db": -4.6174540519714355
+    },
+    {
+      "date": "2026-08-22",
+      "acquired_at": "2026-08-22T06:47:32.000000Z",
+      "granule": "NISAR_L2_PR_GCOV_028_131_A_037_7700_SHNA_A_20260822T064732_20260822T064808_P05023_N_P_J_001",
+      "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_028_131_A_037_7700_SHNA_A_20260822T064732_20260822T064808_P05023_N_P_J_001/NISAR_L2_PR_GCOV_028_131_A_037_7700_SHNA_A_20260822T064732_20260822T064808_P05023_N_P_J_001.h5",
+      "polarization": "HH",
+      "valid_fraction": 0.9998207092285156,
+      "mean_db": -9.586639404296875,
+      "p2_db": -16.48250389099121,
+      "p98_db": -5.18615198135376
+    },
+    {
+      "date": "2026-09-03",
+      "acquired_at": "2026-09-03T06:47:31.000000Z",
+      "granule": "NISAR_L2_PR_GCOV_029_131_A_037_7700_SHNA_A_20260903T064731_20260903T064812_P05023_N_P_J_001",
+      "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_029_131_A_037_7700_SHNA_A_20260903T064731_20260903T064812_P05023_N_P_J_001/NISAR_L2_PR_GCOV_029_131_A_037_7700_SHNA_A_20260903T064731_20260903T064812_P05023_N_P_J_001.h5",
+      "polarization": "HH",
+      "valid_fraction": 0.9998321533203125,
+      "mean_db": -9.533466339111328,
+      "p2_db": -16.82255744934082,
+      "p98_db": -5.074789047241211
+    },
+    {
+      "date": "2026-09-15",
+      "acquired_at": "2026-09-15T06:47:31.000000Z",
+      "granule": "NISAR_L2_PR_GCOV_030_131_A_037_7700_SHNA_A_20260915T064731_20260915T064812_P05023_N_P_J_001",
+      "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_030_131_A_037_7700_SHNA_A_20260915T064731_20260915T064812_P05023_N_P_J_001/NISAR_L2_PR_GCOV_030_131_A_037_7700_SHNA_A_20260915T064731_20260915T064812_P05023_N_P_J_001.h5",
+      "polarization": "HH",
+      "valid_fraction": 0.9998359680175781,
+      "mean_db": -9.100883483886719,
+      "p2_db": -17.610000610351562,
+      "p98_db": -4.08963680267334
+    },
+    {
+      "date": "2026-09-27",
+      "acquired_at": "2026-09-27T06:47:31.000000Z",
+      "granule": "NISAR_L2_PR_GCOV_031_131_A_037_7700_SHNA_A_20260927T064731_20260927T064812_P05023_N_P_J_001",
+      "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_031_131_A_037_7700_SHNA_A_20260927T064731_20260927T064812_P05023_N_P_J_001/NISAR_L2_PR_GCOV_031_131_A_037_7700_SHNA_A_20260927T064731_20260927T064812_P05023_N_P_J_001.h5",
+      "polarization": "HH",
+      "valid_fraction": 0.9998283386230469,
+      "mean_db": -9.502232551574707,
+      "p2_db": -17.498167037963867,
+      "p98_db": -3.501361608505249
+    },
+    {
+      "date": "2026-10-09",
+      "acquired_at": "2026-10-09T06:47:31.000000Z",
+      "granule": "NISAR_L2_PR_GCOV_032_131_A_037_7700_SHNA_A_20261009T064731_20261009T064808_P05023_N_P_J_001",
+      "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_032_131_A_037_7700_SHNA_A_20261009T064731_20261009T064808_P05023_N_P_J_001/NISAR_L2_PR_GCOV_032_131_A_037_7700_SHNA_A_20261009T064731_20261009T064808_P05023_N_P_J_001.h5",
+      "polarization": "HH",
+      "valid_fraction": 0.9998283386230469,
+      "mean_db": -9.861299514770508,
+      "p2_db": -18.08132553100586,
+      "p98_db": -3.1996524333953857
+    },
+    {
+      "date": "2026-10-21",
+      "acquired_at": "2026-10-21T06:47:31.000000Z",
+      "granule": "NISAR_L2_PR_GCOV_033_131_A_037_7700_SHNA_A_20261021T064731_20261021T064808_P05023_N_P_J_001",
+      "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_033_131_A_037_7700_SHNA_A_20261021T064731_20261021T064808_P05023_N_P_J_001/NISAR_L2_PR_GCOV_033_131_A_037_7700_SHNA_A_20261021T064731_20261021T064808_P05023_N_P_J_001.h5",
+      "polarization": "HH",
+      "valid_fraction": 0.9998283386230469,
+      "mean_db": -10.303817749023438,
+      "p2_db": -18.017915725708008,
+      "p98_db": -3.2534568309783936
+    }
+  ],
+  "time_series": [
+    {
+      "date": "2026-08-10",
+      "mean_db": -9.35
+    },
+    {
+      "date": "2026-08-22",
+      "mean_db": -9.59
+    },
+    {
+      "date": "2026-09-03",
+      "mean_db": -9.53
+    },
+    {
+      "date": "2026-09-15",
+      "mean_db": -9.1
+    },
+    {
+      "date": "2026-09-27",
+      "mean_db": -9.5
+    },
+    {
+      "date": "2026-10-09",
+      "mean_db": -9.86
+    },
+    {
+      "date": "2026-10-21",
+      "mean_db": -10.3
+    }
+  ],
+  "water": {},
+  "pairs": {
+    "2026-08-10--2026-08-22": {
+      "from": "2026-08-10",
+      "to": "2026-08-22",
+      "threshold_db": 1.5,
+      "changed_fraction": 0.2609,
+      "changed_area_km2": 109.411,
+      "gain_area_km2": 11.656,
+      "loss_area_km2": 39.946,
+      "clusters": [
+        {
+          "id": 2623,
+          "pixels": 1827,
+          "area_km2": 2.923,
+          "centroid_px": [
+            412.6,
+            264.5
+          ],
+          "bbox_px": [
+            371,
+            217,
+            447,
+            322
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.94296,
+            69.17195
+          ]
+        },
+        {
+          "id": 5022,
+          "pixels": 1283,
+          "area_km2": 2.053,
+          "centroid_px": [
+            131.8,
+            417.6
+          ],
+          "bbox_px": [
+            89,
+            389,
+            165,
+            439
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.21029,
+            69.10847
+          ]
+        },
+        {
+          "id": 350,
+          "pixels": 1033,
+          "area_km2": 1.653,
+          "centroid_px": [
+            197.6,
+            51.6
+          ],
+          "bbox_px": [
+            170,
+            19,
+            233,
+            74
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.17769,
+            69.24109
+          ]
+        },
+        {
+          "id": 5909,
+          "pixels": 682,
+          "area_km2": 1.091,
+          "centroid_px": [
+            75.7,
+            496.0
+          ],
+          "bbox_px": [
+            58,
+            476,
+            103,
+            511
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.2591,
+            69.0787
+          ]
+        },
+        {
+          "id": 2104,
+          "pixels": 451,
+          "area_km2": 0.722,
+          "centroid_px": [
+            417.6,
+            197.6
+          ],
+          "bbox_px": [
+            408,
+            177,
+            431,
+            221
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.94374,
+            69.19598
+          ]
+        },
+        {
+          "id": 4978,
+          "pixels": 338,
+          "area_km2": 0.541,
+          "centroid_px": [
+            191.5,
+            401.2
+          ],
+          "bbox_px": [
+            170,
+            384,
+            213,
+            419
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.15213,
+            69.11624
+          ]
+        },
+        {
+          "id": 1710,
+          "pixels": 311,
+          "area_km2": 0.498,
+          "centroid_px": [
+            122.5,
+            158.6
+          ],
+          "bbox_px": [
+            102,
+            139,
+            140,
+            179
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.2433,
+            69.20049
+          ]
+        },
+        {
+          "id": 2715,
+          "pixels": 307,
+          "area_km2": 0.491,
+          "centroid_px": [
+            16.3,
+            238.6
+          ],
+          "bbox_px": [
+            0,
+            223,
+            36,
+            253
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.34232,
+            69.16847
+          ]
+        },
+        {
+          "id": 2246,
+          "pixels": 280,
+          "area_km2": 0.448,
+          "centroid_px": [
+            244.0,
+            201.2
+          ],
+          "bbox_px": [
+            228,
+            188,
+            259,
+            215
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.11757,
+            69.18924
+          ]
+        },
+        {
+          "id": 663,
+          "pixels": 261,
+          "area_km2": 0.418,
+          "centroid_px": [
+            133.8,
+            61.7
+          ],
+          "bbox_px": [
+            123,
+            41,
+            144,
+            78
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.24089,
+            69.23541
+          ]
+        },
+        {
+          "id": 1060,
+          "pixels": 258,
+          "area_km2": 0.413,
+          "centroid_px": [
+            447.4,
+            85.0
+          ],
+          "bbox_px": [
+            429,
+            77,
+            461,
+            95
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.92358,
+            69.23705
+          ]
+        },
+        {
+          "id": 2386,
+          "pixels": 253,
+          "area_km2": 0.405,
+          "centroid_px": [
+            54.9,
+            214.4
+          ],
+          "bbox_px": [
+            40,
+            201,
+            68,
+            232
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.30592,
+            69.17838
+          ]
+        },
+        {
+          "id": 372,
+          "pixels": 9794,
+          "area_km2": 15.67,
+          "centroid_px": [
+            367.8,
+            161.4
+          ],
+          "bbox_px": [
+            227,
+            43,
+            511,
+            260
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.99688,
+            69.20734
+          ]
+        },
+        {
+          "id": 1863,
+          "pixels": 5310,
+          "area_km2": 8.496,
+          "centroid_px": [
+            275.3,
+            279.7
+          ],
+          "bbox_px": [
+            163,
+            204,
+            399,
+            336
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.07918,
+            69.16224
+          ]
+        },
+        {
+          "id": 3570,
+          "pixels": 2361,
+          "area_km2": 3.778,
+          "centroid_px": [
+            401.5,
+            388.1
+          ],
+          "bbox_px": [
+            351,
+            337,
+            468,
+            425
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.94337,
+            69.12753
+          ]
+        },
+        {
+          "id": 2193,
+          "pixels": 1625,
+          "area_km2": 2.6,
+          "centroid_px": [
+            139.1,
+            256.3
+          ],
+          "bbox_px": [
+            85,
+            227,
+            187,
+            295
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.2177,
+            69.16621
+          ]
+        },
+        {
+          "id": 3719,
+          "pixels": 1291,
+          "area_km2": 2.066,
+          "centroid_px": [
+            479.1,
+            384.0
+          ],
+          "bbox_px": [
+            439,
+            347,
+            511,
+            420
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.8661,
+            69.13136
+          ]
+        },
+        {
+          "id": 1264,
+          "pixels": 856,
+          "area_km2": 1.37,
+          "centroid_px": [
+            188.2,
+            182.1
+          ],
+          "bbox_px": [
+            147,
+            150,
+            236,
+            209
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.17525,
+            69.19426
+          ]
+        },
+        {
+          "id": 1559,
+          "pixels": 842,
+          "area_km2": 1.347,
+          "centroid_px": [
+            452.0,
+            202.0
+          ],
+          "bbox_px": [
+            421,
+            176,
+            473,
+            238
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.90885,
+            69.19545
+          ]
+        },
+        {
+          "id": 2871,
+          "pixels": 760,
+          "area_km2": 1.216,
+          "centroid_px": [
+            492.7,
+            313.3
+          ],
+          "bbox_px": [
+            467,
+            283,
+            511,
+            344
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.85851,
+            69.15699
+          ]
+        },
+        {
+          "id": 2774,
+          "pixels": 640,
+          "area_km2": 1.024,
+          "centroid_px": [
+            80.0,
+            295.6
+          ],
+          "bbox_px": [
+            60,
+            274,
+            101,
+            318
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.27325,
+            69.15027
+          ]
+        },
+        {
+          "id": 621,
+          "pixels": 638,
+          "area_km2": 1.021,
+          "centroid_px": [
+            189.3,
+            96.1
+          ],
+          "bbox_px": [
+            159,
+            73,
+            210,
+            115
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.18197,
+            69.22495
+          ]
+        },
+        {
+          "id": 3665,
+          "pixels": 555,
+          "area_km2": 0.888,
+          "centroid_px": [
+            315.2,
+            371.6
+          ],
+          "bbox_px": [
+            298,
+            344,
+            337,
+            413
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.03111,
+            69.13072
+          ]
+        },
+        {
+          "id": 1606,
+          "pixels": 294,
+          "area_km2": 0.47,
+          "centroid_px": [
+            367.7,
+            200.0
+          ],
+          "bbox_px": [
+            353,
+            181,
+            385,
+            214
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.9936,
+            69.19357
+          ]
+        }
+      ],
+      "delta_url": "rasters/2026-08-10--2026-08-22.delta.i16",
+      "story": {
+        "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-08-10 and 2026-08-22.",
+        "summary": "About 109.4 km\u00b2 (26%) of the analyzed window changed radar brightness between 2026-08-10 and 2026-08-22, across 24 clusters."
+      }
+    },
+    "2026-08-22--2026-09-03": {
+      "from": "2026-08-22",
+      "to": "2026-09-03",
+      "threshold_db": 1.5,
+      "changed_fraction": 0.2599,
+      "changed_area_km2": 108.989,
+      "gain_area_km2": 25.425,
+      "loss_area_km2": 15.352,
+      "clusters": [
+        {
+          "id": 3558,
+          "pixels": 4637,
+          "area_km2": 7.419,
+          "centroid_px": [
+            393.0,
+            379.4
+          ],
+          "bbox_px": [
+            305,
+            288,
+            470,
+            430
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.95262,
+            69.13037
+          ]
+        },
+        {
+          "id": 2667,
+          "pixels": 2020,
+          "area_km2": 3.232,
+          "centroid_px": [
+            172.3,
+            254.8
+          ],
+          "bbox_px": [
+            126,
+            217,
+            221,
+            295
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.18458,
+            69.16782
+          ]
+        },
+        {
+          "id": 1721,
+          "pixels": 1883,
+          "area_km2": 3.013,
+          "centroid_px": [
+            488.2,
+            167.9
+          ],
+          "bbox_px": [
+            452,
+            141,
+            511,
+            207
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.87543,
+            69.20872
+          ]
+        },
+        {
+          "id": 2948,
+          "pixels": 1170,
+          "area_km2": 1.872,
+          "centroid_px": [
+            94.0,
+            268.7
+          ],
+          "bbox_px": [
+            62,
+            240,
+            126,
+            307
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.26173,
+            69.16032
+          ]
+        },
+        {
+          "id": 3273,
+          "pixels": 1133,
+          "area_km2": 1.813,
+          "centroid_px": [
+            298.7,
+            298.0
+          ],
+          "bbox_px": [
+            269,
+            266,
+            342,
+            329
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.05412,
+            69.15645
+          ]
+        },
+        {
+          "id": 2399,
+          "pixels": 1002,
+          "area_km2": 1.603,
+          "centroid_px": [
+            421.9,
+            214.8
+          ],
+          "bbox_px": [
+            389,
+            193,
+            460,
+            236
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.93793,
+            69.18996
+          ]
+        },
+        {
+          "id": 2941,
+          "pixels": 919,
+          "area_km2": 1.47,
+          "centroid_px": [
+            234.4,
+            267.5
+          ],
+          "bbox_px": [
+            214,
+            239,
+            259,
+            302
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.12124,
+            69.16528
+          ]
+        },
+        {
+          "id": 2412,
+          "pixels": 659,
+          "area_km2": 1.054,
+          "centroid_px": [
+            482.1,
+            224.1
+          ],
+          "bbox_px": [
+            462,
+            194,
+            511,
+            248
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.87674,
+            69.18849
+          ]
+        },
+        {
+          "id": 2558,
+          "pixels": 648,
+          "area_km2": 1.037,
+          "centroid_px": [
+            283.6,
+            237.7
+          ],
+          "bbox_px": [
+            262,
+            207,
+            307,
+            262
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.0746,
+            69.17747
+          ]
+        },
+        {
+          "id": 4250,
+          "pixels": 631,
+          "area_km2": 1.01,
+          "centroid_px": [
+            319.4,
+            357.1
+          ],
+          "bbox_px": [
+            297,
+            333,
+            354,
+            385
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.02818,
+            69.13602
+          ]
+        },
+        {
+          "id": 5079,
+          "pixels": 624,
+          "area_km2": 0.998,
+          "centroid_px": [
+            471.6,
+            437.8
+          ],
+          "bbox_px": [
+            438,
+            422,
+            510,
+            453
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.86902,
+            69.11195
+          ]
+        },
+        {
+          "id": 1631,
+          "pixels": 565,
+          "area_km2": 0.904,
+          "centroid_px": [
+            393.3,
+            142.7
+          ],
+          "bbox_px": [
+            338,
+            132,
+            440,
+            155
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.97292,
+            69.21481
+          ]
+        },
+        {
+          "id": 2719,
+          "pixels": 3498,
+          "area_km2": 5.597,
+          "centroid_px": [
+            371.2,
+            196.8
+          ],
+          "bbox_px": [
+            289,
+            154,
+            458,
+            277
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.99036,
+            69.19481
+          ]
+        },
+        {
+          "id": 1916,
+          "pixels": 2613,
+          "area_km2": 4.181,
+          "centroid_px": [
+            168.2,
+            142.8
+          ],
+          "bbox_px": [
+            94,
+            103,
+            239,
+            190
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.1989,
+            69.20762
+          ]
+        },
+        {
+          "id": 3267,
+          "pixels": 801,
+          "area_km2": 1.282,
+          "centroid_px": [
+            29.6,
+            216.1
+          ],
+          "bbox_px": [
+            0,
+            199,
+            64,
+            244
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.33111,
+            69.17693
+          ]
+        },
+        {
+          "id": 3321,
+          "pixels": 473,
+          "area_km2": 0.757,
+          "centroid_px": [
+            85.4,
+            219.6
+          ],
+          "bbox_px": [
+            55,
+            202,
+            118,
+            235
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.27488,
+            69.17754
+          ]
+        },
+        {
+          "id": 3024,
+          "pixels": 400,
+          "area_km2": 0.64,
+          "centroid_px": [
+            191.1,
+            201.8
+          ],
+          "bbox_px": [
+            168,
+            181,
+            212,
+            220
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.17056,
+            69.18732
+          ]
+        },
+        {
+          "id": 3770,
+          "pixels": 342,
+          "area_km2": 0.547,
+          "centroid_px": [
+            415.7,
+            250.2
+          ],
+          "bbox_px": [
+            395,
+            236,
+            437,
+            268
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.94109,
+            69.17715
+          ]
+        },
+        {
+          "id": 427,
+          "pixels": 329,
+          "area_km2": 0.526,
+          "centroid_px": [
+            200.6,
+            40.5
+          ],
+          "bbox_px": [
+            182,
+            23,
+            217,
+            60
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.17568,
+            69.24514
+          ]
+        },
+        {
+          "id": 3831,
+          "pixels": 299,
+          "area_km2": 0.478,
+          "centroid_px": [
+            493.0,
+            253.3
+          ],
+          "bbox_px": [
+            479,
+            240,
+            510,
+            271
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.86332,
+            69.1784
+          ]
+        },
+        {
+          "id": 2655,
+          "pixels": 293,
+          "area_km2": 0.469,
+          "centroid_px": [
+            272.1,
+            162.8
+          ],
+          "bbox_px": [
+            255,
+            150,
+            290,
+            175
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.09282,
+            69.20381
+          ]
+        },
+        {
+          "id": 2669,
+          "pixels": 215,
+          "area_km2": 0.344,
+          "centroid_px": [
+            223.7,
+            164.7
+          ],
+          "bbox_px": [
+            203,
+            151,
+            237,
+            177
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.14122,
+            69.2016
+          ]
+        },
+        {
+          "id": 2981,
+          "pixels": 172,
+          "area_km2": 0.275,
+          "centroid_px": [
+            29.9,
+            191.5
+          ],
+          "bbox_px": [
+            19,
+            178,
+            43,
+            202
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.33311,
+            69.18571
+          ]
+        },
+        {
+          "id": 1447,
+          "pixels": 160,
+          "area_km2": 0.256,
+          "centroid_px": [
+            222.8,
+            91.9
+          ],
+          "bbox_px": [
+            213,
+            79,
+            231,
+            105
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.1487,
+            69.22752
+          ]
+        }
+      ],
+      "delta_url": "rasters/2026-08-22--2026-09-03.delta.i16",
+      "story": {
+        "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-08-22 and 2026-09-03.",
+        "summary": "About 109.0 km\u00b2 (26%) of the analyzed window changed radar brightness between 2026-08-22 and 2026-09-03, across 24 clusters."
+      }
+    },
+    "2026-09-03--2026-09-15": {
+      "from": "2026-09-03",
+      "to": "2026-09-15",
+      "threshold_db": 1.5,
+      "changed_fraction": 0.3398,
+      "changed_area_km2": 142.498,
+      "gain_area_km2": 34.952,
+      "loss_area_km2": 8.624,
+      "clusters": [
+        {
+          "id": 3878,
+          "pixels": 4352,
+          "area_km2": 6.963,
+          "centroid_px": [
+            456.7,
+            342.9
+          ],
+          "bbox_px": [
+            385,
+            271,
+            511,
+            435
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.89202,
+            69.14535
+          ]
+        },
+        {
+          "id": 5254,
+          "pixels": 3003,
+          "area_km2": 4.805,
+          "centroid_px": [
+            54.9,
+            419.0
+          ],
+          "bbox_px": [
+            0,
+            369,
+            116,
+            466
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.28694,
+            69.10545
+          ]
+        },
+        {
+          "id": 1994,
+          "pixels": 2901,
+          "area_km2": 4.642,
+          "centroid_px": [
+            329.8,
+            185.6
+          ],
+          "bbox_px": [
+            256,
+            138,
+            397,
+            227
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.03289,
+            69.19751
+          ]
+        },
+        {
+          "id": 3814,
+          "pixels": 1579,
+          "area_km2": 2.526,
+          "centroid_px": [
+            33.7,
+            296.4
+          ],
+          "bbox_px": [
+            0,
+            268,
+            66,
+            328
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.31951,
+            69.14845
+          ]
+        },
+        {
+          "id": 5424,
+          "pixels": 1578,
+          "area_km2": 2.525,
+          "centroid_px": [
+            424.5,
+            424.3
+          ],
+          "bbox_px": [
+            390,
+            382,
+            480,
+            462
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.91725,
+            69.11533
+          ]
+        },
+        {
+          "id": 5308,
+          "pixels": 1564,
+          "area_km2": 2.502,
+          "centroid_px": [
+            240.9,
+            414.3
+          ],
+          "bbox_px": [
+            198,
+            373,
+            277,
+            452
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.1016,
+            69.11316
+          ]
+        },
+        {
+          "id": 2161,
+          "pixels": 1445,
+          "area_km2": 2.312,
+          "centroid_px": [
+            430.6,
+            177.8
+          ],
+          "bbox_px": [
+            394,
+            150,
+            475,
+            215
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.93241,
+            69.20343
+          ]
+        },
+        {
+          "id": 954,
+          "pixels": 1160,
+          "area_km2": 1.856,
+          "centroid_px": [
+            212.1,
+            92.3
+          ],
+          "bbox_px": [
+            178,
+            62,
+            237,
+            120
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.15941,
+            69.22704
+          ]
+        },
+        {
+          "id": 1206,
+          "pixels": 1148,
+          "area_km2": 1.837,
+          "centroid_px": [
+            119.5,
+            103.5
+          ],
+          "bbox_px": [
+            87,
+            80,
+            151,
+            134
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.2514,
+            69.22004
+          ]
+        },
+        {
+          "id": 3038,
+          "pixels": 1081,
+          "area_km2": 1.73,
+          "centroid_px": [
+            400.2,
+            244.3
+          ],
+          "bbox_px": [
+            360,
+            218,
+            459,
+            276
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.95713,
+            69.17877
+          ]
+        },
+        {
+          "id": 4225,
+          "pixels": 1050,
+          "area_km2": 1.68,
+          "centroid_px": [
+            201.1,
+            313.4
+          ],
+          "bbox_px": [
+            163,
+            294,
+            247,
+            336
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.15044,
+            69.14786
+          ]
+        },
+        {
+          "id": 277,
+          "pixels": 984,
+          "area_km2": 1.574,
+          "centroid_px": [
+            162.5,
+            56.6
+          ],
+          "bbox_px": [
+            142,
+            17,
+            191,
+            87
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.21251,
+            69.23817
+          ]
+        },
+        {
+          "id": 352,
+          "pixels": 946,
+          "area_km2": 1.514,
+          "centroid_px": [
+            241.4,
+            70.0
+          ],
+          "bbox_px": [
+            214,
+            43,
+            267,
+            96
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.13199,
+            69.23593
+          ]
+        },
+        {
+          "id": 3814,
+          "pixels": 708,
+          "area_km2": 1.133,
+          "centroid_px": [
+            337.0,
+            385.6
+          ],
+          "bbox_px": [
+            305,
+            364,
+            368,
+            410
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.00808,
+            69.12642
+          ]
+        },
+        {
+          "id": 1007,
+          "pixels": 535,
+          "area_km2": 0.856,
+          "centroid_px": [
+            247.2,
+            180.2
+          ],
+          "bbox_px": [
+            222,
+            151,
+            265,
+            211
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.11624,
+            69.19682
+          ]
+        },
+        {
+          "id": 831,
+          "pixels": 508,
+          "area_km2": 0.813,
+          "centroid_px": [
+            143.4,
+            139.3
+          ],
+          "bbox_px": [
+            120,
+            124,
+            165,
+            153
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.22411,
+            69.20805
+          ]
+        },
+        {
+          "id": 68,
+          "pixels": 474,
+          "area_km2": 0.758,
+          "centroid_px": [
+            211.4,
+            29.7
+          ],
+          "bbox_px": [
+            193,
+            5,
+            228,
+            46
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.1658,
+            69.24935
+          ]
+        },
+        {
+          "id": 1561,
+          "pixels": 436,
+          "area_km2": 0.698,
+          "centroid_px": [
+            409.4,
+            210.6
+          ],
+          "bbox_px": [
+            393,
+            191,
+            430,
+            230
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.95084,
+            69.19108
+          ]
+        },
+        {
+          "id": 1442,
+          "pixels": 390,
+          "area_km2": 0.624,
+          "centroid_px": [
+            474.8,
+            197.7
+          ],
+          "bbox_px": [
+            460,
+            183,
+            485,
+            217
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.88633,
+            69.19769
+          ]
+        },
+        {
+          "id": 786,
+          "pixels": 381,
+          "area_km2": 0.61,
+          "centroid_px": [
+            176.1,
+            120.2
+          ],
+          "bbox_px": [
+            161,
+            110,
+            198,
+            132
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.19304,
+            69.21593
+          ]
+        },
+        {
+          "id": 364,
+          "pixels": 319,
+          "area_km2": 0.51,
+          "centroid_px": [
+            134.9,
+            61.5
+          ],
+          "bbox_px": [
+            124,
+            44,
+            144,
+            77
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.2398,
+            69.23552
+          ]
+        },
+        {
+          "id": 1463,
+          "pixels": 242,
+          "area_km2": 0.387,
+          "centroid_px": [
+            72.7,
+            194.2
+          ],
+          "bbox_px": [
+            56,
+            185,
+            84,
+            206
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.28995,
+            69.18617
+          ]
+        },
+        {
+          "id": 2544,
+          "pixels": 232,
+          "area_km2": 0.371,
+          "centroid_px": [
+            168.0,
+            269.3
+          ],
+          "bbox_px": [
+            156,
+            258,
+            183,
+            281
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.18758,
+            69.16251
+          ]
+        },
+        {
+          "id": 2312,
+          "pixels": 219,
+          "area_km2": 0.35,
+          "centroid_px": [
+            8.0,
+            257.5
+          ],
+          "bbox_px": [
+            0,
+            243,
+            20,
+            273
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.34887,
+            69.16146
+          ]
+        }
+      ],
+      "delta_url": "rasters/2026-09-03--2026-09-15.delta.i16",
+      "story": {
+        "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-09-03 and 2026-09-15.",
+        "summary": "About 142.5 km\u00b2 (34%) of the analyzed window changed radar brightness between 2026-09-03 and 2026-09-15, across 24 clusters."
+      }
+    },
+    "2026-09-15--2026-09-27": {
+      "from": "2026-09-15",
+      "to": "2026-09-27",
+      "threshold_db": 1.5,
+      "changed_fraction": 0.4011,
+      "changed_area_km2": 168.19,
+      "gain_area_km2": 16.033,
+      "loss_area_km2": 40.33,
+      "clusters": [
+        {
+          "id": 683,
+          "pixels": 2573,
+          "area_km2": 4.117,
+          "centroid_px": [
+            467.1,
+            207.0
+          ],
+          "bbox_px": [
+            423,
+            143,
+            511,
+            260
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.89326,
+            69.19414
+          ]
+        },
+        {
+          "id": 575,
+          "pixels": 951,
+          "area_km2": 1.522,
+          "centroid_px": [
+            140.1,
+            164.1
+          ],
+          "bbox_px": [
+            115,
+            124,
+            157,
+            205
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.22514,
+            69.1991
+          ]
+        },
+        {
+          "id": 719,
+          "pixels": 868,
+          "area_km2": 1.389,
+          "centroid_px": [
+            400.5,
+            165.5
+          ],
+          "bbox_px": [
+            365,
+            147,
+            438,
+            190
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.9637,
+            69.20689
+          ]
+        },
+        {
+          "id": 2114,
+          "pixels": 801,
+          "area_km2": 1.282,
+          "centroid_px": [
+            442.5,
+            291.1
+          ],
+          "bbox_px": [
+            419,
+            255,
+            467,
+            325
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.91069,
+            69.16338
+          ]
+        },
+        {
+          "id": 768,
+          "pixels": 737,
+          "area_km2": 1.179,
+          "centroid_px": [
+            344.3,
+            174.7
+          ],
+          "bbox_px": [
+            319,
+            151,
+            375,
+            200
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.0193,
+            69.20186
+          ]
+        },
+        {
+          "id": 1151,
+          "pixels": 709,
+          "area_km2": 1.134,
+          "centroid_px": [
+            319.0,
+            225.5
+          ],
+          "bbox_px": [
+            298,
+            185,
+            346,
+            251
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.0402,
+            69.18295
+          ]
+        },
+        {
+          "id": 1462,
+          "pixels": 669,
+          "area_km2": 1.07,
+          "centroid_px": [
+            227.1,
+            235.2
+          ],
+          "bbox_px": [
+            203,
+            209,
+            250,
+            263
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.13145,
+            69.17656
+          ]
+        },
+        {
+          "id": 1161,
+          "pixels": 640,
+          "area_km2": 1.024,
+          "centroid_px": [
+            387.2,
+            208.4
+          ],
+          "bbox_px": [
+            362,
+            186,
+            408,
+            233
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.9733,
+            69.19117
+          ]
+        },
+        {
+          "id": 3392,
+          "pixels": 618,
+          "area_km2": 0.989,
+          "centroid_px": [
+            336.0,
+            374.2
+          ],
+          "bbox_px": [
+            305,
+            361,
+            373,
+            387
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.01008,
+            69.13045
+          ]
+        },
+        {
+          "id": 773,
+          "pixels": 498,
+          "area_km2": 0.797,
+          "centroid_px": [
+            180.2,
+            167.1
+          ],
+          "bbox_px": [
+            161,
+            152,
+            200,
+            181
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.18464,
+            69.19934
+          ]
+        },
+        {
+          "id": 2441,
+          "pixels": 491,
+          "area_km2": 0.786,
+          "centroid_px": [
+            314.1,
+            293.1
+          ],
+          "bbox_px": [
+            292,
+            275,
+            338,
+            309
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.03913,
+            69.15868
+          ]
+        },
+        {
+          "id": 540,
+          "pixels": 465,
+          "area_km2": 0.744,
+          "centroid_px": [
+            242.9,
+            141.8
+          ],
+          "bbox_px": [
+            226,
+            112,
+            259,
+            172
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.12402,
+            69.21038
+          ]
+        },
+        {
+          "id": 4960,
+          "pixels": 4921,
+          "area_km2": 7.874,
+          "centroid_px": [
+            58.7,
+            425.1
+          ],
+          "bbox_px": [
+            0,
+            358,
+            133,
+            510
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.28259,
+            69.10341
+          ]
+        },
+        {
+          "id": 288,
+          "pixels": 4688,
+          "area_km2": 7.501,
+          "centroid_px": [
+            109.3,
+            89.1
+          ],
+          "bbox_px": [
+            0,
+            16,
+            183,
+            138
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.26297,
+            69.22484
+          ]
+        },
+        {
+          "id": 4097,
+          "pixels": 4321,
+          "area_km2": 6.914,
+          "centroid_px": [
+            187.9,
+            331.7
+          ],
+          "bbox_px": [
+            119,
+            283,
+            263,
+            401
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.162,
+            69.14091
+          ]
+        },
+        {
+          "id": 5090,
+          "pixels": 2709,
+          "area_km2": 4.334,
+          "centroid_px": [
+            241.2,
+            414.5
+          ],
+          "bbox_px": [
+            193,
+            368,
+            277,
+            473
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.10128,
+            69.11309
+          ]
+        },
+        {
+          "id": 3758,
+          "pixels": 2538,
+          "area_km2": 4.061,
+          "centroid_px": [
+            50.3,
+            321.2
+          ],
+          "bbox_px": [
+            0,
+            258,
+            116,
+            357
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.3006,
+            69.14016
+          ]
+        },
+        {
+          "id": 5401,
+          "pixels": 1261,
+          "area_km2": 2.018,
+          "centroid_px": [
+            299.4,
+            438.8
+          ],
+          "bbox_px": [
+            274,
+            393,
+            331,
+            482
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.04099,
+            69.10628
+          ]
+        },
+        {
+          "id": 5902,
+          "pixels": 1140,
+          "area_km2": 1.824,
+          "centroid_px": [
+            200.7,
+            470.4
+          ],
+          "bbox_px": [
+            170,
+            443,
+            237,
+            497
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.13672,
+            69.09187
+          ]
+        },
+        {
+          "id": 6328,
+          "pixels": 1140,
+          "area_km2": 1.824,
+          "centroid_px": [
+            197.3,
+            496.5
+          ],
+          "bbox_px": [
+            129,
+            474,
+            258,
+            511
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.13777,
+            69.08246
+          ]
+        },
+        {
+          "id": 1,
+          "pixels": 697,
+          "area_km2": 1.115,
+          "centroid_px": [
+            13.5,
+            22.0
+          ],
+          "bbox_px": [
+            0,
+            0,
+            37,
+            44
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.3655,
+            69.24559
+          ]
+        },
+        {
+          "id": 2152,
+          "pixels": 649,
+          "area_km2": 1.038,
+          "centroid_px": [
+            30.8,
+            159.7
+          ],
+          "bbox_px": [
+            0,
+            143,
+            60,
+            177
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.33518,
+            69.19707
+          ]
+        },
+        {
+          "id": 3690,
+          "pixels": 575,
+          "area_km2": 0.92,
+          "centroid_px": [
+            84.9,
+            284.2
+          ],
+          "bbox_px": [
+            64,
+            254,
+            107,
+            306
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.26941,
+            69.1545
+          ]
+        },
+        {
+          "id": 2133,
+          "pixels": 567,
+          "area_km2": 0.907,
+          "centroid_px": [
+            110.4,
+            161.7
+          ],
+          "bbox_px": [
+            88,
+            141,
+            132,
+            186
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.25516,
+            69.19899
+          ]
+        }
+      ],
+      "delta_url": "rasters/2026-09-15--2026-09-27.delta.i16",
+      "story": {
+        "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-09-15 and 2026-09-27.",
+        "summary": "About 168.2 km\u00b2 (40%) of the analyzed window changed radar brightness between 2026-09-15 and 2026-09-27, across 24 clusters."
+      }
+    },
+    "2026-09-27--2026-10-09": {
+      "from": "2026-09-27",
+      "to": "2026-10-09",
+      "threshold_db": 1.5,
+      "changed_fraction": 0.2293,
+      "changed_area_km2": 96.15,
+      "gain_area_km2": 4.23,
+      "loss_area_km2": 5.872,
+      "clusters": [
+        {
+          "id": 3710,
+          "pixels": 372,
+          "area_km2": 0.595,
+          "centroid_px": [
+            379.6,
+            365.5
+          ],
+          "bbox_px": [
+            357,
+            344,
+            396,
+            384
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.96723,
+            69.13491
+          ]
+        },
+        {
+          "id": 3902,
+          "pixels": 337,
+          "area_km2": 0.539,
+          "centroid_px": [
+            406.6,
+            383.3
+          ],
+          "bbox_px": [
+            385,
+            364,
+            425,
+            408
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.93868,
+            69.12939
+          ]
+        },
+        {
+          "id": 929,
+          "pixels": 315,
+          "area_km2": 0.504,
+          "centroid_px": [
+            450.3,
+            179.3
+          ],
+          "bbox_px": [
+            435,
+            164,
+            465,
+            195
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.91251,
+            69.2035
+          ]
+        },
+        {
+          "id": 3856,
+          "pixels": 242,
+          "area_km2": 0.387,
+          "centroid_px": [
+            456.2,
+            374.1
+          ],
+          "bbox_px": [
+            444,
+            359,
+            469,
+            387
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.88985,
+            69.13419
+          ]
+        },
+        {
+          "id": 2292,
+          "pixels": 204,
+          "area_km2": 0.326,
+          "centroid_px": [
+            435.8,
+            258.0
+          ],
+          "bbox_px": [
+            425,
+            241,
+            447,
+            272
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.92027,
+            69.17499
+          ]
+        },
+        {
+          "id": 1365,
+          "pixels": 200,
+          "area_km2": 0.32,
+          "centroid_px": [
+            415.2,
+            204.4
+          ],
+          "bbox_px": [
+            404,
+            189,
+            426,
+            221
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.94556,
+            69.19347
+          ]
+        },
+        {
+          "id": 3363,
+          "pixels": 177,
+          "area_km2": 0.283,
+          "centroid_px": [
+            378.6,
+            329.5
+          ],
+          "bbox_px": [
+            372,
+            312,
+            388,
+            350
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.97136,
+            69.14772
+          ]
+        },
+        {
+          "id": 1259,
+          "pixels": 172,
+          "area_km2": 0.275,
+          "centroid_px": [
+            506.0,
+            193.3
+          ],
+          "bbox_px": [
+            498,
+            183,
+            511,
+            203
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.85539,
+            69.20021
+          ]
+        },
+        {
+          "id": 4129,
+          "pixels": 168,
+          "area_km2": 0.269,
+          "centroid_px": [
+            363.2,
+            408.7
+          ],
+          "bbox_px": [
+            350,
+            395,
+            372,
+            419
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.97987,
+            69.119
+          ]
+        },
+        {
+          "id": 3106,
+          "pixels": 159,
+          "area_km2": 0.254,
+          "centroid_px": [
+            435.9,
+            301.9
+          ],
+          "bbox_px": [
+            425,
+            290,
+            446,
+            315
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.91638,
+            69.15933
+          ]
+        },
+        {
+          "id": 434,
+          "pixels": 155,
+          "area_km2": 0.248,
+          "centroid_px": [
+            387.7,
+            142.8
+          ],
+          "bbox_px": [
+            369,
+            136,
+            403,
+            151
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.97853,
+            69.2146
+          ]
+        },
+        {
+          "id": 4154,
+          "pixels": 144,
+          "area_km2": 0.23,
+          "centroid_px": [
+            381.3,
+            413.5
+          ],
+          "bbox_px": [
+            373,
+            400,
+            388,
+            424
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.96136,
+            69.11784
+          ]
+        },
+        {
+          "id": 4971,
+          "pixels": 495,
+          "area_km2": 0.792,
+          "centroid_px": [
+            16.7,
+            305.2
+          ],
+          "bbox_px": [
+            0,
+            282,
+            39,
+            329
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.3357,
+            69.14474
+          ]
+        },
+        {
+          "id": 5600,
+          "pixels": 427,
+          "area_km2": 0.683,
+          "centroid_px": [
+            366.7,
+            345.5
+          ],
+          "bbox_px": [
+            349,
+            315,
+            383,
+            376
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.98188,
+            69.14164
+          ]
+        },
+        {
+          "id": 6851,
+          "pixels": 361,
+          "area_km2": 0.578,
+          "centroid_px": [
+            132.6,
+            412.1
+          ],
+          "bbox_px": [
+            114,
+            392,
+            147,
+            435
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.20998,
+            69.11046
+          ]
+        },
+        {
+          "id": 3796,
+          "pixels": 351,
+          "area_km2": 0.562,
+          "centroid_px": [
+            157.5,
+            258.0
+          ],
+          "bbox_px": [
+            137,
+            228,
+            174,
+            280
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.19912,
+            69.1662
+          ]
+        },
+        {
+          "id": 8077,
+          "pixels": 326,
+          "area_km2": 0.522,
+          "centroid_px": [
+            78.0,
+            493.6
+          ],
+          "bbox_px": [
+            64,
+            475,
+            90,
+            511
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.25703,
+            69.07963
+          ]
+        },
+        {
+          "id": 2921,
+          "pixels": 285,
+          "area_km2": 0.456,
+          "centroid_px": [
+            491.2,
+            191.0
+          ],
+          "bbox_px": [
+            472,
+            180,
+            503,
+            202
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.87044,
+            69.20057
+          ]
+        },
+        {
+          "id": 2285,
+          "pixels": 279,
+          "area_km2": 0.446,
+          "centroid_px": [
+            193.4,
+            168.2
+          ],
+          "bbox_px": [
+            174,
+            137,
+            208,
+            197
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.1713,
+            69.19937
+          ]
+        },
+        {
+          "id": 4362,
+          "pixels": 275,
+          "area_km2": 0.44,
+          "centroid_px": [
+            123.8,
+            272.9
+          ],
+          "bbox_px": [
+            113,
+            253,
+            137,
+            291
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.23151,
+            69.15979
+          ]
+        },
+        {
+          "id": 5366,
+          "pixels": 225,
+          "area_km2": 0.36,
+          "centroid_px": [
+            93.7,
+            323.6
+          ],
+          "bbox_px": [
+            78,
+            303,
+            107,
+            341
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.25697,
+            69.14073
+          ]
+        },
+        {
+          "id": 5169,
+          "pixels": 223,
+          "area_km2": 0.357,
+          "centroid_px": [
+            71.6,
+            316.6
+          ],
+          "bbox_px": [
+            59,
+            292,
+            87,
+            338
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.27972,
+            69.1425
+          ]
+        },
+        {
+          "id": 2406,
+          "pixels": 219,
+          "area_km2": 0.35,
+          "centroid_px": [
+            151.0,
+            170.1
+          ],
+          "bbox_px": [
+            138,
+            147,
+            161,
+            187
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.21366,
+            69.19733
+          ]
+        },
+        {
+          "id": 3077,
+          "pixels": 204,
+          "area_km2": 0.326,
+          "centroid_px": [
+            403.1,
+            206.2
+          ],
+          "bbox_px": [
+            383,
+            189,
+            416,
+            224
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.95754,
+            69.19245
+          ]
+        }
+      ],
+      "delta_url": "rasters/2026-09-27--2026-10-09.delta.i16",
+      "story": {
+        "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-09-27 and 2026-10-09.",
+        "summary": "About 96.2 km\u00b2 (23%) of the analyzed window changed radar brightness between 2026-09-27 and 2026-10-09, across 24 clusters."
+      }
+    },
+    "2026-10-09--2026-10-21": {
+      "from": "2026-10-09",
+      "to": "2026-10-21",
+      "threshold_db": 1.5,
+      "changed_fraction": 0.256,
+      "changed_area_km2": 107.347,
+      "gain_area_km2": 3.955,
+      "loss_area_km2": 11.682,
+      "clusters": [
+        {
+          "id": 3820,
+          "pixels": 669,
+          "area_km2": 1.07,
+          "centroid_px": [
+            364.1,
+            397.3
+          ],
+          "bbox_px": [
+            345,
+            364,
+            385,
+            426
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.97997,
+            69.12309
+          ]
+        },
+        {
+          "id": 1017,
+          "pixels": 263,
+          "area_km2": 0.421,
+          "centroid_px": [
+            444.6,
+            176.1
+          ],
+          "bbox_px": [
+            433,
+            163,
+            458,
+            189
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.9185,
+            69.20447
+          ]
+        },
+        {
+          "id": 1297,
+          "pixels": 219,
+          "area_km2": 0.35,
+          "centroid_px": [
+            495.9,
+            192.2
+          ],
+          "bbox_px": [
+            486,
+            181,
+            505,
+            202
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.86563,
+            69.20029
+          ]
+        },
+        {
+          "id": 1339,
+          "pixels": 208,
+          "area_km2": 0.333,
+          "centroid_px": [
+            407.0,
+            203.7
+          ],
+          "bbox_px": [
+            396,
+            184,
+            417,
+            220
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.95385,
+            69.19347
+          ]
+        },
+        {
+          "id": 2999,
+          "pixels": 205,
+          "area_km2": 0.328,
+          "centroid_px": [
+            421.1,
+            304.8
+          ],
+          "bbox_px": [
+            407,
+            291,
+            435,
+            319
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.93095,
+            69.15784
+          ]
+        },
+        {
+          "id": 3281,
+          "pixels": 180,
+          "area_km2": 0.288,
+          "centroid_px": [
+            376.8,
+            335.8
+          ],
+          "bbox_px": [
+            365,
+            317,
+            390,
+            356
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.97261,
+            69.14542
+          ]
+        },
+        {
+          "id": 3885,
+          "pixels": 135,
+          "area_km2": 0.216,
+          "centroid_px": [
+            448.7,
+            381.3
+          ],
+          "bbox_px": [
+            440,
+            370,
+            455,
+            390
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.89674,
+            69.1314
+          ]
+        },
+        {
+          "id": 218,
+          "pixels": 131,
+          "area_km2": 0.21,
+          "centroid_px": [
+            240.1,
+            61.4
+          ],
+          "bbox_px": [
+            230,
+            53,
+            247,
+            75
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.13407,
+            69.23897
+          ]
+        },
+        {
+          "id": 611,
+          "pixels": 129,
+          "area_km2": 0.206,
+          "centroid_px": [
+            387.0,
+            141.0
+          ],
+          "bbox_px": [
+            376,
+            136,
+            400,
+            149
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.9794,
+            69.21521
+          ]
+        },
+        {
+          "id": 3701,
+          "pixels": 112,
+          "area_km2": 0.179,
+          "centroid_px": [
+            370.6,
+            359.8
+          ],
+          "bbox_px": [
+            363,
+            352,
+            379,
+            366
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.97673,
+            69.13666
+          ]
+        },
+        {
+          "id": 4050,
+          "pixels": 111,
+          "area_km2": 0.178,
+          "centroid_px": [
+            172.1,
+            395.4
+          ],
+          "bbox_px": [
+            162,
+            388,
+            184,
+            404
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.17204,
+            69.11768
+          ]
+        },
+        {
+          "id": 2246,
+          "pixels": 110,
+          "area_km2": 0.176,
+          "centroid_px": [
+            420.8,
+            248.9
+          ],
+          "bbox_px": [
+            415,
+            240,
+            427,
+            257
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.93608,
+            69.17776
+          ]
+        },
+        {
+          "id": 2282,
+          "pixels": 1275,
+          "area_km2": 2.04,
+          "centroid_px": [
+            336.0,
+            180.7
+          ],
+          "bbox_px": [
+            313,
+            133,
+            371,
+            225
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.0271,
+            69.19946
+          ]
+        },
+        {
+          "id": 1119,
+          "pixels": 1000,
+          "area_km2": 1.6,
+          "centroid_px": [
+            207.5,
+            100.2
+          ],
+          "bbox_px": [
+            160,
+            65,
+            241,
+            124
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.16332,
+            69.22408
+          ]
+        },
+        {
+          "id": 2121,
+          "pixels": 803,
+          "area_km2": 1.285,
+          "centroid_px": [
+            188.8,
+            161.4
+          ],
+          "bbox_px": [
+            164,
+            125,
+            208,
+            209
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.17654,
+            69.20165
+          ]
+        },
+        {
+          "id": 2416,
+          "pixels": 655,
+          "area_km2": 1.048,
+          "centroid_px": [
+            31.7,
+            161.9
+          ],
+          "bbox_px": [
+            3,
+            142,
+            61,
+            183
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.33408,
+            69.19633
+          ]
+        },
+        {
+          "id": 2064,
+          "pixels": 580,
+          "area_km2": 0.928,
+          "centroid_px": [
+            217.1,
+            148.7
+          ],
+          "bbox_px": [
+            197,
+            122,
+            237,
+            182
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.14928,
+            69.20708
+          ]
+        },
+        {
+          "id": 4927,
+          "pixels": 507,
+          "area_km2": 0.811,
+          "centroid_px": [
+            83.3,
+            320.9
+          ],
+          "bbox_px": [
+            59,
+            301,
+            107,
+            337
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.26762,
+            69.14135
+          ]
+        },
+        {
+          "id": 2252,
+          "pixels": 498,
+          "area_km2": 0.797,
+          "centroid_px": [
+            294.9,
+            161.4
+          ],
+          "bbox_px": [
+            277,
+            131,
+            317,
+            193
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.07006,
+            69.20505
+          ]
+        },
+        {
+          "id": 2426,
+          "pixels": 433,
+          "area_km2": 0.693,
+          "centroid_px": [
+            401.2,
+            175.6
+          ],
+          "bbox_px": [
+            382,
+            142,
+            418,
+            207
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.96211,
+            69.20331
+          ]
+        },
+        {
+          "id": 2442,
+          "pixels": 399,
+          "area_km2": 0.638,
+          "centroid_px": [
+            98.2,
+            170.1
+          ],
+          "bbox_px": [
+            72,
+            144,
+            117,
+            200
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.26662,
+            69.1956
+          ]
+        },
+        {
+          "id": 2738,
+          "pixels": 386,
+          "area_km2": 0.618,
+          "centroid_px": [
+            476.6,
+            187.5
+          ],
+          "bbox_px": [
+            457,
+            170,
+            491,
+            203
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.8854,
+            69.20138
+          ]
+        },
+        {
+          "id": 3839,
+          "pixels": 383,
+          "area_km2": 0.613,
+          "centroid_px": [
+            307.8,
+            281.7
+          ],
+          "bbox_px": [
+            289,
+            244,
+            322,
+            304
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.04645,
+            69.16255
+          ]
+        },
+        {
+          "id": 4161,
+          "pixels": 382,
+          "area_km2": 0.611,
+          "centroid_px": [
+            176.2,
+            280.8
+          ],
+          "bbox_px": [
+            156,
+            260,
+            198,
+            297
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.17832,
+            69.15868
+          ]
+        }
+      ],
+      "delta_url": "rasters/2026-10-09--2026-10-21.delta.i16",
+      "story": {
+        "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-10-09 and 2026-10-21.",
+        "summary": "About 107.3 km\u00b2 (26%) of the analyzed window changed radar brightness between 2026-10-09 and 2026-10-21, across 24 clusters."
+      }
+    },
+    "2026-08-10--2026-10-21": {
+      "from": "2026-08-10",
+      "to": "2026-10-21",
+      "threshold_db": 1.5,
+      "changed_fraction": 0.5366,
+      "changed_area_km2": 225.035,
+      "gain_area_km2": 40.221,
+      "loss_area_km2": 131.556,
+      "clusters": [
+        {
+          "id": 1055,
+          "pixels": 20303,
+          "area_km2": 32.485,
+          "centroid_px": [
+            417.5,
+            355.1
+          ],
+          "bbox_px": [
+            305,
+            184,
+            511,
+            468
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.93021,
+            69.13979
+          ]
+        },
+        {
+          "id": 1097,
+          "pixels": 1247,
+          "area_km2": 1.995,
+          "centroid_px": [
+            475.1,
+            224.7
+          ],
+          "bbox_px": [
+            450,
+            187,
+            500,
+            270
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.88371,
+            69.18806
+          ]
+        },
+        {
+          "id": 71,
+          "pixels": 873,
+          "area_km2": 1.397,
+          "centroid_px": [
+            193.6,
+            51.0
+          ],
+          "bbox_px": [
+            170,
+            19,
+            220,
+            70
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.18176,
+            69.24118
+          ]
+        },
+        {
+          "id": 10,
+          "pixels": 764,
+          "area_km2": 1.222,
+          "centroid_px": [
+            470.4,
+            19.1
+          ],
+          "bbox_px": [
+            436,
+            0,
+            511,
+            45
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.90613,
+            69.26127
+          ]
+        },
+        {
+          "id": 2879,
+          "pixels": 438,
+          "area_km2": 0.701,
+          "centroid_px": [
+            316.7,
+            325.2
+          ],
+          "bbox_px": [
+            287,
+            313,
+            345,
+            335
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.0337,
+            69.14732
+          ]
+        },
+        {
+          "id": 3069,
+          "pixels": 385,
+          "area_km2": 0.616,
+          "centroid_px": [
+            333.7,
+            344.1
+          ],
+          "bbox_px": [
+            314,
+            334,
+            351,
+            356
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.01502,
+            69.14111
+          ]
+        },
+        {
+          "id": 1096,
+          "pixels": 299,
+          "area_km2": 0.478,
+          "centroid_px": [
+            442.5,
+            210.8
+          ],
+          "bbox_px": [
+            431,
+            187,
+            452,
+            229
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.91762,
+            69.19202
+          ]
+        },
+        {
+          "id": 863,
+          "pixels": 209,
+          "area_km2": 0.334,
+          "centroid_px": [
+            495.4,
+            181.6
+          ],
+          "bbox_px": [
+            481,
+            172,
+            508,
+            193
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.86703,
+            69.20406
+          ]
+        },
+        {
+          "id": 247,
+          "pixels": 187,
+          "area_km2": 0.299,
+          "centroid_px": [
+            447.5,
+            84.2
+          ],
+          "bbox_px": [
+            428,
+            77,
+            459,
+            93
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.92354,
+            69.23734
+          ]
+        },
+        {
+          "id": 1527,
+          "pixels": 181,
+          "area_km2": 0.29,
+          "centroid_px": [
+            286.9,
+            224.5
+          ],
+          "bbox_px": [
+            272,
+            215,
+            302,
+            235
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -50.07247,
+            69.1823
+          ]
+        },
+        {
+          "id": 2240,
+          "pixels": 156,
+          "area_km2": 0.25,
+          "centroid_px": [
+            503.5,
+            272.1
+          ],
+          "bbox_px": [
+            494,
+            261,
+            511,
+            281
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.85119,
+            69.17201
+          ]
+        },
+        {
+          "id": 511,
+          "pixels": 96,
+          "area_km2": 0.154,
+          "centroid_px": [
+            481.1,
+            152.4
+          ],
+          "bbox_px": [
+            471,
+            144,
+            489,
+            165
+          ],
+          "kind": "gain",
+          "centroid_lonlat": [
+            -49.88389,
+            69.21404
+          ]
+        },
+        {
+          "id": 1,
+          "pixels": 68274,
+          "area_km2": 109.238,
+          "centroid_px": [
+            136.9,
+            214.7
+          ],
+          "bbox_px": [
+            0,
+            0,
+            387,
+            511
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.22372,
+            69.18096
+          ]
+        },
+        {
+          "id": 2766,
+          "pixels": 5112,
+          "area_km2": 8.179,
+          "centroid_px": [
+            218.1,
+            440.7
+          ],
+          "bbox_px": [
+            132,
+            356,
+            285,
+            511
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.12202,
+            69.10301
+          ]
+        },
+        {
+          "id": 298,
+          "pixels": 1792,
+          "area_km2": 2.867,
+          "centroid_px": [
+            314.5,
+            55.4
+          ],
+          "bbox_px": [
+            250,
+            28,
+            368,
+            93
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.05981,
+            69.24347
+          ]
+        },
+        {
+          "id": 3053,
+          "pixels": 1370,
+          "area_km2": 2.192,
+          "centroid_px": [
+            303.9,
+            437.4
+          ],
+          "bbox_px": [
+            272,
+            388,
+            339,
+            482
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.03661,
+            69.10691
+          ]
+        },
+        {
+          "id": 3571,
+          "pixels": 941,
+          "area_km2": 1.506,
+          "centroid_px": [
+            348.1,
+            496.8
+          ],
+          "bbox_px": [
+            306,
+            465,
+            395,
+            511
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.98728,
+            69.08712
+          ]
+        },
+        {
+          "id": 1322,
+          "pixels": 935,
+          "area_km2": 1.496,
+          "centroid_px": [
+            412.8,
+            154.9
+          ],
+          "bbox_px": [
+            366,
+            134,
+            451,
+            185
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.95227,
+            69.21104
+          ]
+        },
+        {
+          "id": 2510,
+          "pixels": 907,
+          "area_km2": 1.451,
+          "centroid_px": [
+            372.4,
+            330.0
+          ],
+          "bbox_px": [
+            343,
+            307,
+            395,
+            355
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.97752,
+            69.14735
+          ]
+        },
+        {
+          "id": 2654,
+          "pixels": 814,
+          "area_km2": 1.302,
+          "centroid_px": [
+            309.0,
+            355.0
+          ],
+          "bbox_px": [
+            283,
+            331,
+            337,
+            378
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.03877,
+            69.13646
+          ]
+        },
+        {
+          "id": 745,
+          "pixels": 725,
+          "area_km2": 1.16,
+          "centroid_px": [
+            399.7,
+            90.8
+          ],
+          "bbox_px": [
+            365,
+            71,
+            432,
+            109
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.97102,
+            69.23351
+          ]
+        },
+        {
+          "id": 147,
+          "pixels": 470,
+          "area_km2": 0.752,
+          "centroid_px": [
+            210.2,
+            34.3
+          ],
+          "bbox_px": [
+            196,
+            14,
+            228,
+            51
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -50.1666,
+            69.24767
+          ]
+        },
+        {
+          "id": 957,
+          "pixels": 443,
+          "area_km2": 0.709,
+          "centroid_px": [
+            422.9,
+            116.5
+          ],
+          "bbox_px": [
+            401,
+            101,
+            453,
+            130
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.94547,
+            69.22506
+          ]
+        },
+        {
+          "id": 1644,
+          "pixels": 440,
+          "area_km2": 0.704,
+          "centroid_px": [
+            503.0,
+            231.1
+          ],
+          "bbox_px": [
+            487,
+            192,
+            511,
+            266
+          ],
+          "kind": "loss",
+          "centroid_lonlat": [
+            -49.85518,
+            69.18663
+          ]
+        }
+      ],
+      "delta_url": "rasters/2026-08-10--2026-10-21.delta.i16",
+      "story": {
+        "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-08-10 and 2026-10-21.",
+        "summary": "About 225.0 km\u00b2 (54%) of the analyzed window changed radar brightness between 2026-08-10 and 2026-10-21, across 24 clusters."
+      }
+    }
+  },
+  "persistent_clusters": [
+    {
+      "id": 1,
+      "pixels": 206628,
+      "area_km2": 330.605,
+      "centroid_px": [
+        244.5,
+        262.2
+      ],
+      "bbox_px": [
+        0,
+        0,
+        511,
+        511
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -50.1116,
+        69.1675
+      ]
+    },
+    {
+      "id": 14,
+      "pixels": 2014,
+      "area_km2": 3.222,
+      "centroid_px": [
+        480.6,
+        20.2
+      ],
+      "bbox_px": [
+        433,
+        0,
+        511,
+        62
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -49.89577,
+        69.26118
+      ]
+    },
+    {
+      "id": 112,
+      "pixels": 362,
+      "area_km2": 0.579,
+      "centroid_px": [
+        421.9,
+        44.1
+      ],
+      "bbox_px": [
+        404,
+        30,
+        442,
+        59
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -49.95277,
+        69.25085
+      ]
+    },
+    {
+      "id": 292,
+      "pixels": 352,
+      "area_km2": 0.563,
+      "centroid_px": [
+        497.0,
+        84.0
+      ],
+      "bbox_px": [
+        479,
+        72,
+        511,
+        98
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -49.87378,
+        69.23892
+      ]
+    },
+    {
+      "id": 8,
+      "pixels": 292,
+      "area_km2": 0.467,
+      "centroid_px": [
+        393.3,
+        14.7
+      ],
+      "bbox_px": [
+        383,
+        0,
+        403,
+        33
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -49.98413,
+        69.26046
+      ]
+    },
+    {
+      "id": 155,
+      "pixels": 205,
+      "area_km2": 0.328,
+      "centroid_px": [
+        456.5,
+        60.0
+      ],
+      "bbox_px": [
+        444,
+        41,
+        471,
+        73
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -49.91659,
+        69.24625
+      ]
+    },
+    {
+      "id": 11,
+      "pixels": 143,
+      "area_km2": 0.229,
+      "centroid_px": [
+        416.2,
+        12.4
+      ],
+      "bbox_px": [
+        407,
+        0,
+        426,
+        26
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -49.96128,
+        69.26199
+      ]
+    },
+    {
+      "id": 887,
+      "pixels": 79,
+      "area_km2": 0.126,
+      "centroid_px": [
+        482.4,
+        503.8
+      ],
+      "bbox_px": [
+        474,
+        497,
+        490,
+        511
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -49.85262,
+        69.08874
+      ]
+    },
+    {
+      "id": 413,
+      "pixels": 60,
+      "area_km2": 0.096,
+      "centroid_px": [
+        466.0,
+        113.0
+      ],
+      "bbox_px": [
+        459,
+        108,
+        473,
+        119
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -49.90245,
+        69.22763
+      ]
+    },
+    {
+      "id": 441,
+      "pixels": 59,
+      "area_km2": 0.094,
+      "centroid_px": [
+        483.5,
+        127.2
+      ],
+      "bbox_px": [
+        478,
+        115,
+        489,
+        139
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -49.88365,
+        69.22311
+      ]
+    },
+    {
+      "id": 65,
+      "pixels": 51,
+      "area_km2": 0.082,
+      "centroid_px": [
+        458.5,
+        27.5
+      ],
+      "bbox_px": [
+        451,
+        19,
+        466,
+        34
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -49.91739,
+        69.2579
+      ]
+    },
+    {
+      "id": 579,
+      "pixels": 42,
+      "area_km2": 0.067,
+      "centroid_px": [
+        436.8,
+        138.3
+      ],
+      "bbox_px": [
+        430,
+        133,
+        445,
+        145
+      ],
+      "kind": "persistent",
+      "centroid_lonlat": [
+        -49.9296,
+        69.21771
+      ]
+    }
+  ],
+  "story": {
+    "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland across 7 acquisitions.",
+    "summary": "Between 2026-08-10 and 2026-10-21, about 225.0 km\u00b2 (54%) of the analyzed window changed radar brightness in 24 clusters, with 12 clusters changing persistently across the season.",
+    "detail": "Derived from calibrated NISAR L-band HH backscatter (gamma-0) on a single ascending orbit track. Amplitude change indicates surface change, not ice speed or mass loss. Values are provisional."
+  },
+  "provenance": {
+    "mission": "NISAR",
+    "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+    "product": "L2 GCOV (gamma-0, radiometrically terrain corrected)",
+    "polarization": "HH",
+    "dates": [
+      "2026-08-10",
+      "2026-08-22",
+      "2026-09-03",
+      "2026-09-15",
+      "2026-09-27",
+      "2026-10-09",
+      "2026-10-21"
+    ],
+    "citations": [
+      "NASA ISRO NISAR L2 GCOV Provisional, Alaska Satellite Facility (ASF), via CMR"
+    ]
+  },
+  "limitations": [
+    "Single-polarization amplitude change; not ground deformation or velocity.",
+    "Provisional NISAR calibration; values may shift with reprocessing.",
+    "Radar brightness alone cannot confirm water depth, tide stage, or ice thickness.",
+    "Not a hazard warning; for situational understanding only."
+  ]
+}

@@ -8,6 +8,8 @@ import { catalogueBoundsSchema, catalogueProductIdSchema, catalogueQuerySchema, 
 import { moduleRegistry } from "../../domain/module-registry"
 import { usePlace } from "../../data/queries"
 import { catalogueItemKey, fetchCatalogue } from "../../data/catalogue"
+import { useAnalysisBundle } from "../../features/analysis/analysisBundle"
+import { AnalysisPanel } from "../../features/analysis/AnalysisPanel"
 import { acquisitionGroup, catalogueObservation, nisarSource, operaSource, type NisarPolarization, type NisarProductKey } from "../../data/live-explorer"
 import { ComparisonViewer } from "../../features/comparison/ComparisonViewer"
 import { EvidenceDrawer } from "../../features/evidence/EvidenceDrawer"
@@ -46,6 +48,13 @@ function ExplorerWorkspace({ place }: { place: Place }) {
   const polarization: NisarPolarization = searchParams.get("pol") === "HHHH" ? "HHHH" : "HVHV"
   const windowDefaults = archiveWindow(product)
   const activeSource = isNisar ? nisarSource(product as NisarProductKey) : operaSource
+  const analysisQuery = useAnalysisBundle(place.id)
+  const analysis = analysisQuery.data ?? null
+  const [analysisDate, setAnalysisDate] = useState("")
+  const [analysisPair, setAnalysisPair] = useState("")
+  const [showAnalysisChange, setShowAnalysisChange] = useState(false)
+  const resolvedAnalysisDate = analysisDate || analysis?.dates.at(-1)?.date || ""
+  const resolvedAnalysisPair = analysisPair || (analysis ? Object.keys(analysis.pairs).at(-1) || "" : "")
   const parsedQuery = catalogueQuerySchema.safeParse({ product, bbox: place.bounds, start: searchParams.get("start") ?? windowDefaults.start, end: searchParams.get("end") ?? windowDefaults.end, limit: 20 })
   const query = parsedQuery.success ? parsedQuery.data : null
   const archive = useInfiniteQuery({
@@ -193,6 +202,17 @@ function ExplorerWorkspace({ place }: { place: Place }) {
       observations={observations}
       layers={layers.filter((layer) => state.activeLayers.includes(layer.id))}
       sources={[activeSource]}
+      analysisPanel={analysis ? (
+        <AnalysisPanel
+          manifest={analysis}
+          date={resolvedAnalysisDate}
+          onDateChange={setAnalysisDate}
+          pair={resolvedAnalysisPair}
+          onPairChange={setAnalysisPair}
+          showChange={showAnalysisChange}
+          onShowChange={setShowAnalysisChange}
+        />
+      ) : null}
     />
   )
   const selectionNotice = <div className="shared-selection-notice"><StatePanel compact title="Shared selection not loaded" message={archive.hasNextPage ? "The link names records that are not in the loaded pages. Load more acquisitions in Controls to restore them; no different scenes have been substituted." : "The requested records are not available in this search. Adjust the filters or explicitly choose loaded acquisitions; no different scenes have been substituted."} icon="info" /><Button tone="secondary" size="small" disabled={!items.length} onClick={() => setSearchParams((current) => { const next = new URLSearchParams(current); for (const key of ["burst", "left", "right"]) next.delete(key); return next })}>Use loaded acquisitions</Button></div>
@@ -208,7 +228,7 @@ function ExplorerWorkspace({ place }: { place: Place }) {
       {state.view === "map" ? (
         <>
           <Suspense fallback={<div className="explorer-loading"><Skeleton lines={5} /></div>}>
-            <EarthMap place={place} moduleId={state.moduleId} activeLayers={state.activeLayers} layerDefinitions={layers} selectedObservation={right} catalogueItems={groupItems} onAreaChange={chooseArea} onObservationSelect={state.selectObservation} />
+            <EarthMap place={place} moduleId={state.moduleId} activeLayers={state.activeLayers} layerDefinitions={layers} selectedObservation={right} catalogueItems={groupItems} onAreaChange={chooseArea} onObservationSelect={state.selectObservation} analysisManifest={analysis} analysisDate={resolvedAnalysisDate} analysisPair={resolvedAnalysisPair} showAnalysisChange={showAnalysisChange} />
           </Suspense>
           {waiting && <div className="explorer-no-coverage"><StatePanel compact title="Searching satellite archive" message="Loading real acquisition records. No satellite rasters are downloaded." icon="calendar" /></div>}
           {!waiting && failed && <div className="explorer-no-coverage"><StatePanel compact title="Archive unavailable" message={archive.error?.message ?? "Choose valid bounds and a date window of 1 to 366 days."} icon="alert" /></div>}

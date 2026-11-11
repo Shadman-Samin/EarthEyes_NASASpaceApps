@@ -1,4 +1,5 @@
 import * as Tabs from "@radix-ui/react-tabs"
+import type { ReactNode } from "react"
 import { Link } from "react-router-dom"
 import type { DataSource, EventContext, LayerDefinition, Measurement, ModuleId, Observation, Place } from "../../domain/models"
 import { moduleRegistry } from "../../domain/module-registry"
@@ -6,7 +7,7 @@ import { formatDate } from "../../shared/formatting"
 import { DataBadge, Icon, QualityBadge, StatePanel } from "../../shared/ui"
 import { getDataOrigin } from "../../data/repository"
 
-function Summary({ place, moduleId, measurements, live, selected }: { place: Place; moduleId: ModuleId; measurements: Measurement[]; live: boolean; selected?: Observation }) {
+function Summary({ place, moduleId, measurements, live, selected, analysisPanel }: { place: Place; moduleId: ModuleId; measurements: Measurement[]; live: boolean; selected?: Observation; analysisPanel?: ReactNode }) {
   const definition = moduleRegistry[moduleId]
   return (
     <div className="evidence-summary">
@@ -17,7 +18,7 @@ function Summary({ place, moduleId, measurements, live, selected }: { place: Pla
       </div>
       {live && <>
         <article className="measurement-card"><DataBadge value="observed" /><span>Selected acquisition</span><strong>{selected ? formatDate(selected.acquiredAt) : "Choose a date"}</strong><p>{selected?.id ?? "Search the archive to load real acquisitions."}</p>{selected?.sourceUrl && <a className="text-link" href={selected.sourceUrl} target="_blank" rel="noreferrer">Provider record <Icon name="external" size={13} /></a>}</article>
-        <StatePanel compact title="Measurements unavailable" message="No calibrated change analysis has been run. Shoreline change, ice velocity, elevation and hazard estimates are not replaced with sample numbers." icon="info" />
+        {analysisPanel ? analysisPanel : <StatePanel compact title="Measurements unavailable" message="No calibrated change analysis has been run for this place. Browse previews are not proof of change." icon="info" />}
         <p className="fixture-note">The source images and acquisition dates are real. Browse previews are not proof of change, and their alignment has not been validated.</p>
       </>}
       <div className="measurement-grid">
@@ -120,6 +121,7 @@ export function EvidenceDrawer({
   sources,
   dataOrigin = getDataOrigin(),
   selectedObservation,
+  analysisPanel,
 }: {
   place: Place
   moduleId: ModuleId
@@ -130,6 +132,7 @@ export function EvidenceDrawer({
   sources: DataSource[]
   dataOrigin?: "fixture" | "live"
   selectedObservation?: Observation
+  analysisPanel?: ReactNode
 }) {
   return (
     <aside className="evidence-drawer" aria-label="Evidence drawer">
@@ -140,7 +143,7 @@ export function EvidenceDrawer({
           <Tabs.Trigger value="context">Context</Tabs.Trigger>
           <Tabs.Trigger value="sources">Sources</Tabs.Trigger>
         </Tabs.List>
-        <Tabs.Content value="summary"><Summary place={place} moduleId={moduleId} measurements={measurements} live={dataOrigin === "live"} selected={selectedObservation} /></Tabs.Content>
+        <Tabs.Content value="summary"><Summary place={place} moduleId={moduleId} measurements={measurements} live={dataOrigin === "live"} selected={selectedObservation} analysisPanel={analysisPanel} /></Tabs.Content>
         <Tabs.Content value="chart"><MiniChart measurements={measurements} moduleId={moduleId} live={dataOrigin === "live"} /></Tabs.Content>
         <Tabs.Content value="context"><Context events={events} moduleId={moduleId} live={dataOrigin === "live"} /></Tabs.Content>
         <Tabs.Content value="sources"><Sources observations={observations} layers={layers} measurements={measurements} sources={sources} live={dataOrigin === "live"} /></Tabs.Content>
