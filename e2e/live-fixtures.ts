@@ -65,7 +65,9 @@ export const test = base.extend<{ liveArchive: void }>({
       } })
     })
     await page.route(/nisar\.asf\.earthdatacloud\.nasa\.gov|datapool\.asf\.alaska\.edu/, (route) => route.fulfill({
-      contentType: "image/svg+xml", body: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" fill="#aab4ad"/></svg>',
+      contentType: "image/svg+xml",
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" fill="#aab4ad"/></svg>',
     }))
     await use()
   }, { auto: true }],

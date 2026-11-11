@@ -41,3 +41,24 @@
 .comparison-viewer[data-origin="live"] .state-panel p {
   color: rgb(255 255 255 / 72%);
 }
+
+.live-difference {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.live-difference canvas {
+  width: 100%;
+  height: auto;
+  max-height: clamp(300px, 56vh, 640px);
+  object-fit: contain;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: var(--radius-sm);
+  background: #0b1d1a;
+}
+
+.live-difference--loading {
+  align-content: center;
+  min-height: clamp(300px, 52vh, 600px);
+}

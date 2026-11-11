@@ -83,5 +83,5 @@ test("unimplemented measurements and difference analysis fail closed without hid
   await expect(controls.getByText("Authority assessment")).toHaveCount(0)
 
   await page.goto("/explore/kuakata-bangladesh?module=coastal&mode=difference&view=compare&left=kua-s1-20240413&right=kua-nisar-20261018")
-  await expect(page.getByText("Calibrated difference unavailable", { exact: true })).toBeVisible()
+  await expect(page.getByText("Exploratory difference unavailable", { exact: true })).toBeVisible()
 })

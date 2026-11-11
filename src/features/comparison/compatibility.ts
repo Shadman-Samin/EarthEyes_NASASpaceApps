@@ -2,6 +2,15 @@ import type { Observation } from "../../domain/models"
 
 export type Compatibility = { level: "compatible" | "review" | "incompatible"; message: string }
 
+export function sameFamily(left?: Observation, right?: Observation): boolean {
+  return Boolean(left && right
+    && left.platform === right.platform
+    && left.instrument === right.instrument
+    && left.polarization === right.polarization
+    && left.processingLevel === right.processingLevel
+    && left.imageUrl && right.imageUrl)
+}
+
 export function getCompatibility(left?: Observation, right?: Observation): Compatibility {
   if (!left || !right) return { level: "incompatible", message: "Select two observations to compare." }
   if (left.id === right.id) return { level: "incompatible", message: "The two sides must use distinct observations." }

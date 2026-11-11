@@ -2,8 +2,9 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react"
 import type { ComparisonMode, Observation } from "../../domain/models"
 import { formatDateTime } from "../../shared/formatting"
 import { prefersLowBandwidth } from "../../shared/network"
-import { DataBadge, Icon, QualityBadge, StatePanel } from "../../shared/ui"
-import { getCompatibility } from "./compatibility"
+import { DataBadge, Icon, QualityBadge, Skeleton, StatePanel } from "../../shared/ui"
+import { getCompatibility, sameFamily } from "./compatibility"
+import { browseDifference, type DifferenceResult } from "./difference"
 import { getDataOrigin } from "../../data/repository"
 import "./live-comparison.css"
 
@@ -221,8 +222,7 @@ function ObservationImage({ observation, label, lowBandwidth, preview }: { obser
   )
 }
 
-function ObservationDetails({ observation, fixtureData }: { observation: Observation; fixtureData: boolean }) {
-  return (
+function ObservationDetails({ observation, fixtureData }: { observation: Observation; fixtureData: boolean }) {  return (
     <>
       <dl className="observation-details">
         <div><dt>Observation ID</dt><dd>{observation.id}</dd></div>
@@ -238,6 +238,65 @@ function ObservationDetails({ observation, fixtureData }: { observation: Observa
         {observation.knownLimitations.map((limitation) => <li key={limitation}>{limitation}</li>)}
       </ul>
     </>
+  )
+}
+
+const differenceDisclaimer = "Exploratory pixel difference of official browse renders. Not calibrated, not georeferenced, not a change measurement."
+
+function loadBrowseImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image()
+    image.crossOrigin = "anonymous"
+    image.onload = () => resolve(image)
+    image.onerror = () => reject(new Error("The browse image could not be loaded for difference processing."))
+    image.src = src
+  })
+}
+
+function readPixels(image: HTMLImageElement, width: number, height: number) {
+  const canvas = document.createElement("canvas")
+  canvas.width = width
+  canvas.height = height
+  const context = canvas.getContext("2d", { willReadFrequently: true })
+  if (!context) throw new Error("Canvas rendering is unavailable in this browser.")
+  context.drawImage(image, 0, 0, width, height)
+  return context.getImageData(0, 0, width, height)
+}
+
+function LiveDifference({ left, right }: { left: Observation; right: Observation }) {
+  const [result, setResult] = useState<DifferenceResult | null>(null)
+  const [failed, setFailed] = useState(false)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([loadBrowseImage(left.imageUrl!), loadBrowseImage(right.imageUrl!)])
+      .then(([earlier, later]) => {
+        if (cancelled) return
+        const size = { width: Math.min(earlier.naturalWidth, later.naturalWidth, 2400), height: Math.min(earlier.naturalHeight, later.naturalHeight, 2400) }
+        if (!size.width || !size.height) throw new Error("The browse renders are empty.")
+        setResult(browseDifference(readPixels(earlier, size.width, size.height), readPixels(later, size.width, size.height)))
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true)
+      })
+    return () => { cancelled = true }
+  }, [left.imageUrl, right.imageUrl])
+
+  useEffect(() => {
+    if (!result || !canvasRef.current) return
+    canvasRef.current.getContext("2d")?.putImageData(new ImageData(result.pixels, result.width, result.height), 0, 0)
+  }, [result])
+
+  if (failed) {
+    return <StatePanel title="Difference preview unavailable" message="The browse renders could not be loaded for pixel processing. Use Swipe, Side by side, Single, or Fade instead; no substitute image is shown." icon="alert" />
+  }
+  if (!result) return <div className="live-difference live-difference--loading"><Skeleton lines={5} /></div>
+  return (
+    <div className="live-difference">
+      <canvas ref={canvasRef} role="img" aria-label={`Exploratory pixel difference between ${formatDateTime(left.acquiredAt)} and ${formatDateTime(right.acquiredAt)} browse renders`} />
+      <div className="difference-view__legend"><DataBadge value="derived" /> {differenceDisclaimer} Warmer: later date brighter. Teal: later date darker. {Math.round(result.changedShare * 100)}% of compared pixels differ noticeably.</div>
+    </div>
   )
 }
 
@@ -259,7 +318,12 @@ export function ComparisonViewer({
   const fixtureData = dataOrigin === "fixture"
 
   if (mode === "difference" && !fixtureData) {
-    return <StatePanel title="Calibrated difference unavailable" message={`${browseDisclaimer} Use Swipe, Side by side, Single, or Fade for visual review only.`} icon="alert" />
+    if (!left || !right) {
+      return <StatePanel title="Exploratory difference unavailable" message="Choose two available acquisitions to preview a difference." icon="alert" />
+    }
+    if (!sameFamily(left, right)) {
+      return <StatePanel title="Exploratory difference unavailable" message="Difference preview needs both sides from the same platform, polarization, and processing with imagery loaded. Switch polarization or pick another pair." icon="alert" />
+    }
   }
   if (!right || (mode !== "single" && !left)) {
     return <StatePanel title="Observation unavailable" message="Choose an available acquisition from the timeline." icon="calendar" />
@@ -267,7 +331,7 @@ export function ComparisonViewer({
   if (mode !== "single" && compatibility.level === "incompatible") {
     return <StatePanel title="Comparison blocked" message={compatibility.message} icon="alert" />
   }
-  if (mode === "difference" && compatibility.level !== "compatible") {
+  if (mode === "difference" && fixtureData && compatibility.level !== "compatible") {
     return <StatePanel title="Difference view blocked" message={`${compatibility.message} Choose a compatible pair before calculating a derived difference.`} icon="alert" />
   }
 
@@ -283,7 +347,7 @@ export function ComparisonViewer({
       <header className="comparison-viewer__header">
         <div>
           <span className="section-kicker">Observation workspace</span>
-          <h2>{mode === "side-by-side" ? (fixtureData ? "Synchronized scenes" : "SAR browse previews") : mode === "difference" ? "Derived difference view" : mode === "single" ? "Single observation" : mode === "fade" ? "Overlay fade" : "Jelly swipe comparison"}</h2>
+          <h2>{mode === "side-by-side" ? (fixtureData ? "Synchronized scenes" : "SAR browse previews") : mode === "difference" ? (fixtureData ? "Derived difference view" : "Exploratory difference") : mode === "single" ? "Single observation" : mode === "fade" ? "Overlay fade" : "Jelly swipe comparison"}</h2>
         </div>
         <div className={`compatibility compatibility--${compatibility.level}`}>
           <Icon name={compatibility.level === "compatible" ? "check" : "alert"} size={15} />
@@ -311,12 +375,12 @@ export function ComparisonViewer({
               <div className="side-by-side"><ObservationImage observation={left} label="Earlier" lowBandwidth={lowBandwidth} preview={preview} /><ObservationImage observation={right} label="Later" lowBandwidth={lowBandwidth} preview={preview} /></div>
             )}
             {mode === "single" && <ObservationImage observation={right} label="Selected observation" lowBandwidth={lowBandwidth} preview={preview} />}
-            {mode === "difference" && left && (
+            {mode === "difference" && left && (fixtureData ? (
               <div className="difference-view">
                 {lowBandwidth ? <><FixtureTexture side="left" /><FixtureTexture side="right" /></> : <><PreviewImage observation={left} preview={preview} decorative /><PreviewImage observation={right} preview={preview} decorative /></>}
                 <div className="difference-view__legend"><DataBadge value="derived" /> Pixel-difference preview / fixture imagery</div>
               </div>
-            )}
+            ) : <LiveDifference key={`${left.id}|${right.id}|${left.imageUrl}|${right.imageUrl}`} left={left} right={right!} />)}
             {mode === "fade" && left && (
               <div className="fade-view">
                 {lowBandwidth ? <><FixtureTexture side="left" /><div style={{ opacity: fade / 100 }}><FixtureTexture side="right" /></div></> : <><PreviewImage observation={left} preview={preview} decorative={fixtureData} /><PreviewImage observation={right} preview={preview} decorative={fixtureData} opacity={fade / 100} /></>}

@@ -133,13 +133,34 @@ describe("live comparison previews", () => {
     expect(container.querySelectorAll("img")).toHaveLength(2)
   })
 
-  it("blocks live Difference even when all compatibility metadata is supplied", () => {
-    const { container } = render(<ComparisonViewer mode="difference" left={fixturePair[0]} right={fixturePair[1]} dataOrigin="live" />)
+  it("offers the exploratory live difference for same-instrument pairs and degrades without canvas", async () => {
+    const originalImage = window.Image
+    class FailingImage {
+      crossOrigin = "anonymous"
+      onload: (() => void) | null = null
+      onerror: (() => void) | null = null
+      set src(_value: string) { window.setTimeout(() => this.onerror?.(), 0) }
+    }
+    window.Image = FailingImage as unknown as typeof Image
+    try {
+      const { container } = render(<ComparisonViewer mode="difference" left={fixturePair[0]} right={fixturePair[1]} dataOrigin="live" />)
 
-    expect(screen.getByText(/Calibrated difference unavailable/)).toBeVisible()
-    expect(screen.getByText(/not a calibrated raster or validated change measurement/)).toBeVisible()
+      expect(screen.getByRole("heading", { name: "Exploratory difference" })).toBeVisible()
+      expect(container.querySelectorAll("img")).toHaveLength(0)
+      await waitFor(() => expect(screen.getByText(/Difference preview unavailable/)).toBeVisible())
+    } finally {
+      window.Image = originalImage
+    }
+  })
+
+  it("blocks the live difference when platforms or polarization differ", () => {
+    const crossPlatform: Observation = { ...right, platform: "NISAR", instrument: "L-band SAR" }
+    const { container } = render(<ComparisonViewer mode="difference" left={left} right={crossPlatform} dataOrigin="live" />)
+
+    expect(screen.getByText(/Exploratory difference unavailable/)).toBeVisible()
+    expect(screen.getByText(/same platform, polarization, and processing/)).toBeVisible()
     expect(container.querySelectorAll("img")).toHaveLength(0)
-    expect(screen.queryByText(/Pixel-difference|Derived difference view/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Exploratory pixel difference of official browse renders/)).not.toBeInTheDocument()
   })
 
   it.each(previewModes)("pauses real imagery without synthetic textures in low-bandwidth %s", (mode) => {
