@@ -1,0 +1,58 @@
+.argus-launcher { position: fixed; z-index: 160; right: 18px; bottom: 18px; min-height: 54px; gap: 10px; border-radius: var(--radius-md); padding: 7px 14px 7px 8px; box-shadow: var(--shadow-float); }
+.app-shell--explorer .argus-launcher { bottom: 108px; }
+.argus-launcher > span:first-child { display: grid; width: 39px; height: 39px; place-items: center; border-radius: 50%; background: rgb(255 255 255 / 9%); color: var(--lime); }
+.argus-launcher > span:last-child { display: grid; gap: 2px; text-align: left; }
+.argus-launcher strong { font-size: 12px; }
+.argus-launcher small { color: rgb(255 255 255 / 55%); font: 500 8px var(--font-mono); text-transform: uppercase; }
+.argus { display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgb(255 255 255 / 12%); background: var(--panel); color: var(--ink); box-shadow: var(--shadow-float); }
+.argus--desktop { position: fixed; z-index: 170; top: 0; left: 0; min-width: 330px; min-height: 420px; max-width: min(720px, calc(100vw - 24px)); max-height: calc(100dvh - 88px); }
+.argus--floating { resize: both; }
+.argus--docked-left, .argus--docked-right { top: calc(var(--header-height) + var(--signal-height) + 8px); bottom: 8px; width: min(410px, 36vw); height: auto; }
+.argus--docked-left { left: 8px; }
+.argus--docked-right { right: 8px; left: auto; }
+.argus--expanded { top: 6dvh; left: 50%; width: min(720px, calc(100vw - 40px)); height: min(820px, 88dvh); translate: -50% 0; }
+.argus__header { display: grid; min-height: 61px; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; background: var(--forest-950); padding: 10px 12px; color: white; touch-action: none; }
+.argus--floating .argus__header { cursor: move; }
+.argus__mark { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 50%; background: rgb(255 255 255 / 9%); color: var(--lime); }
+.argus__header strong, .argus__header small { display: block; }
+.argus__header strong { font: 700 12px var(--font-display); }
+.argus__header small { margin-top: 3px; color: rgb(255 255 255 / 50%); font: 500 7px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.argus__window-actions { display: flex; }
+.argus__window-actions button { display: grid; width: 31px; height: 31px; place-items: center; border: 0; border-radius: var(--radius-sm); background: transparent; color: rgb(255 255 255 / 66%); }
+.argus__window-actions button:hover { background: rgb(255 255 255 / 9%); color: white; }
+.argus__dock-controls { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); background: var(--panel-muted); padding: 4px; }
+.argus__dock-controls button { display: flex; min-height: 29px; align-items: center; justify-content: center; gap: 4px; border: 0; border-right: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 8px; font-weight: 700; }
+.argus__dock-controls button:last-child { border: 0; }
+.argus__dock-controls button[aria-pressed="true"] { background: var(--lime-soft); color: var(--forest-900); }
+.argus__context { display: flex; flex-wrap: wrap; gap: 5px; border-bottom: 1px solid var(--line); padding: 8px 11px; }
+.argus__context span { border-radius: 99px; background: var(--aqua-soft); padding: 4px 7px; color: var(--aqua-dark); font: 500 7px var(--font-mono); text-transform: uppercase; }
+.argus__messages { flex: 1; overflow-y: auto; padding: 13px; }
+.argus__message { display: flex; margin-bottom: 9px; }
+.argus__message p { max-width: 89%; border-radius: 6px; padding: 10px 11px; font-size: 11px; line-height: 1.52; }
+.argus__message small { display: block; margin: 4px 0 0 8px; color: var(--faint); font: 500 7px var(--font-mono); }
+.argus__message--argus { flex-direction: column; align-items: flex-start; }
+.argus__message--argus p { background: var(--panel-muted); color: var(--ink); }
+.argus__message--user { justify-content: flex-end; }
+.argus__message--user p { background: var(--forest-900); color: white; }
+.argus__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; border-top: 1px solid var(--line); padding: 9px; }
+.argus__actions > span { grid-column: 1 / -1; margin-bottom: 2px; color: var(--muted); font: 500 7px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+.argus__actions button, .argus__actions a { display: flex; min-height: 31px; align-items: center; justify-content: space-between; gap: 5px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--panel); padding: 0 8px; color: var(--forest-900); font-size: 8px; font-weight: 700; text-align: left; }
+.argus__actions button:hover, .argus__actions a:hover { border-color: var(--aqua); background: var(--aqua-soft); }
+.argus__footer { display: flex; min-height: 31px; align-items: center; justify-content: center; gap: 6px; background: var(--forest-950); padding: 5px 10px; color: rgb(255 255 255 / 58%); font-size: 8px; }
+.argus__footer svg { color: var(--lime); }
+.argus-minimized { position: fixed; z-index: 170; right: 18px; bottom: 18px; display: flex; min-height: 40px; align-items: center; gap: 9px; border: 1px solid rgb(255 255 255 / 14%); border-radius: var(--radius-md); background: var(--forest-950); padding: 0 11px; box-shadow: var(--shadow-float); color: white; }
+.app-shell--explorer .argus-minimized { bottom: 108px; }
+.argus-minimized svg:first-child { color: var(--lime); }
+.argus-minimized span { font: 500 8px var(--font-mono); text-transform: uppercase; }
+.dialog-overlay { position: fixed; z-index: 249; inset: 0; background: rgb(8 23 20 / 48%); backdrop-filter: blur(2px); animation: overlay-in 180ms ease; }
+.argus--mobile { position: fixed; z-index: 250; right: 0; bottom: 0; left: 0; max-height: min(82dvh, 760px); border-radius: 14px 14px 0 0; padding-bottom: env(safe-area-inset-bottom); animation: sheet-in 260ms cubic-bezier(.2, .8, .2, 1); }
+.argus--mobile .argus__dock-controls { display: none; }
+@keyframes overlay-in { from { opacity: 0; } }
+@keyframes sheet-in { from { translate: 0 100%; } }
+@media (max-width: 719px) {
+  .argus-launcher { right: 12px; bottom: 12px; min-height: 48px; padding-right: 9px; }
+  .app-shell--explorer .argus-launcher { right: 12px; bottom: 165px; }
+  .argus-launcher > span:first-child { width: 34px; height: 34px; }
+  .argus-launcher > span:last-child { display: none; }
+  .argus__header { padding-top: 14px; }
+}

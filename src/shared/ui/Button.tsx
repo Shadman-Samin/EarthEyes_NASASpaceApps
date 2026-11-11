@@ -1,0 +1,26 @@
+import type { ButtonHTMLAttributes, ReactNode } from "react"
+
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  children: ReactNode
+  tone?: "primary" | "secondary" | "quiet" | "danger"
+  size?: "small" | "medium"
+}
+
+export function Button({
+  children,
+  className = "",
+  tone = "primary",
+  size = "medium",
+  type = "button",
+  ...props
+}: ButtonProps) {
+  return (
+    <button
+      type={type}
+      className={`button button--${tone} button--${size} ${className}`.trim()}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}

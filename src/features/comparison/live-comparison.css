@@ -1,0 +1,43 @@
+.comparison-viewer[data-origin="live"] .comparison-viewer__stage {
+  height: auto;
+}
+
+.comparison-viewer[data-origin="live"] .comparison-viewer__stage img {
+  object-fit: contain;
+  min-height: 0;
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+.comparison-viewer[data-origin="live"] .comparison-tint {
+  display: none;
+}
+
+.comparison-viewer[data-origin="live"] .observation-image {
+  height: clamp(300px, 52vh, 600px);
+  min-height: 0;
+  min-width: 0;
+  background: #0b1d1a;
+}
+
+.comparison-viewer[data-origin="live"] .side-by-side {
+  min-height: 0;
+}
+
+.comparison-viewer[data-origin="live"] .observation-details dd {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.comparison-viewer[data-origin="live"] .observation-details a {
+  color: var(--lime);
+  text-decoration: underline;
+}
+
+.comparison-viewer[data-origin="live"] .state-panel {
+  color: white;
+}
+
+.comparison-viewer[data-origin="live"] .state-panel p {
+  color: rgb(255 255 255 / 72%);
+}
