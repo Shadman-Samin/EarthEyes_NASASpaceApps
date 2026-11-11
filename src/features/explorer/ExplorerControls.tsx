@@ -3,7 +3,7 @@ import { moduleRegistry } from "../../domain/module-registry"
 import { formatDate } from "../../shared/formatting"
 import { DataBadge, Icon, QualityBadge } from "../../shared/ui"
 import { PlaceSearch } from "../search/PlaceSearch"
-import { getCompatibility } from "../comparison/compatibility"
+import { getCompatibility, sameFamily } from "../comparison/compatibility"
 import { getDataOrigin } from "../../data/repository"
 import type { ReactNode } from "react"
 
@@ -83,7 +83,7 @@ export function ExplorerControls({
               key={item.id}
               type="button"
               aria-pressed={mode === item.id}
-              disabled={item.id === "difference" && (!fixtureData || compatibility.level !== "compatible")}
+              disabled={item.id === "difference" && (fixtureData ? compatibility.level !== "compatible" : !(left && right && sameFamily(left, right)))}
               onClick={() => onModeChange(item.id)}
             >
               {item.label}
