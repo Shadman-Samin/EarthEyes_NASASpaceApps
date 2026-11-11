@@ -2,7 +2,7 @@
 
 EarthEyes is a map-first environmental field atlas for the NASA Space Apps “Dancing with the SARs” challenge. It supports place search, dated observation comparison, coastal and ice evidence modules, GLOF review context, GroundLine warning governance, and the contextual Argus guide.
 
-The existing `/explore` workspace now loads real NASA OPERA Sentinel-1 RTC acquisitions and official SAR browse images. Its map, footprint selector, timeline, swipe, side-by-side, single and fade views use those records. Calibrated change measurements are explicitly unavailable, not replaced with fixtures. GroundLine remains a clearly labelled demonstration and must not be used for safety decisions.
+The existing `/explore` workspace now loads real NASA NISAR GCOV acquisitions and official per-polarization L-band browse images by default, with an OPERA Sentinel-1 RTC switch for the historical C-band archive. Its map, footprint selector, timeline, polarization switch, swipe, side-by-side, single and fade views use those records. Calibrated change measurements are explicitly unavailable, not replaced with fixtures. GroundLine remains a clearly labelled demonstration and must not be used for safety decisions.
 
 ## Run locally
 
@@ -13,7 +13,7 @@ npm ci
 npm run dev
 ```
 
-Open the Vite URL and select **Open the explorer**. `npm run dev` serves the frontend and metadata API together; a second server or Earthdata login is not needed for public metadata and browse images. Kuakata starts with a known May 2024 archive window. Use **Area and date filters** in Controls to change the window, choose a **Scene footprint**, then compare its real acquisition dates. Grouping by OPERA burst prevents comparing adjacent ground footprints as if they were before/after observations.
+Open the Vite URL and select **Open the explorer**. `npm run dev` serves the frontend and metadata API together; a second server or Earthdata login is not needed for public metadata and browse images. The explorer defaults to NISAR GCOV (provisional) from January 2026 to today; Kuakata has a known mid-2026 NISAR coverage window. Use **Area and date filters** in Controls to change the window or switch to the OPERA Sentinel-1 2024 archive, choose a **Scene footprint**, then compare its real acquisition dates. Grouping by acquisition frame prevents comparing adjacent ground footprints as if they were before/after observations. NISAR records additionally expose an **HV cross-pol / HH co-pol** switch.
 
 The name search offers reference places, not a global geocoder. Any valid worldwide area remains eligible: pan/zoom the map and select **Search this map area**, or enter WGS84 bounds in Controls. Source coverage varies. Only selected public browse images are fetched, never whole protected satellite rasters. These previews are not calibrated change maps or georeferenced image overlays; the map displays actual acquisition footprints. Missing images and provider failures stay explicit.
 

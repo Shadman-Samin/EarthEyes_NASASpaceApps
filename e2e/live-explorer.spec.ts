@@ -24,21 +24,42 @@ test("the development explorer loads its map worker from a valid JavaScript URL"
   } finally { await server.close() }
 })
 
-test("the existing explorer loads real-source images and keeps its comparison controls", async ({ page }, testInfo) => {
+test("the existing explorer loads real NISAR source images and keeps its comparison controls", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === "mobile", "Desktop workspace journey")
   await page.goto("/explore/kuakata-bangladesh?module=coastal&view=compare&mode=swipe")
-  await expect(page.getByText("Live SAR archive", { exact: true }).first()).toBeVisible()
+  await expect(page.getByText("Live NISAR archive", { exact: true }).first()).toBeVisible()
   await expect(page.getByRole("heading", { name: "Jelly swipe comparison" })).toBeVisible()
   const viewer = page.locator('.comparison-viewer[data-origin="live"]')
-  await expect(viewer.locator('img[src*="datapool.asf.alaska.edu"]')).toHaveCount(2)
+  await expect(viewer.locator('img[src*="nisar.asf.earthdatacloud.nasa.gov"]')).toHaveCount(2)
   await expect(viewer.locator("img").first()).toHaveCSS("filter", "none")
   await expect(page.getByRole("button", { name: "Difference", exact: true })).toBeDisabled()
   await expect(page.getByLabel("Evidence drawer").getByText("Measurements unavailable", { exact: true })).toBeVisible()
   await page.getByLabel("Explorer controls").getByRole("button", { name: "Side by side", exact: true }).click()
   await expect(page.getByRole("heading", { name: "SAR browse previews" })).toBeVisible()
+  await page.getByRole("combobox", { name: "Scene footprint", exact: true }).selectOption("NISAR_L2_PR_GCOV_023_091_D_077_2005_DHDH_M")
+  await expect(viewer.locator('img[src*="023_091_D_077_2005_DHDH_M"]')).toHaveCount(2)
+  await expect(page.getByRole("link", { name: "Live catalogue", exact: true })).toHaveCount(0)
+})
+
+test("the polarization switch reloads the same NISAR acquisitions with co-pol imagery", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile", "Desktop workspace journey")
+  await page.goto("/explore/kuakata-bangladesh?module=coastal&view=compare&mode=side-by-side")
+  const viewer = page.locator('.comparison-viewer[data-origin="live"]')
+  await expect(viewer.locator('img[src*="NATIVE_B_HVHV"]')).toHaveCount(2)
+  await page.getByRole("combobox", { name: "Polarization", exact: true }).selectOption("HHHH")
+  await expect(viewer.locator('img[src*="NATIVE_B_HHHH"]')).toHaveCount(2)
+  await expect(page.locator(".observation-image, .comparison-image").first()).toBeVisible()
+})
+
+test("the OPERA product switch restores the Sentinel-1 C-band archive", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile", "Desktop workspace journey")
+  await page.goto("/explore/kuakata-bangladesh?module=coastal&view=compare&product=opera-rtc-s1&start=2024-05-01&end=2024-05-31")
+  await expect(page.getByText("Live SAR archive", { exact: true }).first()).toBeVisible()
+  const viewer = page.locator('.comparison-viewer[data-origin="live"]')
+  await expect(viewer.locator('img[src*="datapool.asf.alaska.edu"]')).toHaveCount(2)
+  await expect(page.getByRole("combobox", { name: "Scene footprint", exact: true })).toBeVisible()
   await page.getByRole("combobox", { name: "Scene footprint", exact: true }).selectOption("T002-000002-IW1")
   await expect(viewer.locator('img[src*="T002-000002-IW1"]')).toHaveCount(2)
-  await expect(page.getByRole("link", { name: "Live catalogue", exact: true })).toHaveCount(0)
 })
 
 test("the explorer reports provider failure without falling back to fixture observations", async ({ page }) => {
@@ -58,6 +79,6 @@ test("mobile comparison uses the same live acquisitions", async ({ page }, testI
   await expect(page.getByLabel("Observation timeline")).toBeVisible()
   await page.getByRole("navigation", { name: "Explorer panels" }).getByRole("button", { name: "Compare", exact: true }).click()
   const dialog = page.getByRole("dialog", { name: "comparison panel" })
-  await expect(dialog.locator('img[src*="datapool.asf.alaska.edu"]')).toHaveCount(2)
+  await expect(dialog.locator('img[src*="nisar.asf.earthdatacloud.nasa.gov"]')).toHaveCount(2)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
 })

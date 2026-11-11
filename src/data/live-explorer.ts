@@ -12,27 +12,87 @@ export const operaSource: DataSource = {
   limitations: ["Browse images are not calibrated analytical rasters.", "No overlap, alignment, or change measurement has been computed."],
 }
 
-export function acquisitionGroup(item: CatalogueItem) {
-  return item.id.match(/^OPERA_L2_RTC-S1_(T\d+-\d+-IW[123])_/)?.[1] ?? item.id
+export type NisarProductKey = "nisar-gcov" | "nisar-gcov-provisional" | "nisar-gcov-beta"
+
+export function nisarSource(product: NisarProductKey = "nisar-gcov-provisional"): DataSource {
+  const config = catalogueProducts[product]
+  return {
+    id: config.collectionId, name: config.name, provider: "NASA / ISRO / ASF DAAC",
+    technology: "L-band and S-band SAR", role: "Real NISAR acquisition records and official per-polarization browse images.",
+    coverage: "Source archive coverage; loaded pages are not a complete scene count.",
+    updateCadence: "Acquisition and publication schedules vary.",
+    accessUrl: config.documentationUrl,
+    citation: "NASA-ISRO Synthetic Aperture Radar (NISAR) GCOV, ASF DAAC.",
+    limitations: [
+      "Browse images are published PNG renders, not calibrated analytical rasters.",
+      "GCOV data products are HDF5 and were not loaded; no georeferenced raster overlay exists.",
+      "Provisional and beta products carry unflagged quality caveats.",
+      "No overlap, alignment, or change measurement has been computed.",
+    ],
+  }
 }
 
-export function catalogueObservation(item: CatalogueItem, placeId: string, moduleId: ModuleId) {
+export function isNisarCollection(item: CatalogueItem) {
+  return /^NISAR_L2/.test(item.collectionId)
+}
+
+export function acquisitionGroup(item: CatalogueItem) {
+  return item.id.match(/^OPERA_L2_RTC-S1_(T\d+-\d+-IW[123])_/)?.[1]
+    ?? item.id.match(/^(NISAR_L2_PR_GCOV_.*)_\d{8}T/)?.[1]
+    ?? item.id
+}
+
+export type NisarPolarization = "HHHH" | "HVHV"
+
+function nisarPreview(previews: CatalogueItem["assets"], polarization: NisarPolarization) {
+  // Browse assets repeat with thumbnail roles; deduplicate by file name.
+  const unique = [...new Map(previews.map((asset) => [asset.href.split("/").at(-1)?.replace(/\?.*$/, "") ?? asset.href, asset])).values()]
+  const beams = ["B", "A"] as const
+  for (const beam of beams) {
+    const match = unique.find((asset) => new RegExp(`_NATIVE_${beam}_${polarization}\\.png(?:\\?|$)`, "i").test(asset.href))
+    if (match) return { asset: match, beam }
+  }
+  const composite = unique.find((asset) => /_NATIVE\.png(?:\?|$)/i.test(asset.href))
+  if (composite) return { asset: composite, beam: null }
+  return null
+}
+
+export function catalogueObservation(
+  item: CatalogueItem,
+  placeId: string,
+  moduleId: ModuleId,
+  { polarization = "HVHV" as NisarPolarization }: { polarization?: NisarPolarization } = {},
+) {
   const previews = item.assets.filter((asset) => asset.access === "public" && asset.roles.some((role) => ["browse", "thumbnail"].includes(role)))
-  const preview = previews.find((asset) => /_BROWSE_low-res\.png(?:\?|$)/i.test(asset.href))
-    ?? previews.find((asset) => /_BROWSE_thumbnail\.png(?:\?|$)/i.test(asset.href))
+  const nisar = isNisarCollection(item)
+  const nisarPreviewAsset = nisar ? nisarPreview(previews, polarization) : null
+  if (nisar && !nisarPreviewAsset) throw new Error("The selected NISAR record has no published browse image.")
+  const preview = nisar
+    ? nisarPreviewAsset!.asset
+    : previews.find((asset) => /_BROWSE_low-res\.png(?:\?|$)/i.test(asset.href))
+      ?? previews.find((asset) => /_BROWSE_thumbnail\.png(?:\?|$)/i.test(asset.href))
+  const nisarPolarization = nisarPreviewAsset?.asset.href.match(/_NATIVE_[AB]_([HV]{4})\.png(?:\?|$)/i)?.[1]
+  const polarizationLabel = nisar
+    ? `${nisarPolarization?.slice(0, 2) ?? "Not reported"}${nisarPreviewAsset?.beam ? ` (beam ${nisarPreviewAsset.beam})` : " (composite)"}`
+    : item.polarizations.join(" / ") || "Not reported"
   return observationSchema.parse({
     id: item.id, placeId, moduleId, acquiredAt: item.acquiredAt,
-    platform: item.platform ?? "Not reported", instrument: "Sentinel-1 SAR",
+    platform: nisar ? "NISAR" : item.platform ?? "Not reported",
+    instrument: nisar ? "NISAR L-band SAR" : "Sentinel-1 SAR",
     orbitDirection: item.orbitDirection, relativeOrbit: item.relativeOrbit,
-    polarization: item.polarizations.join(" / ") || "Not reported",
+    polarization: polarizationLabel,
     processingLevel: item.processingFamily, resolutionM: null, coverageOverlap: null, alignmentQuality: null,
     sourceId: item.collectionId, classification: "observed",
     quality: item.sourceMaturity === "validated" ? "validated" : "review-required",
     imageUrl: preview?.href ?? null, sourceUrl: item.sourceUrl,
     knownLimitations: [
-      "Official SAR browse image, not a calibrated raster or a validated change measurement.",
+      nisar
+        ? "Official NISAR L-band browse image, not a calibrated raster or a validated change measurement."
+        : "Official SAR browse image, not a calibrated raster or a validated change measurement.",
       "Preview alignment, overlap and pixel resolution have not been computed.",
-      `Provider source maturity: ${item.sourceMaturity}. Missing metadata remains unreported.`,
+      nisar
+        ? `NISAR products are ${item.sourceMaturity}; quality flags are not final.`
+        : `Provider source maturity: ${item.sourceMaturity}. Missing metadata remains unreported.`,
     ],
   })
 }

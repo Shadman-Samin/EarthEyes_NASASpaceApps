@@ -4,11 +4,11 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import { Group, Panel, Separator } from "react-resizable-panels"
 import { useParams, useSearchParams } from "react-router-dom"
 import { moduleIdSchema, type LayerDefinition, type ModuleId, type Place } from "../../domain/models"
-import { catalogueBoundsSchema, catalogueQuerySchema, type CatalogueBounds, type CatalogueSearchResult } from "../../domain/catalogue"
+import { catalogueBoundsSchema, catalogueProductIdSchema, catalogueQuerySchema, type CatalogueBounds, type CatalogueProductId, type CatalogueSearchResult } from "../../domain/catalogue"
 import { moduleRegistry } from "../../domain/module-registry"
 import { usePlace } from "../../data/queries"
 import { catalogueItemKey, fetchCatalogue } from "../../data/catalogue"
-import { acquisitionGroup, catalogueObservation, operaSource } from "../../data/live-explorer"
+import { acquisitionGroup, catalogueObservation, nisarSource, operaSource, type NisarPolarization, type NisarProductKey } from "../../data/live-explorer"
 import { ComparisonViewer } from "../../features/comparison/ComparisonViewer"
 import { EvidenceDrawer } from "../../features/evidence/EvidenceDrawer"
 import { ExplorerControls } from "../../features/explorer/ExplorerControls"
@@ -21,6 +21,16 @@ import { formatDateTime } from "../../shared/formatting"
 
 type MobileSheet = "controls" | "evidence" | "comparison" | null
 
+const nisarPolarizations: Array<{ id: NisarPolarization; label: string }> = [
+  { id: "HVHV", label: "HV cross-pol" },
+  { id: "HHHH", label: "HH co-pol" },
+]
+
+function archiveWindow(product: CatalogueProductId) {
+  if (product.startsWith("nisar")) return { start: "2026-01-01", end: new Date().toISOString().slice(0, 10) }
+  return { start: "2024-05-01", end: "2024-05-31" }
+}
+
 const EarthMap = lazy(() => import("../../features/map/EarthMap").then((module) => ({ default: module.EarthMap })))
 
 function ExplorerWorkspace({ place }: { place: Place }) {
@@ -30,7 +40,13 @@ function ExplorerWorkspace({ place }: { place: Place }) {
   const moduleId: ModuleId = requestedModule.success && place.moduleIds.includes(requestedModule.data)
     ? requestedModule.data
     : place.moduleIds[0]
-  const parsedQuery = catalogueQuerySchema.safeParse({ product: "opera-rtc-s1", bbox: place.bounds, start: searchParams.get("start") ?? "2024-05-01", end: searchParams.get("end") ?? "2024-05-31", limit: 20 })
+  const requestedProduct = catalogueProductIdSchema.safeParse(searchParams.get("product"))
+  const product: CatalogueProductId = requestedProduct.success ? requestedProduct.data : "nisar-gcov-provisional"
+  const isNisar = product.startsWith("nisar")
+  const polarization: NisarPolarization = searchParams.get("pol") === "HHHH" ? "HHHH" : "HVHV"
+  const windowDefaults = archiveWindow(product)
+  const activeSource = isNisar ? nisarSource(product as NisarProductKey) : operaSource
+  const parsedQuery = catalogueQuerySchema.safeParse({ product, bbox: place.bounds, start: searchParams.get("start") ?? windowDefaults.start, end: searchParams.get("end") ?? windowDefaults.end, limit: 20 })
   const query = parsedQuery.success ? parsedQuery.data : null
   const archive = useInfiniteQuery({
     queryKey: ["explorer-catalogue", query], enabled: query !== null,
@@ -49,10 +65,10 @@ function ExplorerWorkspace({ place }: { place: Place }) {
   const requestedItem = items.find((item) => item.id === searchParams.get("right")) ?? items.find((item) => item.id === searchParams.get("left"))
   const group = requestedGroup ?? (requestedItem ? acquisitionGroup(requestedItem) : groups.find((id) => new Set(items.filter((item) => acquisitionGroup(item) === id).map((item) => item.acquiredAt)).size > 1) ?? groups[0] ?? "")
   const groupItems = items.filter((item) => acquisitionGroup(item) === group).sort((a, b) => a.acquiredAt.localeCompare(b.acquiredAt))
-  const observations = groupItems.map((item) => catalogueObservation(item, place.id, moduleId))
+  const observations = groupItems.map((item) => catalogueObservation(item, place.id, moduleId, { polarization }))
   const layers: LayerDefinition[] = [
-    { id: "acquisition-footprint", moduleId, label: "Acquisition footprints", description: "Provider geometries for loaded acquisitions.", classification: "observed", quality: "validated", sourceId: operaSource.id, unit: null, color: "#3ca9ad", defaultEnabled: true },
-    { id: "sar-preview", moduleId, label: "Selected SAR preview", description: "Official browse image, shown separately from the georeferenced map.", classification: "observed", quality: "validated", sourceId: operaSource.id, unit: null, color: "#c8e56b", defaultEnabled: true },
+    { id: "acquisition-footprint", moduleId, label: "Acquisition footprints", description: "Provider geometries for loaded acquisitions.", classification: "observed", quality: "validated", sourceId: activeSource.id, unit: null, color: "#3ca9ad", defaultEnabled: true },
+    { id: "sar-preview", moduleId, label: "Selected SAR preview", description: "Official browse image, shown separately from the georeferenced map.", classification: "observed", quality: "validated", sourceId: activeSource.id, unit: null, color: "#c8e56b", defaultEnabled: true },
   ]
   const [mobileSheet, setMobileSheet] = useState<MobileSheet>(null)
   const mobileSheetTrigger = useRef<HTMLButtonElement | null>(null)
@@ -83,13 +99,15 @@ function ExplorerWorkspace({ place }: { place: Place }) {
   const submitArchive = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
-    const parsed = catalogueQuerySchema.safeParse({ product: "opera-rtc-s1", bbox: String(form.get("bbox")).split(",").map((value) => value.trim() ? Number(value) : NaN), start: form.get("start"), end: form.get("end"), limit: 20 })
+    const parsed = catalogueQuerySchema.safeParse({ product: form.get("product") ?? product, bbox: String(form.get("bbox")).split(",").map((value) => value.trim() ? Number(value) : NaN), start: form.get("start"), end: form.get("end"), limit: 20 })
     if (!parsed.success) { setFormError("Enter valid west,south,east,north bounds and an inclusive date window of 1 to 366 days."); return }
     setFormError("")
     void queryClient.resetQueries({ queryKey: ["explorer-catalogue", parsed.data], exact: true })
     setSearchParams((current) => {
       const next = new URLSearchParams(current)
       next.set("start", parsed.data.start); next.set("end", parsed.data.end)
+      next.set("product", parsed.data.product)
+      if (parsed.data.product.startsWith("nisar")) next.set("pol", polarization); else next.delete("pol")
       if (current.has("bbox") || parsed.data.bbox.some((value, index) => value !== place.bounds[index])) next.set("bbox", parsed.data.bbox.join(","))
       for (const key of ["burst", "left", "right"]) next.delete(key)
       return next
@@ -105,6 +123,8 @@ function ExplorerWorkspace({ place }: { place: Place }) {
       url.searchParams.set("start", query.start); url.searchParams.set("end", query.end)
       url.searchParams.set("bbox", query.bbox.join(","))
     }
+    url.searchParams.set("product", product)
+    if (isNisar) url.searchParams.set("pol", polarization); else url.searchParams.delete("pol")
     if (group) url.searchParams.set("burst", group)
     if (state.leftId) url.searchParams.set("left", state.leftId)
     if (state.rightId) url.searchParams.set("right", state.rightId)
@@ -137,12 +157,18 @@ function ExplorerWorkspace({ place }: { place: Place }) {
       archive={(
         <section className="control-rail__section archive-search">
           <h2 className="control-label"><Icon name="globe" size={14} /> Live SAR archive</h2>
-          <p>NASA OPERA / Sentinel-1 RTC. Real source previews, not computed change maps.</p>
+          <p>{isNisar ? "NASA NISAR GCOV. Real L-band source previews, not computed change maps." : "NASA OPERA / Sentinel-1 RTC. Real source previews, not computed change maps."}</p>
+          <label>Product<select value={product} onChange={(event) => setSearchParams((current) => { const next = new URLSearchParams(current); next.set("product", event.target.value); for (const key of ["burst", "left", "right", "pol"]) next.delete(key); return next })}>
+            <option value="nisar-gcov-provisional">NISAR GCOV (provisional)</option>
+            <option value="nisar-gcov">NISAR GCOV (validated)</option>
+            <option value="opera-rtc-s1">OPERA Sentinel-1 RTC</option>
+          </select></label>
+          {isNisar && <label>Polarization<select value={polarization} onChange={(event) => setSearchParams((current) => { const next = new URLSearchParams(current); next.set("pol", event.target.value); return next })}>{nisarPolarizations.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}</select></label>}
           <details className="archive-search__filters"><summary>Area and date filters</summary>
-          <form key={`${place.bounds.join(",")}/${query?.start}/${query?.end}`} onSubmit={submitArchive}>
-            <div className="archive-search__dates"><label>Start date<input name="start" type="date" required defaultValue={query?.start ?? "2024-05-01"} /></label><label>End date<input name="end" type="date" required defaultValue={query?.end ?? "2024-05-31"} /></label></div>
+          <form key={`${place.bounds.join(",")}/${query?.start}/${query?.end}/${product}`} onSubmit={submitArchive}>
+            <div className="archive-search__dates"><label>Start date<input name="start" type="date" required defaultValue={query?.start ?? windowDefaults.start} /></label><label>End date<input name="end" type="date" required defaultValue={query?.end ?? windowDefaults.end} /></label></div>
             <label>Area bounds<input name="bbox" required defaultValue={place.bounds.join(",")} aria-describedby="bounds-help" /></label>
-            <small id="bounds-help">West, south, east, north. Or pan the map and select Search this map area. The initial window is May 2024.</small>
+            <small id="bounds-help">West, south, east, north. Or pan the map and select Search this map area. The initial window is {isNisar ? "January 2026 to today" : "May 2024"}.</small>
             <Button type="submit" size="small" disabled={archive.isFetching}>{archive.isFetching ? "Searching archive..." : "Search archive"}</Button>
           </form>
           </details>
@@ -166,7 +192,7 @@ function ExplorerWorkspace({ place }: { place: Place }) {
       events={[]}
       observations={observations}
       layers={layers.filter((layer) => state.activeLayers.includes(layer.id))}
-      sources={[operaSource]}
+      sources={[activeSource]}
     />
   )
   const selectionNotice = <div className="shared-selection-notice"><StatePanel compact title="Shared selection not loaded" message={archive.hasNextPage ? "The link names records that are not in the loaded pages. Load more acquisitions in Controls to restore them; no different scenes have been substituted." : "The requested records are not available in this search. Adjust the filters or explicitly choose loaded acquisitions; no different scenes have been substituted."} icon="info" /><Button tone="secondary" size="small" disabled={!items.length} onClick={() => setSearchParams((current) => { const next = new URLSearchParams(current); for (const key of ["burst", "left", "right"]) next.delete(key); return next })}>Use loaded acquisitions</Button></div>
@@ -202,7 +228,7 @@ function ExplorerWorkspace({ place }: { place: Place }) {
         </div>
         <div className="explorer-toolbar__search"><PlaceSearch currentPlace={place} onSelect={state.setPlace} /></div>
         <div className="explorer-toolbar__actions">
-          <span className="data-status"><i /> Live SAR archive</span>
+          <span className="data-status"><i /> {isNisar ? "Live NISAR archive" : "Live SAR archive"}</span>
           <Button tone="secondary" size="small" onClick={share}><Icon name="link" size={15} /> Share</Button>
         </div>
         {shareStatus && <span className="sr-only" role="status">{shareStatus}</span>}
