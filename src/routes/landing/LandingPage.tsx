@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+﻿import { Link } from "react-router-dom"
 import { moduleList } from "../../domain/module-registry"
 import { useDataSources, usePlaces } from "../../data/queries"
 import { Icon, Skeleton, StatePanel } from "../../shared/ui"
@@ -14,16 +14,16 @@ export function LandingPage() {
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero__copy">
           <span className="section-kicker">DANCING WITH THE SARS · NASA SPACE APPS</span>
-          <h1 id="landing-title">The ground has <em>a story.</em> Let's read it.</h1>
-          <p>Explore real satellite radar acquisitions in one workspace. Choose an area, inspect its source imagery, and compare dates while keeping observations separate from claims.</p>
+          <h1 id="landing-title">See what radar <em>reveals.</em></h1>
+          <p>Real satellite radar (SAR) images, explained in plain language. Pick any area worldwide and get a real-time visual analysis of the pulled data — with clear numbers, visuals, and honest limits.</p>
           <div className="landing-hero__actions">
-            <Link className="button button--primary button--medium" to="/explore/kuakata-bangladesh?module=coastal&mode=swipe&view=compare">Open the explorer <Icon name="arrow" size={17} /></Link>
-            <Link className="text-link" to="/methodology">How evidence is handled <Icon name="arrow" size={15} /></Link>
+            <Link className="button button--primary button--medium" to="/explore/kuakata-bangladesh?module=coastal&view=map">See coastal change (Kuakata) <Icon name="arrow" size={17} /></Link>
+            <Link className="button button--secondary button--medium" to="/explore/jakobshavn-glacier?module=ice&view=map">See ice change (Greenland) <Icon name="arrow" size={17} /></Link>
           </div>
           <dl className="landing-hero__facts">
-            <div><dt>Search</dt><dd>Any worldwide bounding box</dd></div>
-            <div><dt>Discover</dt><dd>Real NASA and Sentinel-1 records</dd></div>
-            <div><dt>Compare</dt><dd>Real source images, explicit limits</dd></div>
+            <div><dt>Interpreted</dt><dd>Real-time visual analysis &amp; plain summaries</dd></div>
+            <div><dt>Real data</dt><dd>NASA NISAR / Sentinel-1 acquisitions</dd></div>
+            <div><dt>Any area</dt><dd>Search and compare worldwide</dd></div>
           </dl>
         </div>
         <Link className="atlas-preview" to="/explore/jakobshavn-glacier?module=ice&mode=side-by-side&view=compare">
@@ -38,7 +38,7 @@ export function LandingPage() {
       </section>
 
       <section className="landing-section" aria-labelledby="modules-title">
-        <header className="landing-section__header"><div><span className="section-kicker">Environmental lenses</span><h2 id="modules-title">Choose the phenomenon, not a generic dashboard.</h2></div><p>Inspect real source imagery through each lens. Calibrated change measurements stay unavailable until the required processing and validation are complete.</p></header>
+        <header className="landing-section__header"><div><span className="section-kicker">Environmental lenses</span><h2 id="modules-title">Choose the phenomenon, not a generic dashboard.</h2></div><p>Inspect real source imagery through each lens. Visual change is computed live from pulled previews (exploratory); calibrated georeferenced measurements stay unavailable until the required processing and validation are complete.</p></header>
         <div className="module-cards">
           {moduleList.filter((module) => module.id !== "glof").map((module) => (
             <Link key={module.id} to={module.id === "coastal" ? "/explore/kuakata-bangladesh?module=coastal" : "/explore/jakobshavn-glacier?module=ice"} className={`module-card module-card--${module.id}`}>

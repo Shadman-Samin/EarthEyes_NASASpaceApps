@@ -41,6 +41,7 @@ test("shared surfaces remain opaque and hero decoration stays behind its content
 test("comparison mode opens its view without stealing keyboard focus", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto("/explore/kuakata-bangladesh?module=coastal")
+  await page.getByLabel("Explorer controls").getByText("Advanced (optional)", { exact: true }).click()
   const sideBySide = page.getByLabel("Explorer controls").getByRole("button", { name: "Side by side", exact: true })
   await sideBySide.focus()
   await page.keyboard.press("Enter")

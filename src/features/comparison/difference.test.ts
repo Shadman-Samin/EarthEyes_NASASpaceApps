@@ -20,6 +20,8 @@ describe("browseDifference", () => {
     expect(result.width).toBe(2)
     expect(result.height).toBe(1)
     expect(result.changedShare).toBe(1)
+    expect(result.brighterShare).toBeCloseTo(0.5, 5)
+    expect(result.darkerShare).toBeCloseTo(0.5, 5)
     const [warmR, warmG, warmB] = [result.pixels[0], result.pixels[1], result.pixels[2]]
     expect(warmR).toBeGreaterThan(warmG)
     expect(warmG).toBeGreaterThan(warmB)

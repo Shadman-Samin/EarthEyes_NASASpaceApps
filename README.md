@@ -2,7 +2,7 @@
 
 EarthEyes is a map-first environmental field atlas for the NASA Space Apps “Dancing with the SARs” challenge. It supports place search, dated observation comparison, coastal and ice evidence modules, GLOF review context, GroundLine warning governance, and the contextual Argus guide.
 
-The existing `/explore` workspace now loads real NASA NISAR GCOV acquisitions and official per-polarization L-band browse images by default, with an OPERA Sentinel-1 RTC switch for the historical C-band archive. Its map, footprint selector, timeline, polarization switch, swipe, side-by-side, single and fade views use those records. Browse previews remain explicitly uncalibrated. For two flagship investigations (Kuakata, Bangladesh and Jakobshavn Isbrae, Greenland), EarthEyes also ships calibrated NISAR GCOV change bundles: L-band HV/HH gamma-0 rasters, water-area time series, changed-area clusters, and plain-language explanations with provenance. Other places keep live archive discovery and honest browse-only comparison. GroundLine remains a clearly labelled demonstration and must not be used for safety decisions.
+The `/explore` workspace loads real NASA NISAR GCOV acquisitions and official per-polarization L-band browse images by default, with an OPERA Sentinel-1 RTC switch for the historical C-band archive. Its map, footprint selector, timeline, polarization switch, swipe, side-by-side, single and fade views use those records. For any pulled location, the explorer auto-selects the best footprint and earliest/latest usable pair, computes a client-side difference from the pulled preview images, and builds a real-time Summary, Chart and Context from the pulled metadata. A short Groq vision-grounded interpretation is generated when configured, with a deterministic computed fallback; all of it stays labelled exploratory and uncalibrated. The two flagship calibrated NISAR GCOV bundles (Kuakata, Bangladesh and Jakobshavn Isbrae, Greenland) remain reproducible under `public/analysis/` but are no longer wired into the explorer UI. GroundLine remains a clearly labelled demonstration and must not be used for safety decisions.
 
 ## Run locally
 
@@ -13,9 +13,9 @@ npm ci
 npm run dev
 ```
 
-Open the Vite URL and select **Open the explorer**. `npm run dev` serves the frontend and metadata API together; a second server or Earthdata login is not needed for public metadata and browse images. The explorer defaults to NISAR GCOV (provisional) from January 2026 to today; Kuakata has a known mid-2026 NISAR coverage window. Use **Area and date filters** in Controls to change the window or switch to the OPERA Sentinel-1 2024 archive, choose a **Scene footprint**, then compare its real acquisition dates. Grouping by acquisition frame prevents comparing adjacent ground footprints as if they were before/after observations. NISAR records additionally expose an **HV cross-pol / HH co-pol** switch.
+Open the Vite URL and select **Open the explorer**. `npm run dev` serves the frontend and metadata API together; a second server or Earthdata login is not needed for public metadata and browse images. The explorer defaults to NISAR GCOV (provisional) from January 2026 to today; Kuakata has a known mid-2026 NISAR coverage window. The best footprint, date pair and comparison view are selected automatically from the pulled data. Use **Advanced options (optional)** in Controls to change the window, switch to the OPERA Sentinel-1 2024 archive, choose a **Footprint**, or change **Polarization** (HV recommended). Grouping by acquisition frame prevents comparing adjacent ground footprints as if they were before/after observations.
 
-The name search offers reference places, not a global geocoder. Any valid worldwide area remains eligible: pan/zoom the map and select **Search this map area**, or enter WGS84 bounds in Controls. Source coverage varies. Only selected public browse images are fetched, never whole protected satellite rasters. These previews are not calibrated change maps or georeferenced image overlays; the map displays actual acquisition footprints. Missing images and provider failures stay explicit.
+The name search offers reference places, not a global geocoder. Any valid worldwide area remains eligible: pan/zoom the map and select **Search this map area**, or enter WGS84 bounds in Controls. Source coverage varies. Only selected public browse images are fetched, never whole protected satellite rasters. These previews are not calibrated change maps or georeferenced image overlays; the map displays actual acquisition footprints. The realtime Summary, Chart and Context are generated from the pulled records and preview images, and missing images or provider failures stay explicit. Groq configuration is optional: set `VITE_GROQ_API_KEY` and `VITE_GROQ_MODEL` in a gitignored `.env`; set `VITE_GROQ_VISION_MODEL` only if your account has a vision-capable model (the code retries facts-only automatically). The current account has no vision model, so the Groq narrative is grounded in computed facts rather than pixels. **`VITE_` values are embedded in the client bundle and are public**, so use a Worker proxy for any public production deployment.
 
 Share links capture the selected bounds, dates, footprint and acquisition IDs. If a shared record is outside the loaded pages, the explorer asks you to load more or explicitly choose available records instead of silently showing a different scene.
 
@@ -54,11 +54,12 @@ The deployment workflow sets `VITE_BASE_PATH=/EarthEyes_NASASpaceApps/`. The bui
 
 ## Integration Boundary
 
-Real acquisition discovery and public SAR preview comparison are connected inside the explorer. Calibrated georeferenced change analysis is available for two flagship investigations from precomputed NISAR GCOV bundles; other places remain browse-only. Quantitative claims are tied to granule IDs and stated limitations. NISAR SAR observations must never be presented as direct sea-level measurements, and GLOF candidates must never become public warnings without analyst review and authority approval.
+Real acquisition discovery, public SAR preview comparison and real-time interpretation are connected inside the explorer for any pulled location. Interpretation and computed change summaries are exploratory and uncalibrated; they are not georeferenced measurements or hazard warnings. The calibrated georeferenced bundles for the two flagship investigations remain reproducible but are not used by the current explorer. Quantitative claims stay tied to granule IDs and stated limitations. NISAR SAR observations must never be presented as direct sea-level measurements, and GLOF candidates must never become public warnings without analyst review and authority approval.
 
-## Computed change analysis
+## Computed change analysis (legacy bundles)
 
-Flagship change bundles live under `public/analysis/<place>/` and are generated offline
+The explorer no longer reads these bundles; it interprets pulled data in real time. The calibrated
+bundles remain under `public/analysis/<place>/` for reproducibility and are generated offline
 by `tools/analysis` from real NISAR GCOV granules (Earthdata bearer token required,
 never committed). The pipeline reads only the needed HDF5 windows, computes calibrated
 dB change, water-area time series, clusters and a plain-language story for every date

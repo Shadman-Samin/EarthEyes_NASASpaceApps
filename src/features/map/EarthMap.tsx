@@ -13,7 +13,6 @@ import { prefersLowBandwidth } from "../../shared/network"
 import { DataBadge, Icon } from "../../shared/ui"
 import { getDataOrigin } from "../../data/repository"
 import { catalogueMapGeometry } from "./catalogueGeometry"
-import type { AnalysisManifest } from "../analysis/analysisBundle"
 
 const baseStyle: StyleSpecification = {
   version: 8,
@@ -43,10 +42,6 @@ export function EarthMap({
   catalogueItems,
   onAreaChange,
   onObservationSelect,
-  analysisManifest,
-  analysisDate,
-  analysisPair,
-  showAnalysisChange,
 }: {
   place: Place
   moduleId: ModuleId
@@ -56,14 +51,9 @@ export function EarthMap({
   catalogueItems?: CatalogueItem[]
   onAreaChange?: (bounds: CatalogueBounds) => void
   onObservationSelect?: (id: string) => void
-  analysisManifest?: AnalysisManifest | null
-  analysisDate?: string
-  analysisPair?: string
-  showAnalysisChange?: boolean
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
-  const analysisObjectUrlRef = useRef("")
   const initialPlace = useRef(place)
   const initialModuleId = useRef(moduleId)
   const [inspected, setInspected] = useState<string | null>(null)
@@ -157,92 +147,6 @@ export function EarthMap({
     return () => { map.off("click", "live-acquisition-fill", select) }
   }, [mapReady, onObservationSelect])
 
-  useEffect(() => {
-    const map = mapRef.current
-    if (!map || !mapReady || !analysisManifest || !analysisDate) return
-    const manifest = analysisManifest
-    const grid = manifest.grid
-    const corners = grid.corners.map(([lon, lat]) => [lon, lat]) as [[number, number], [number, number], [number, number], [number, number]]
-    const url = `/analysis/${place.id}/${manifest.raster.urls[analysisDate]}`
-    let cancelled = false
-    const load = async () => {
-      try {
-        const response = await fetch(url)
-        if (!response.ok) return
-        const buffer = await response.arrayBuffer()
-        if (cancelled) return
-        const values = new Int16Array(buffer)
-        const canvas = document.createElement("canvas")
-        canvas.width = grid.width
-        canvas.height = grid.height
-        const context = canvas.getContext("2d")
-        if (!context) return
-        const image = context.createImageData(grid.width, grid.height)
-        if (showAnalysisChange && analysisPair) {
-          const pair = manifest.pairs[analysisPair] as { delta_url: string } | undefined
-          if (!pair) return
-          const deltaResponse = await fetch(`/analysis/${place.id}/${pair.delta_url}`)
-          if (!deltaResponse.ok || cancelled) return
-          const deltaValues = new Int16Array(await deltaResponse.arrayBuffer())
-          for (let i = 0; i < deltaValues.length; i += 1) {
-            const value = deltaValues[i] / 100
-            const alpha = Math.abs(value) < 0.5 ? 0 : Math.min(200, 60 + Math.abs(value) * 24)
-            if (value > 0) {
-              image.data[i * 4] = 232
-              image.data[i * 4 + 1] = 118
-              image.data[i * 4 + 2] = 86
-              image.data[i * 4 + 3] = alpha
-            } else if (value < 0) {
-              image.data[i * 4] = 36
-              image.data[i * 4 + 1] = 117
-              image.data[i * 4 + 2] = 122
-              image.data[i * 4 + 3] = alpha
-            }
-          }
-        } else {
-          const dateMeta = manifest.dates.find((item) => item.date === analysisDate)
-          const lo = dateMeta?.p2_db ?? -25
-          const hi = dateMeta?.p98_db ?? -8
-          const range = Math.max(hi - lo, 1)
-          for (let i = 0; i < values.length; i += 1) {
-            if (values[i] <= manifest.raster.invalid + 1) continue
-            const db = values[i] / 100
-            const shade = Math.round(((db - lo) / range) * 255)
-            const clamped = Math.max(0, Math.min(255, shade))
-            image.data[i * 4] = clamped
-            image.data[i * 4 + 1] = clamped
-            image.data[i * 4 + 2] = clamped
-            image.data[i * 4 + 3] = 180
-          }
-        }
-        context.putImageData(image, 0, 0)
-        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"))
-        if (!blob || cancelled) return
-        const nextUrl = URL.createObjectURL(blob)
-        const previousUrl = analysisObjectUrlRef.current
-        analysisObjectUrlRef.current = nextUrl
-        const source = map.getSource("analysis-raster") as { setUrl?: (value: string) => void; updateImage?: (options: { url: string; coordinates: typeof corners }) => void } | undefined
-        if (source?.updateImage) source.updateImage({ url: nextUrl, coordinates: corners })
-        else if (source?.setUrl) source.setUrl(nextUrl)
-        else {
-          map.addSource("analysis-raster", { type: "image", url: nextUrl, coordinates: corners })
-          map.addLayer({ id: "analysis-raster", type: "raster", source: "analysis-raster", paint: { "raster-opacity": 0.72 } }, "study-point")
-        }
-        if (previousUrl) URL.revokeObjectURL(previousUrl)
-      } catch {
-        // Leave the map unchanged if a bundle raster cannot be decoded.
-      }
-    }
-    void load()
-    return () => {
-      cancelled = true
-    }
-  }, [analysisManifest, analysisDate, analysisPair, showAnalysisChange, mapReady, place.id])
-
-  useEffect(() => () => {
-    if (analysisObjectUrlRef.current) URL.revokeObjectURL(analysisObjectUrlRef.current)
-  }, [])
-
   const visibleLayers = layerDefinitions.filter((layer) => activeLayers.includes(layer.id))
 
   return (
@@ -272,6 +176,7 @@ export function EarthMap({
           <p>Official browse image, not a georeferenced map layer. Open Compare for the full view.</p>
         </details>
       )}
+
       {inspected && (
         <div className="earth-map__inspection">
           <button type="button" aria-label="Close inspected feature" onClick={() => setInspected(null)}><Icon name="close" size={14} /></button>

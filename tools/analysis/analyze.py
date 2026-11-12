@@ -202,7 +202,7 @@ def analyze_site(site_id, pairs):
 
         changed_fraction = float(changed.sum()) / max(int(common.sum()), 1)
         changed_area = round(changed_fraction * common.sum() * spacing_m * spacing_m / 1e6, 3)
-        pair_story = build_pair_story(site, f, t, water, changed_fraction, changed_area, gain_clusters, loss_clusters)
+        pair_story = build_pair_story(site, f, t, water, changed_fraction, changed_area, gain_clusters, loss_clusters, threshold_db=1.5)
         pair_results[f"{f}--{t}"] = {
             "from": f,
             "to": t,
@@ -309,7 +309,7 @@ def _json_default(o):
     raise TypeError(f"not serializable: {type(o)}")
 
 
-def build_pair_story(site, f, t, water, changed_fraction, changed_area, gain_clusters, loss_clusters):
+def build_pair_story(site, f, t, water, changed_fraction, changed_area, gain_clusters, loss_clusters, threshold_db=1.5):
     """Plain-language summary for one date pair, so the prose matches the selection."""
     pct = changed_fraction * 100
     clusters = gain_clusters + loss_clusters
@@ -324,14 +324,14 @@ def build_pair_story(site, f, t, water, changed_fraction, changed_area, gain_clu
         summary = (
             f"Dark (radar-absorbing) water covered about {w_f:.1f} km² on {f} and "
             f"{w_t:.1f} km² on {t} — a {dw:+.1f} km² ({dw / max(w_f, 0.01) * 100:+.0f}%) shift. "
-            f"About {changed_area:.1f} km² ({pct:.0f}%) of the analyzed window changed brightness between the two dates, "
-            f"in {n_clusters} clusters{top_txt}"
+            f"About {changed_area:.1f} km² ({pct:.0f}%) of the analyzed window changed brightness by more than {threshold_db:g} dB between the two dates, "
+            f"in {n_clusters} clusters.{top_txt}"
         )
     else:
         headline = f"Ice-surface change near {site['label']} between {f} and {t}."
         summary = (
-            f"About {changed_area:.1f} km² ({pct:.0f}%) of the analyzed window changed radar brightness between "
-            f"{f} and {t}, across {n_clusters} clusters."
+            f"About {changed_area:.1f} km² ({pct:.0f}%) of the analyzed window changed radar brightness by more than {threshold_db:g} dB between "
+            f"{f} and {t}, across {n_clusters} clusters.{top_txt}"
         )
     return {"headline": headline, "summary": summary}
 

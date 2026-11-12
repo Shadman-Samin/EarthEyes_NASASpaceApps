@@ -13,9 +13,11 @@ test("visitor searches Kuakata and changes comparison mode", async ({ page }, te
   await expect(page.getByRole("heading", { name: /Jelly swipe comparison/ })).toBeVisible()
   const controls = page.getByLabel("Explorer controls")
   if (await controls.isVisible()) {
+    await controls.getByText("Advanced (optional)", { exact: true }).click()
     await controls.getByRole("button", { name: "Side by side" }).click()
     await expect(page).toHaveURL(/mode=side-by-side/)
     await page.reload()
+    await controls.getByText("Advanced (optional)", { exact: true }).click()
     await expect(controls.getByRole("button", { name: "Side by side" })).toHaveAttribute("aria-pressed", "true")
     await expect(page.getByRole("heading", { name: "SAR browse previews" })).toBeVisible()
   }
@@ -34,7 +36,7 @@ test("mobile explorer exposes controls through a bottom sheet", async ({ page },
   await page.goto("/explore/jakobshavn-glacier?module=ice")
   await page.getByRole("button", { name: /Controls/ }).click()
   await expect(page.getByRole("dialog", { name: "controls panel" })).toBeVisible()
-  await expect(page.getByText("Evidence layers")).toBeVisible()
+  await expect(page.getByText("Auto analysis")).toBeVisible()
 })
 
 test("Argus docks, minimizes, and keeps contextual safety language", async ({ page }, testInfo) => {
@@ -72,16 +74,17 @@ test("Save-Data mode preserves evidence without remote imagery", async ({ page }
   await expect(page.getByText(/imagery paused/i).first()).toBeVisible()
 })
 
-test("unimplemented measurements and difference analysis fail closed without hiding controls", async ({ page }, testInfo) => {
+test("difference analysis stays exploratory and safety controls remain available", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "Canonical safety-state journey")
   await page.goto("/explore/imja-tsho-nepal?module=ice")
   const controls = page.getByLabel("Explorer controls")
-  await expect(page.getByText("Measurements unavailable", { exact: true })).toBeVisible()
+  await controls.getByText("Advanced (optional)", { exact: true }).click()
   await expect(controls.getByRole("button", { name: /GLOF/ })).toBeVisible()
   await controls.getByRole("button", { name: /GLOF/ }).click()
   await expect(page.getByLabel("Observation timeline")).toBeVisible()
   await expect(controls.getByText("Authority assessment")).toHaveCount(0)
 
-  await page.goto("/explore/kuakata-bangladesh?module=coastal&mode=difference&view=compare&left=kua-s1-20240413&right=kua-nisar-20261018")
-  await expect(page.getByText("Exploratory difference unavailable", { exact: true })).toBeVisible()
+  await page.goto("/explore/kuakata-bangladesh?module=coastal&mode=difference&view=compare")
+  await expect(page.getByRole("heading", { name: "Exploratory difference" })).toBeVisible()
+  await expect(page.getByText(/not calibrated, not georeferenced, not a change measurement/i)).toBeVisible()
 })

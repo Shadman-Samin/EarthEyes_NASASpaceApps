@@ -9,7 +9,7 @@
   --white: #fffefa;
   --ink: #172a27;
   --ink-2: #243a35;
-  --muted: #56665f;
+  --muted: #35463f;
   --line: #dcded5;
   --green: #c8e56b;
   --green-deep: #527247;
@@ -24,7 +24,7 @@
   --lime-dark: #49633b;
   --lime-soft: #edf3dc;
   --gold: var(--yellow);
-  --faint: #59685f;
+  --faint: #3f5049;
   --line-strong: #b8c2b6;
   --shadow: 0 14px 40px rgba(24,43,38,.09);
   --mono: "DM Mono",ui-monospace,monospace;

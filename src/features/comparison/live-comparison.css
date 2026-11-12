@@ -62,3 +62,7 @@
   align-content: center;
   min-height: clamp(300px, 52vh, 600px);
 }
+
+.live-difference__summary { padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,0.08); border-left: 3px solid #c8e56b; color: #fff; }
+.live-difference__summary strong { display: block; font-size: 0.95rem; }
+.live-difference__summary p { margin: 4px 0 0; font-size: 0.85rem; color: rgba(255,255,255,0.78); }

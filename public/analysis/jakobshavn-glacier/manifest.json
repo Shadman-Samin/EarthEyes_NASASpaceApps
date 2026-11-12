@@ -9,7 +9,7 @@
   "grid": {
     "width": 512,
     "height": 512,
-    "spacing_m": 40.0,
+    "spacing_m": 40,
     "epsg": 3413,
     "corners": [
       [
@@ -231,7 +231,7 @@
           "area_km2": 1.091,
           "centroid_px": [
             75.7,
-            496.0
+            496
           ],
           "bbox_px": [
             58,
@@ -330,7 +330,7 @@
           "pixels": 280,
           "area_km2": 0.448,
           "centroid_px": [
-            244.0,
+            244,
             201.2
           ],
           "bbox_px": [
@@ -371,7 +371,7 @@
           "area_km2": 0.413,
           "centroid_px": [
             447.4,
-            85.0
+            85
           ],
           "bbox_px": [
             429,
@@ -491,7 +491,7 @@
           "area_km2": 2.066,
           "centroid_px": [
             479.1,
-            384.0
+            384
           ],
           "bbox_px": [
             439,
@@ -530,8 +530,8 @@
           "pixels": 842,
           "area_km2": 1.347,
           "centroid_px": [
-            452.0,
-            202.0
+            452,
+            202
           ],
           "bbox_px": [
             421,
@@ -570,7 +570,7 @@
           "pixels": 640,
           "area_km2": 1.024,
           "centroid_px": [
-            80.0,
+            80,
             295.6
           ],
           "bbox_px": [
@@ -631,7 +631,7 @@
           "area_km2": 0.47,
           "centroid_px": [
             367.7,
-            200.0
+            200
           ],
           "bbox_px": [
             353,
@@ -649,7 +649,7 @@
       "delta_url": "rasters/2026-08-10--2026-08-22.delta.i16",
       "story": {
         "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-08-10 and 2026-08-22.",
-        "summary": "About 109.4 km\u00b2 (26%) of the analyzed window changed radar brightness between 2026-08-10 and 2026-08-22, across 24 clusters."
+        "summary": "About 109.4 km² (26%) of the analyzed window changed radar brightness by more than 1.5 dB between 2026-08-10 and 2026-08-22, across 24 clusters. The largest changed cluster covers 2.9 km²."
       }
     },
     "2026-08-22--2026-09-03": {
@@ -666,7 +666,7 @@
           "pixels": 4637,
           "area_km2": 7.419,
           "centroid_px": [
-            393.0,
+            393,
             379.4
           ],
           "bbox_px": [
@@ -726,7 +726,7 @@
           "pixels": 1170,
           "area_km2": 1.872,
           "centroid_px": [
-            94.0,
+            94,
             268.7
           ],
           "bbox_px": [
@@ -747,7 +747,7 @@
           "area_km2": 1.813,
           "centroid_px": [
             298.7,
-            298.0
+            298
           ],
           "bbox_px": [
             269,
@@ -1046,7 +1046,7 @@
           "pixels": 299,
           "area_km2": 0.478,
           "centroid_px": [
-            493.0,
+            493,
             253.3
           ],
           "bbox_px": [
@@ -1145,7 +1145,7 @@
       "delta_url": "rasters/2026-08-22--2026-09-03.delta.i16",
       "story": {
         "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-08-22 and 2026-09-03.",
-        "summary": "About 109.0 km\u00b2 (26%) of the analyzed window changed radar brightness between 2026-08-22 and 2026-09-03, across 24 clusters."
+        "summary": "About 109.0 km² (26%) of the analyzed window changed radar brightness by more than 1.5 dB between 2026-08-22 and 2026-09-03, across 24 clusters. The largest changed cluster covers 7.4 km²."
       }
     },
     "2026-09-03--2026-09-15": {
@@ -1183,7 +1183,7 @@
           "area_km2": 4.805,
           "centroid_px": [
             54.9,
-            419.0
+            419
           ],
           "bbox_px": [
             0,
@@ -1403,7 +1403,7 @@
           "area_km2": 1.514,
           "centroid_px": [
             241.4,
-            70.0
+            70
           ],
           "bbox_px": [
             214,
@@ -1422,7 +1422,7 @@
           "pixels": 708,
           "area_km2": 1.133,
           "centroid_px": [
-            337.0,
+            337,
             385.6
           ],
           "bbox_px": [
@@ -1602,7 +1602,7 @@
           "pixels": 232,
           "area_km2": 0.371,
           "centroid_px": [
-            168.0,
+            168,
             269.3
           ],
           "bbox_px": [
@@ -1622,7 +1622,7 @@
           "pixels": 219,
           "area_km2": 0.35,
           "centroid_px": [
-            8.0,
+            8,
             257.5
           ],
           "bbox_px": [
@@ -1641,7 +1641,7 @@
       "delta_url": "rasters/2026-09-03--2026-09-15.delta.i16",
       "story": {
         "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-09-03 and 2026-09-15.",
-        "summary": "About 142.5 km\u00b2 (34%) of the analyzed window changed radar brightness between 2026-09-03 and 2026-09-15, across 24 clusters."
+        "summary": "About 142.5 km² (34%) of the analyzed window changed radar brightness by more than 1.5 dB between 2026-09-03 and 2026-09-15, across 24 clusters. The largest changed cluster covers 7.0 km²."
       }
     },
     "2026-09-15--2026-09-27": {
@@ -1659,7 +1659,7 @@
           "area_km2": 4.117,
           "centroid_px": [
             467.1,
-            207.0
+            207
           ],
           "bbox_px": [
             423,
@@ -1758,7 +1758,7 @@
           "pixels": 709,
           "area_km2": 1.134,
           "centroid_px": [
-            319.0,
+            319,
             225.5
           ],
           "bbox_px": [
@@ -1818,7 +1818,7 @@
           "pixels": 618,
           "area_km2": 0.989,
           "centroid_px": [
-            336.0,
+            336,
             374.2
           ],
           "bbox_px": [
@@ -2059,7 +2059,7 @@
           "area_km2": 1.115,
           "centroid_px": [
             13.5,
-            22.0
+            22
           ],
           "bbox_px": [
             0,
@@ -2137,7 +2137,7 @@
       "delta_url": "rasters/2026-09-15--2026-09-27.delta.i16",
       "story": {
         "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-09-15 and 2026-09-27.",
-        "summary": "About 168.2 km\u00b2 (40%) of the analyzed window changed radar brightness between 2026-09-15 and 2026-09-27, across 24 clusters."
+        "summary": "About 168.2 km² (40%) of the analyzed window changed radar brightness by more than 1.5 dB between 2026-09-15 and 2026-09-27, across 24 clusters. The largest changed cluster covers 4.1 km²."
       }
     },
     "2026-09-27--2026-10-09": {
@@ -2235,7 +2235,7 @@
           "area_km2": 0.326,
           "centroid_px": [
             435.8,
-            258.0
+            258
           ],
           "bbox_px": [
             425,
@@ -2294,7 +2294,7 @@
           "pixels": 172,
           "area_km2": 0.275,
           "centroid_px": [
-            506.0,
+            506,
             193.3
           ],
           "bbox_px": [
@@ -2455,7 +2455,7 @@
           "area_km2": 0.562,
           "centroid_px": [
             157.5,
-            258.0
+            258
           ],
           "bbox_px": [
             137,
@@ -2474,7 +2474,7 @@
           "pixels": 326,
           "area_km2": 0.522,
           "centroid_px": [
-            78.0,
+            78,
             493.6
           ],
           "bbox_px": [
@@ -2495,7 +2495,7 @@
           "area_km2": 0.456,
           "centroid_px": [
             491.2,
-            191.0
+            191
           ],
           "bbox_px": [
             472,
@@ -2594,7 +2594,7 @@
           "pixels": 219,
           "area_km2": 0.35,
           "centroid_px": [
-            151.0,
+            151,
             170.1
           ],
           "bbox_px": [
@@ -2633,7 +2633,7 @@
       "delta_url": "rasters/2026-09-27--2026-10-09.delta.i16",
       "story": {
         "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-09-27 and 2026-10-09.",
-        "summary": "About 96.2 km\u00b2 (23%) of the analyzed window changed radar brightness between 2026-09-27 and 2026-10-09, across 24 clusters."
+        "summary": "About 96.2 km² (23%) of the analyzed window changed radar brightness by more than 1.5 dB between 2026-09-27 and 2026-10-09, across 24 clusters. The largest changed cluster covers 0.6 km²."
       }
     },
     "2026-10-09--2026-10-21": {
@@ -2710,7 +2710,7 @@
           "pixels": 208,
           "area_km2": 0.333,
           "centroid_px": [
-            407.0,
+            407,
             203.7
           ],
           "bbox_px": [
@@ -2810,8 +2810,8 @@
           "pixels": 129,
           "area_km2": 0.206,
           "centroid_px": [
-            387.0,
-            141.0
+            387,
+            141
           ],
           "bbox_px": [
             376,
@@ -2890,7 +2890,7 @@
           "pixels": 1275,
           "area_km2": 2.04,
           "centroid_px": [
-            336.0,
+            336,
             180.7
           ],
           "bbox_px": [
@@ -3129,7 +3129,7 @@
       "delta_url": "rasters/2026-10-09--2026-10-21.delta.i16",
       "story": {
         "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-10-09 and 2026-10-21.",
-        "summary": "About 107.3 km\u00b2 (26%) of the analyzed window changed radar brightness between 2026-10-09 and 2026-10-21, across 24 clusters."
+        "summary": "About 107.3 km² (26%) of the analyzed window changed radar brightness by more than 1.5 dB between 2026-10-09 and 2026-10-21, across 24 clusters. The largest changed cluster covers 1.1 km²."
       }
     },
     "2026-08-10--2026-10-21": {
@@ -3187,7 +3187,7 @@
           "area_km2": 1.397,
           "centroid_px": [
             193.6,
-            51.0
+            51
           ],
           "bbox_px": [
             170,
@@ -3507,7 +3507,7 @@
           "area_km2": 1.451,
           "centroid_px": [
             372.4,
-            330.0
+            330
           ],
           "bbox_px": [
             343,
@@ -3526,8 +3526,8 @@
           "pixels": 814,
           "area_km2": 1.302,
           "centroid_px": [
-            309.0,
-            355.0
+            309,
+            355
           ],
           "bbox_px": [
             283,
@@ -3606,7 +3606,7 @@
           "pixels": 440,
           "area_km2": 0.704,
           "centroid_px": [
-            503.0,
+            503,
             231.1
           ],
           "bbox_px": [
@@ -3625,7 +3625,7 @@
       "delta_url": "rasters/2026-08-10--2026-10-21.delta.i16",
       "story": {
         "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland between 2026-08-10 and 2026-10-21.",
-        "summary": "About 225.0 km\u00b2 (54%) of the analyzed window changed radar brightness between 2026-08-10 and 2026-10-21, across 24 clusters."
+        "summary": "About 225.0 km² (54%) of the analyzed window changed radar brightness by more than 1.5 dB between 2026-08-10 and 2026-10-21, across 24 clusters. The largest changed cluster covers 32.5 km²."
       }
     }
   },
@@ -3695,8 +3695,8 @@
       "pixels": 352,
       "area_km2": 0.563,
       "centroid_px": [
-        497.0,
-        84.0
+        497,
+        84
       ],
       "bbox_px": [
         479,
@@ -3736,7 +3736,7 @@
       "area_km2": 0.328,
       "centroid_px": [
         456.5,
-        60.0
+        60
       ],
       "bbox_px": [
         444,
@@ -3795,8 +3795,8 @@
       "pixels": 60,
       "area_km2": 0.096,
       "centroid_px": [
-        466.0,
-        113.0
+        466,
+        113
       ],
       "bbox_px": [
         459,
@@ -3873,7 +3873,7 @@
   ],
   "story": {
     "headline": "Ice-surface change near Jakobshavn Isbrae, Greenland across 7 acquisitions.",
-    "summary": "Between 2026-08-10 and 2026-10-21, about 225.0 km\u00b2 (54%) of the analyzed window changed radar brightness in 24 clusters, with 12 clusters changing persistently across the season.",
+    "summary": "Between 2026-08-10 and 2026-10-21, about 225.0 km² (54%) of the analyzed window changed radar brightness by more than 1.5 dB in 24 clusters, with 12 clusters changing persistently across the season.",
     "detail": "Derived from calibrated NISAR L-band HH backscatter (gamma-0) on a single ascending orbit track. Amplitude change indicates surface change, not ice speed or mass loss. Values are provisional."
   },
   "provenance": {

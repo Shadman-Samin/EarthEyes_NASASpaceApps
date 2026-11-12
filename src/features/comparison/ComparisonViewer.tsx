@@ -4,7 +4,7 @@ import { formatDateTime } from "../../shared/formatting"
 import { prefersLowBandwidth } from "../../shared/network"
 import { DataBadge, Icon, QualityBadge, Skeleton, StatePanel } from "../../shared/ui"
 import { getCompatibility, sameFamily } from "./compatibility"
-import { browseDifference, type DifferenceResult } from "./difference"
+import { browseDifference, describeBrowseDifference, type DifferenceResult } from "./difference"
 import { getDataOrigin } from "../../data/repository"
 import "./live-comparison.css"
 
@@ -292,10 +292,15 @@ function LiveDifference({ left, right }: { left: Observation; right: Observation
     return <StatePanel title="Difference preview unavailable" message="The browse renders could not be loaded for pixel processing. Use Swipe, Side by side, Single, or Fade instead; no substitute image is shown." icon="alert" />
   }
   if (!result) return <div className="live-difference live-difference--loading"><Skeleton lines={5} /></div>
+  const summary = describeBrowseDifference(result)
   return (
     <div className="live-difference">
+      <div className="live-difference__summary">
+        <strong>{summary.headline}</strong>
+        <p>{summary.detail}</p>
+      </div>
       <canvas ref={canvasRef} role="img" aria-label={`Exploratory pixel difference between ${formatDateTime(left.acquiredAt)} and ${formatDateTime(right.acquiredAt)} browse renders`} />
-      <div className="difference-view__legend"><DataBadge value="derived" /> {differenceDisclaimer} Warmer: later date brighter. Teal: later date darker. {Math.round(result.changedShare * 100)}% of compared pixels differ noticeably.</div>
+      <div className="difference-view__legend"><DataBadge value="derived" /> {differenceDisclaimer} Warmer: later brighter. Teal: later darker.</div>
     </div>
   )
 }

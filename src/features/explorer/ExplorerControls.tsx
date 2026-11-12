@@ -1,18 +1,16 @@
 import type { ComparisonMode, LayerDefinition, ModuleId, Observation, Place } from "../../domain/models"
 import { moduleRegistry } from "../../domain/module-registry"
 import { formatDate } from "../../shared/formatting"
-import { DataBadge, Icon, QualityBadge } from "../../shared/ui"
+import { Icon } from "../../shared/ui"
 import { PlaceSearch } from "../search/PlaceSearch"
-import { getCompatibility, sameFamily } from "../comparison/compatibility"
-import { getDataOrigin } from "../../data/repository"
 import type { ReactNode } from "react"
 
 const modes: Array<{ id: ComparisonMode; label: string }> = [
-  { id: "swipe", label: "Swipe" },
   { id: "side-by-side", label: "Side by side" },
-  { id: "single", label: "Single" },
+  { id: "swipe", label: "Swipe" },
   { id: "difference", label: "Difference" },
   { id: "fade", label: "Fade" },
+  { id: "single", label: "Single" },
 ]
 
 export function ExplorerControls({
@@ -22,15 +20,11 @@ export function ExplorerControls({
   observations,
   leftId,
   rightId,
-  layers,
-  activeLayers,
   onPlaceChange,
   onModuleChange,
   onModeChange,
   onPairChange,
-  onToggleLayer,
   archive,
-  dataOrigin = getDataOrigin(),
 }: {
   place: Place
   moduleId: ModuleId
@@ -50,94 +44,61 @@ export function ExplorerControls({
 }) {
   const left = observations.find((observation) => observation.id === leftId)
   const right = observations.find((observation) => observation.id === rightId)
-  const compatibility = getCompatibility(left, right)
-  const fixtureData = dataOrigin === "fixture"
 
   return (
     <aside className="control-rail" aria-label="Explorer controls">
       <div className="control-rail__section control-rail__search">
-        <label className="control-label"><Icon name="search" size={14} /> Find place</label>
+        <label className="control-label"><Icon name="search" size={16} /> Search any location</label>
         <PlaceSearch currentPlace={place} onSelect={onPlaceChange} compact />
       </div>
 
       {archive}
 
-      <fieldset className="control-rail__section">
-        <legend className="control-label"><Icon name="globe" size={14} /> Phenomenon</legend>
-        <div className="module-picker">
-          {place.moduleIds.map((id) => (
-            <button key={id} type="button" aria-pressed={moduleId === id} onClick={() => onModuleChange(id)}>
-              <span style={{ background: moduleRegistry[id].accent }} />
-              <strong>{moduleRegistry[id].shortLabel}</strong>
-              <small>{id === "glof" ? "Reviewed hazard context" : moduleRegistry[id].title}</small>
-            </button>
-          ))}
-        </div>
-      </fieldset>
+      <section className="control-rail__section">
+        <p className="control-label"><Icon name="check" size={14} /> Auto analysis</p>
+        <p className="auto-note">Best dates and view are selected automatically from pulled data. Summary, Chart and Context update in real time for this location.</p>
+        {left && right && <p className="auto-note"><strong>Comparing:</strong> {formatDate(left.acquiredAt)} → {formatDate(right.acquiredAt)}</p>}
+      </section>
 
-      <fieldset className="control-rail__section">
-        <legend className="control-label"><Icon name="compare" size={14} /> Display mode</legend>
-        <div className="mode-picker">
-          {modes.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              aria-pressed={mode === item.id}
-              disabled={item.id === "difference" && (fixtureData ? compatibility.level !== "compatible" : !(left && right && sameFamily(left, right)))}
-              onClick={() => onModeChange(item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </fieldset>
-
-      <fieldset className="control-rail__section observation-pair">
-        <legend className="control-label"><Icon name="calendar" size={14} /> Observations</legend>
-        {mode !== "single" && (
-          <label>
-            <span>Earlier / left</span>
-            <select value={leftId} onChange={(event) => onPairChange(event.target.value, rightId)}>
-              {!left && <option value={leftId}>{leftId ? "Requested acquisition (not loaded)" : "No earlier acquisition loaded"}</option>}
-              {observations.map((observation) => (
-                <option key={observation.id} value={observation.id}>{formatDate(observation.acquiredAt)} / {observation.platform}</option>
+      <details className="control-rail__section control-advanced">
+        <summary className="control-label">Advanced (optional)</summary>
+        {place.moduleIds.length > 1 && (
+          <fieldset>
+            <legend>View type</legend>
+            <div className="module-picker">
+              {place.moduleIds.map((id) => (
+                <button key={id} type="button" aria-pressed={moduleId === id} onClick={() => onModuleChange(id)}>
+                  <span style={{ background: moduleRegistry[id].accent }} />
+                  <strong>{moduleRegistry[id].shortLabel}</strong>
+                </button>
               ))}
-            </select>
-          </label>
+            </div>
+          </fieldset>
         )}
-        <label>
-          <span>{mode === "single" ? "Selected date" : "Later / right"}</span>
-            <select value={rightId} onChange={(event) => onPairChange(leftId, event.target.value)}>
-              {!right && <option value={rightId}>{rightId ? "Requested acquisition (not loaded)" : "No acquisition loaded"}</option>}
-            {observations.map((observation) => (
-              <option key={observation.id} value={observation.id}>{formatDate(observation.acquiredAt)} / {observation.platform}</option>
+        <fieldset>
+          <legend>Compare view</legend>
+          <div className="mode-picker">
+            {modes.map((item) => (
+              <button key={item.id} type="button" aria-pressed={mode === item.id} onClick={() => onModeChange(item.id)}>{item.label}</button>
             ))}
-          </select>
-        </label>
-        {right && (
-          <div className="observation-pair__state">
-            <DataBadge value={right.classification} /> <QualityBadge value={right.quality} />
           </div>
-        )}
-      </fieldset>
-
-      <fieldset className="control-rail__section">
-        <legend className="control-label"><Icon name="layers" size={14} /> Evidence layers</legend>
-        <div className="layer-list">
-          {layers.map((layer) => (
-            <label key={`${layer.moduleId}-${layer.id}`}>
-              <input type="checkbox" checked={activeLayers.includes(layer.id)} onChange={() => onToggleLayer(layer.id)} />
-              <i style={{ background: layer.color }} />
-              <span><strong>{layer.label}</strong><small>{layer.classification}{layer.unit ? ` / ${layer.unit}` : ""}</small></span>
+        </fieldset>
+        {observations.length > 1 && (
+          <fieldset className="observation-pair">
+            <legend>Pick dates</legend>
+            <label><span>Earlier</span>
+              <select value={leftId} onChange={(event) => onPairChange(event.target.value, rightId)}>
+                {observations.map((o) => <option key={o.id} value={o.id}>{formatDate(o.acquiredAt)} / {o.platform}</option>)}
+              </select>
             </label>
-          ))}
-        </div>
-      </fieldset>
-
-      <div className="control-rail__data-state">
-        <span><span className={`live-dot ${fixtureData ? "live-dot--fixture" : ""}`} /> {fixtureData ? "Fixture data" : "Connected data"}</span>
-        <small>{fixtureData ? "Typed mock repository / no live feed" : "Official source images / no calibrated change analysis"}</small>
-      </div>
+            <label><span>Later</span>
+              <select value={rightId} onChange={(event) => onPairChange(leftId, event.target.value)}>
+                {observations.map((o) => <option key={o.id} value={o.id}>{formatDate(o.acquiredAt)} / {o.platform}</option>)}
+              </select>
+            </label>
+          </fieldset>
+        )}
+      </details>
     </aside>
   )
 }

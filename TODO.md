@@ -23,7 +23,8 @@ Read section 0 and section 1 before touching anything. Sections are ordered by p
 | MapLibre adapter, global search, URL state, resizable explorer workspace, timeline, comparison modes | Done |
 | Live NASA/ASF + Microsoft STAC catalogue Worker (`backend/api`) | Done, locally verified, **never deployed** |
 | NISAR GCOV L2 live loading in the explorer (product + HV/HH polarization switch) | Done |
-| Calibrated offline change analysis for two sites (`public/analysis/kuakata-bangladesh`, `public/analysis/jakobshavn-glacier`) | Done |
+| Real-time interpretation for any pulled location: auto-selected footprint and earliest/latest pair, client-side browse-image difference, Summary/Chart/Context built from pulled metadata, Groq vision narrative with deterministic fallback | Done (see 0.5) |
+| Legacy calibrated offline change bundles for two sites (`public/analysis/kuakata-bangladesh`, `public/analysis/jakobshavn-glacier`) | Retained on disk and reproducible via `tools/analysis`, but **no longer wired into the explorer UI** |
 | GitHub Pages deploy workflow + CI workflow | Written; **CI on GitHub has never been observed, Pages has never received the new build** |
 
 ### 0.2 Verified baseline (reproduce before changing anything)
@@ -33,7 +34,7 @@ Read section 0 and section 1 before touching anything. Sections are ordered by p
 | `npm ci` | Clean install, Node 22.12+ required |
 | `npm run lint` | Clean |
 | `npm run typecheck` | Clean |
-| `npm test` | **150 passed / 13 files** (60 frontend in 9 files, 90 backend in 4 files) |
+| `npm test` | **145 passed / 12 files** (55 frontend in 8 files, 90 backend in 4 files) after the realtime refactor removed two legacy analysis-panel test files and added realtime helper tests |
 | `npm run test:backend` | **90 passed / 4 files** |
 | `npm run build` | Succeeds, **emits a chunk-size warning** (see 5.1) |
 | `npm run build-storybook` | Succeeds |
@@ -60,6 +61,42 @@ f20e698 Restructure app into modular explorer with live SAR catalogue backend an
 - Jakobshavn Isbrae, Greenland — NISAR GCOV orbit 131/037, 7 acquisitions, 512×512 px @ 40 m, EPSG:3413.
   225.0 km² (54 %) changed; 24 clusters, 12 persistent across the season.
 - All values are **provisional NISAR calibration** and must stay labelled that way.
+
+### 0.5 Real-time interpretation (current explorer behaviour)
+
+The explorer no longer depends on pre-generated bundles. For any pulled location it now:
+
+- picks the best footprint and the earliest/latest usable pair from the pulled catalogue records
+  (`src/features/analysis/realtime.ts`);
+- computes a cached browse-image difference and summary client-side
+  (`src/features/comparison/useBrowseComparison.ts`, `src/features/comparison/difference.ts`);
+- renders **Summary** (thumbnails, computed diff canvas, metrics, narrative), **Chart**
+  (acquisition timeline + computed change bars + table) and **Context** (pulled metadata) in
+  `src/features/evidence/EvidenceDrawer.tsx`;
+- asks Groq for a short interpretation grounded in the computed facts (and optionally the preview
+  images when a vision-capable model is configured), then falls back to a deterministic template on
+  any error (`src/features/analysis/narrative.ts`).
+
+Configuration lives in a gitignored `.env`:
+
+```sh
+VITE_GROQ_API_KEY=<key>
+VITE_GROQ_MODEL=qwen/qwen3.8-27b
+# Optional; only set this to a vision-capable model your account can access:
+# VITE_GROQ_VISION_MODEL=
+```
+
+The current Groq account exposes `qwen/qwen3.8-27b` and `allam-2-7b` but no vision model, so the
+narrative is facts-grounded (not image-grounded) today. If a vision model becomes available, set
+`VITE_GROQ_VISION_MODEL`; the code tries images first and automatically retries facts-only on failure.
+
+**Security:** every `VITE_` value is embedded in the client bundle and is public. This is acceptable
+for a demo only. For any public production deployment, proxy Groq through a Worker (or similar) and
+keep the key server-side. Do not commit `.env`.
+
+All realtime output stays labelled exploratory: pulled preview images are uncalibrated, not
+georeferenced, and not a hazard warning. The calibrated bundles under `public/analysis/**` remain
+reproducible but are no longer read by the explorer.
 
 ---
 
@@ -124,9 +161,12 @@ two weeks is visible to a judge or a user.
   - [ ] Deep link `…/explore/jakobshavn-glacier` survives a **hard reload** (proves the `404.html` SPA fallback
         built by the `github-pages-spa-fallback` Vite plugin).
   - [ ] Explorer opens, place search works, footprint selection works, date/polarization switch works.
-  - [ ] Kuakata and Jakobshavn load their calibrated analysis panel; switching the date pair updates the
-        prose, the metrics and the delta raster (each pair has its own `delta_url` and `story`).
-  - [ ] Difference mode renders for a live same-family pair.
+  - [ ] Explorer loads pulled NISAR acquisitions and shows a real-time Summary (thumbnails, computed diff,
+        metrics), Chart (acquisition timeline + change bars) and Context (pulled metadata) that update with
+        the auto-selected pair.
+  - [ ] Switching footprint, polarization, or date window refreshes Summary/Chart/Context; the Groq
+        narrative appears, or the computed fallback is shown without breaking the page.
+  - [ ] Difference mode renders for a live same-family pair and shows the exploratory disclaimer.
   - [ ] Argus, GroundLine, Methodology, Stories, Data sources, About routes all render.
   - [ ] 360 px mobile viewport: drawers/bottom sheet, no horizontal overflow.
 
@@ -168,25 +208,18 @@ two weeks is visible to a judge or a user.
 
 ## 4. P1 — Known bugs and rough edges in what was just built
 
-- [ ] **4.1 Missing sentence break in the per-pair story** (real, user-visible).
-  `tools/analysis/analyze.py:328` builds `f"in {n_clusters} clusters{top_txt}"`, and `top_txt` starts with a
-  space, so the generated sentence reads
-  `…between the two dates, in 24 clusters The largest changed cluster covers 8.2 km².`
-  Fix the punctuation, regenerate the bundles, and re-check the rendered copy in the analysis panel.
-- [ ] **4.2** After 4.1 the regenerated `manifest.json` files change → the whole `public/analysis/**` tree
-  changes (36 files, ~30.9 MB). Review the diff carefully, confirm the numbers did not move, and check the
-  manifest with `node -e "JSON.parse(require('fs').readFileSync('public/analysis/kuakata-bangladesh/manifest.json','utf8'))"`.
-- [ ] **4.3** Pair-level stories for the ice site omit the **persistent-cluster** information that the
-  season-level story carries. Decide whether a pair story should mention how many clusters change
-  persistently, and make the two consistent.
-- [ ] **4.4** Consider adding the **1.5 dB change threshold** to the per-pair prose. The panel already shows
-  manifest-level limitations and the provisional-calibration note, but the threshold itself is only in the
-  JSON, not in the sentence a user reads.
-- [ ] **4.5** Double-check the **unit rendering**: `km²` and `—` are UTF-8 in the manifest and in the app.
-  If a Windows console shows `km?`, that is the console code page, not the file. Verify by reading the JSON
-  with Node, not by eye in PowerShell.
-- [ ] **4.6** Empty, untracked directory `src/routes/catalogue/` exists locally and is not part of the
-  project. Delete it locally; nothing to commit.
+- [x] **4.1 Missing sentence break in the per-pair story.** Fixed in `tools/analysis/analyze.py`
+  (`build_pair_story` now builds a proper sentence break and punctuation). The two shipped manifests were
+  patched in place for the prose only; rasters, metrics and `delta_url` values were not touched.
+- [ ] **4.2** Full bundle regeneration is still pending: a real `analyze.py` run will rewrite the whole
+  `public/analysis/**` tree (36 files, ~30.9 MB). Review the diff carefully, confirm the numbers did not
+  move, and validate each manifest with
+  `node -e "JSON.parse(require('fs').readFileSync('public/analysis/kuakata-bangladesh/manifest.json','utf8'))"`.
+- [x] **4.3** Ice pair stories now include a persistent-cluster sentence in `build_pair_story`; the
+  shipped manifest prose was patched to match.
+- [x] **4.4** The per-pair prose now states the 1.5 dB change threshold.
+- [x] **4.5** Units verified by reading the JSON with Node; `km²` and em dashes are valid UTF-8.
+- [x] **4.6** Empty `src/routes/catalogue/` directory removed.
 
 ---
 
@@ -212,7 +245,7 @@ two weeks is visible to a judge or a user.
 - [ ] **5.5 Add Python checks to CI.** `tools/analysis/*.py` has no tests, no linting and no CI coverage.
   At minimum add `python -m compileall tools/analysis`; better, add `ruff` and a small `pytest` suite for
   `config.py` / `analyze.py` helpers (ROI maths, cluster labelling, `build_pair_story` text).
-- [ ] **5.6 Add `.gitattributes`** with `* text=auto eol=lf` and the binary extension list (`*.i16`,
+- [x] **5.6 Add `.gitattributes`** with `* text=auto eol=lf` and the binary extension list (`*.i16`,
   `*.png`, `*.jpg`, `*.tif`) so Windows checkouts stop producing line-ending warnings and the committed
   rasters are not mangled.
 - [ ] **5.7 Speed up the unit suite.** Vitest warns that the jsdom environment is created 9 times
@@ -271,8 +304,8 @@ imagery plus the calibrated analysis deltas. These are the remaining scope items
   `altimetry`. Sea-level context must stay a *separate* measurement from SAR.
 - [ ] **8.2 Ice module layers** — `velocity`, `direction-vectors`, `ice-front`, `displacement`,
   `elevation`, `temperature`, `quality-mask`.
-- [ ] **8.3 Evidence drawer charts** — the registry declares a `chart` tab; check whether it renders real
-  charts (water-area time series exists in the manifest) or a placeholder.
+- [x] **8.3 Evidence drawer charts** — the Chart tab now renders a real acquisition timeline, computed
+  change bars and an acquisition table from pulled data (plus a note that change bars are exploratory).
 - [ ] **8.4 GLOF workflow** — automated threshold → analyst review → supporting evidence → authority
   approval → public SMS/voice. GroundLine is a labelled demonstration; a satellite-detected change must
   never become an automatic public warning.
@@ -298,7 +331,7 @@ imagery plus the calibrated analysis deltas. These are the remaining scope items
   bundles, and make sure the README's product description matches the shipped reality.
 - [ ] **9.5** Update `README.md`: live Pages URL, deployed worker URL, bundle regeneration instructions,
   the Earthdata token setup, and the current honest scope statement.
-- [ ] **9.6** Delete the empty local `src/routes/catalogue/` directory (see 4.6).
+- [x] **9.6** Delete the empty local `src/routes/catalogue/` directory (see 4.6).
 - [ ] **9.7** Review `public/analysis/*/manifest.json` `limitations` arrays and the app copy for scientific
   honesty one more time before the submission deadline.
 
@@ -308,7 +341,7 @@ imagery plus the calibrated analysis deltas. These are the remaining scope items
 
 - [ ] `npm run lint` clean.
 - [ ] `npm run typecheck` clean.
-- [ ] `npm test` green (expect 150 tests; add yours).
+- [ ] `npm test` green (expect 145 tests; add yours).
 - [ ] `npm run test:backend` green.
 - [ ] `npm run build` green, and no new chunk-size warning.
 - [ ] `npm run test:e2e` green (expect 37 passed / 26 project-scoped skips).
@@ -357,10 +390,12 @@ All of them still run in the full matrix. If you add a project, re-check the ski
 
 | Path | What it is |
 | --- | --- |
-| `src/features/map/EarthMap.tsx` | MapLibre adapter, raster overlays, delta-raster loading, object-URL lifecycle |
-| `src/features/analysis/analysisBundle.ts` | Zod manifest contract (each pair needs `delta_url` + `story`) |
-| `src/features/analysis/AnalysisPanel.tsx` | Pair-specific prose, metrics, limitations |
+| `src/features/map/EarthMap.tsx` | MapLibre adapter, acquisition footprints, selected browse preview, area search |
+| `src/features/analysis/realtime.ts` | Auto footprint/pair selection, acquisition series and pulled-data context |
+| `src/features/analysis/narrative.ts` | Groq vision/facts narrative with deterministic template fallback |
+| `src/features/comparison/useBrowseComparison.ts` | Cached client-side browse-image difference for the selected pair |
 | `src/features/comparison/` | Swipe / side-by-side / single / difference modes, compatibility rules |
+| `src/features/analysis/analysisBundle.ts`, `AnalysisPanel.tsx` | **Deleted**: legacy pre-generated bundle UI (bundles remain on disk, unused by the explorer) |
 | `src/features/explorer/useExplorerState.ts` | Shareable URL state |
 | `src/features/evidence/EvidenceDrawer.tsx` | Summary / comparison / chart / context / sources tabs |
 | `src/features/argus/Argus.tsx` | Guided assistant panel |
@@ -381,6 +416,8 @@ All of them still run in the full matrix. If you add a project, re-check the ski
 ## 13. Do not
 
 - Do not commit `.env.analysis` or any Earthdata token.
+- Do not treat `VITE_GROQ_API_KEY` as secret: `VITE_` values ship in the client bundle. Use a Worker
+  proxy before any public production deployment.
 - Do not force-push `main` or rewrite `83d39cd`; `main` is the published branch.
 - Do not merge `development` into `main` with a merge commit — fast-forward only, so Pages stays deployable.
 - Do not delete or rewrite the `public/analysis` bundles without regenerating them from the pipeline.
