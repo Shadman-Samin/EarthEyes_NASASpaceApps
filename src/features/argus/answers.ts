@@ -38,7 +38,10 @@ export async function answerArgus(question: string, context: ArgusContext, histo
   const fallback = { text, source: "data" as const }
   if (!groqConfigured() || /warning|evacuat|depth|velocity|sea.?level/.test(query)) return fallback
 
+  const livePageUrl = typeof window !== "undefined" ? window.location.href : undefined
   const facts = {
+    livePageUrl,
+    page: "EarthEyes live explorer webpage currently shown to the user",
     place: view.placeName, area: view.areaLabel, product: view.productLabel, window: view.dateWindow,
     acquisitionCount: view.acquisitionCount, footprintAcquisitionCount: acquisitions.length, footprints: view.groupCount, selectedFootprint: view.groupLabel,
     orbits: view.orbits, polarizations: view.polarizations, maturity: view.sourceMaturity,
