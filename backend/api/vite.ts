@@ -1,5 +1,5 @@
 import type { Plugin, PreviewServer, ViteDevServer } from "vite"
-import worker from "./src/index.ts"
+import worker from "./src/index.js"
 
 // Use the same read-only API locally; static deployments use the deployed Worker.
 export function catalogueApi(): Plugin {

@@ -1,4 +1,4 @@
-import { catalogueQuerySchema } from "../../../src/domain/catalogue.ts"
+import { catalogueQuerySchema } from "../../../src/domain/catalogue.js"
 
 export function parseCatalogueQuery(params: URLSearchParams) {
   const values = Object.fromEntries(params)

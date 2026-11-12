@@ -1,6 +1,6 @@
-import { catalogueProducts } from "../../../src/domain/catalogue.ts"
-import { CatalogueError, searchCatalogue } from "./catalogue.ts"
-import { parseCatalogueQuery } from "./query.ts"
+import { catalogueProducts } from "../../../src/domain/catalogue.js"
+import { CatalogueError, searchCatalogue } from "./catalogue.js"
+import { parseCatalogueQuery } from "./query.js"
 
 type Environment = { ALLOWED_ORIGINS?: string }
 type Context = { waitUntil(promise: Promise<unknown>): void }

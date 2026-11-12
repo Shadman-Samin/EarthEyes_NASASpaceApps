@@ -9,7 +9,7 @@ import {
   type CatalogueItem,
   type CatalogueQuery,
   type CatalogueSearchResult,
-} from "../../../src/domain/catalogue.ts"
+} from "../../../src/domain/catalogue.js"
 
 const endpoints = {
   asf: "https://cmr.earthdata.nasa.gov/stac/ASF/search",

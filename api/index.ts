@@ -1,1 +1,1 @@
-export { default } from "../backend/api/src/index.ts"
+export { default } from "../backend/api/src/index.js"
