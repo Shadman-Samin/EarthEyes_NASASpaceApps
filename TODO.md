@@ -1,10 +1,11 @@
 # EarthEyes — Remaining Work
 
 Hand-off document for the next person picking up the project.
-Written **12 November 2026** at the end of the Phase 3 session.
+Written **12 November 2026** at the end of the Phase 3 session; updated the same day with the
+full-site editorial redesign brief in section 0.6.
 
 - Repository: <https://github.com/Shadman-Samin/EarthEyes_NASASpaceApps>
-- Working branch: `development` (HEAD `2eac270`, tracks `origin/development`)
+- Working branch: `development` (tracks `origin/development`; product baseline `4bc93a0`)
 - `main` is still `83d39cd` ("Complete EarthEyes project") — the **old monolithic app**.
 - The restructured, live-SAR, computed-analysis app exists **only on `development`**.
 
@@ -44,6 +45,8 @@ Read section 0 and section 1 before touching anything. Sections are ordered by p
 ### 0.3 Recent commits on `development`
 
 ```
+4bc93a0 Interpret pulled SAR data in real time for any location
+e7f67f0 Add hand-off TODO with remaining work for teammates
 2eac270 Remove unreferenced standalone eartheyes.html prototype
 a81b556 Merge remote development branch into local history
 080c173 Add calibrated NISAR change analysis for Kuakata and Jakobshavn
@@ -97,6 +100,136 @@ keep the key server-side. Do not commit `.env`.
 All realtime output stays labelled exploratory: pulled preview images are uncalibrated, not
 georeferenced, and not a hazard warning. The calibrated bundles under `public/analysis/**` remain
 reproducible but are no longer read by the explorer.
+
+### 0.6 Active handoff: full editorial UI overhaul (audit complete; implementation not started)
+
+The owner requested a high-quality redesign of every public editorial page and the shared shell,
+plus an on-page project video. A read-only route/content/style/test audit is complete. **No source
+or style file was changed during this planning pass.** The next agent can begin implementation
+directly from this section.
+
+#### Required outcome
+
+- Replace the repetitive card-grid pages with one coherent, evidence-led visual system that still
+  gives Home, Methodology, Data Sources, GroundLine, About and guided stories distinct identities.
+- Keep only content that explains the product, its actual implementation, its evidence, or its
+  safety boundary. Remove slogans, repeated disclaimers and generic filler that add no information.
+- Preserve the existing explorer functionality. Only adjust Explorer where shared shell/tokens need
+  compatibility fixes; do not turn this redesign into another explorer logic refactor.
+- Keep all claims aligned with the current implementation in section 0.5 and `README.md`.
+- Complete responsive/mobile and accessibility work, update tests/snapshots, run the full baseline,
+  then commit and push `development`.
+
+#### Page-by-page implementation plan
+
+- [ ] **UI.1 Shared shell and visual language**
+  - Rework `src/app/AppShell.tsx`, `src/styles/tokens.css`, `src/styles/base.css` and
+    `src/styles/shell.css` as a clear Earth-observation field-journal system: strong editorial type,
+    disciplined grid, high-contrast forest/paper surfaces, and aqua/lime/coral used as data signals.
+  - Improve desktop navigation, mobile menu, active states and footer information architecture.
+    Footer should include Home/Explore/About and the repository or authoritative mission link where
+    useful; do not duplicate the entire header.
+  - Keep one `h1` per route, visible keyboard focus, reduced-motion support, 44 px touch targets and
+    readable metadata (12 px minimum unless truly decorative).
+
+- [ ] **UI.2 Home (`src/routes/landing/LandingPage.tsx`)**
+  - Lead with the concrete product: choose a bounded area, pull real SAR acquisition metadata and
+    official browse previews, compare compatible dates, and read an exploratory interpretation.
+  - Do not claim the four-place name search is a worldwide geocoder. Worldwide discovery currently
+    requires map/bounds selection, and archive coverage varies.
+  - Make the project walkthrough a prominent proof section, not a footer afterthought. Embed:
+
+    ```text
+    https://www.youtube.com/embed/Z79QX64rM4w?si=TPwG5YWCkilhLh4e
+    ```
+
+    Use a responsive 16:9 `<iframe>`, `title="EarthEyes project walkthrough"`, `loading="lazy"`,
+    `referrerPolicy="strict-origin-when-cross-origin"`, `allowFullScreen`, and the supplied allow list:
+    `accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share`.
+    Do not autoplay. Include a direct YouTube fallback link near the player.
+  - Retain only meaningful modules/reference places/product-flow/GroundLine/source material. Replace
+    the current false "Velocity / boundary / elevation" preview claim with facts the live explorer
+    actually exposes.
+
+- [ ] **UI.3 Methodology (`src/routes/methodology/MethodologyPage.tsx`)**
+  - Describe the current live pipeline, not an aspirational calibrated pipeline: catalogue query;
+    footprint/product grouping; earliest/latest usable browse selection; Canvas normalization capped
+    at 1600 px; RGB luminance difference; threshold `26`; changed/brighter/darker shares; metadata-
+    grounded narrative; visible limitations.
+  - Explicitly state that browse previews are uncalibrated and unregistered, percentages are visual
+    screening statistics rather than georeferenced measurements, and Groq currently receives computed
+    facts unless a supported vision model is configured.
+  - Keep the calibrated offline bundle workflow clearly separate and identify it as reproducible but
+    not connected to the explorer UI.
+
+- [ ] **UI.4 Data Sources and source detail**
+  - Redesign `src/routes/data-sources/DataSourcesPage.tsx` around source roles rather than nine
+    identical cards: observation archives, independent context, derived processing, and responsible
+    authority records.
+  - Preserve provider, technology, role, coverage, cadence, citation, limitations and authoritative
+    links. Make fixture/reference metadata versus live explorer catalogue records unmistakable.
+  - Redesign `DataSourceDetailPage.tsx` with a strong provenance hierarchy and useful return path.
+    Do not invent product versions, licenses, freshness or acquisitions absent from the typed record.
+
+- [ ] **UI.5 GroundLine (`src/routes/groundline/GroundLinePage.tsx`)**
+  - Keep the existing five-stage safety gate and interactive tabs, but make "demonstration" visible
+    before any notice. Review candidates must remain visually and semantically separate from
+    authority-issued demo records.
+  - Preserve E.164 validation, local OTP simulation, consent, delivery/language preferences and
+    explicit statements that no data is transmitted or stored. Do not imply real SMS, voice,
+    localization, subscription or warning operations.
+
+- [ ] **UI.6 About and guided stories**
+  - Rebuild `src/routes/about/AboutPage.tsx` around the NASA Space Apps challenge, problem, shipped
+    system, scientific boundaries, open-source repository and current prototype state.
+  - Do not invent team names, affiliations, awards, operational partners or deployment status. Add
+    them only if the owner supplies verified information.
+  - Replace the repeated filler in `src/routes/stories/StoryPage.tsx` with place-specific questions,
+    evidence needed, what the current explorer can inspect, and what cannot be concluded. If a story
+    cannot be made evidence-specific in this pass, remove/de-emphasize its route links rather than
+    presenting generic prose as a case study.
+
+#### Audit findings that constrain the redesign
+
+- All route definitions are in `src/app/router.tsx`; shared shell/footer is `src/app/AppShell.tsx`;
+  most editorial CSS is currently coupled in `src/styles/routes.css`.
+- There are no production-ready local PNG/JPG/WebP/SVG mission images. Do not add generic stock
+  photography. Prefer the authentic project video, data-derived/CSS cartographic graphics, or clearly
+  sourced official imagery if new assets are added.
+- The explorer renders acquisition footprints and selected official browse previews. Declared
+  coastal/ice/GLOF layers in `module-registry.ts` are not all implemented; editorial copy must not
+  present them as available map products.
+- Live visual difference uses unregistered preview pixels (`difference.ts`, threshold 26), not the
+  calibrated Int16 bundles. The bundles remain under `public/analysis/**` but are unused by the UI.
+- Name search contains four reference places. "Any area" means a valid map-selected/bounded area,
+  subject to provider coverage; it does not mean global place-name search.
+- The current key has no Groq vision model. The narrative is facts-grounded today and falls back to a
+  deterministic template. Never claim AI inspected pixels unless a working vision model is configured.
+- GroundLine is a non-operational interface demonstration. A review candidate is never a warning.
+
+#### Test and acceptance plan
+
+- [ ] **UI.7 Unit and route coverage**
+  - Update `src/routes/landing/LandingPage.test.tsx` for the new primary CTA and video iframe.
+  - Add focused render/semantics tests for Methodology, Data Sources, GroundLine and About where they
+    protect important factual/safety copy; avoid brittle tests for purely decorative text.
+- [ ] **UI.8 E2E, responsive and accessibility**
+  - Expand `e2e/responsive.spec.ts` to sweep Home, Methodology, Data Sources, GroundLine and About at
+    320, 360, 768, 1280 and 1920 px without horizontal overflow.
+  - Keep the GroundLine authority/review separation journey green. Add a Home assertion for the
+    YouTube iframe URL/title and direct fallback link.
+  - Run axe on the redesigned editorial routes, not Home alone.
+  - Regenerate `e2e/visual.spec.ts-snapshots/landing-desktop-chromium-win32.png` only after the new
+    design is final; add snapshots selectively rather than freezing every page.
+- [ ] **UI.9 Final quality gate**
+  - Run `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:backend`, `npm run build`,
+    `npm run build-storybook` and `npm run test:e2e`.
+  - Run `npm run lighthouse` or document the exact environment blocker because Home and iframe loading
+    are changing. Lazy-load the YouTube player to limit initial-page cost.
+  - Inspect desktop and 360 px mobile pages manually, verify no overlapping Argus/header/footer,
+    review every retained claim for implementation fidelity, and confirm no secret or `.env` is staged.
+  - Commit in the repository's imperative style and push `origin/development`. Do not merge `main`
+    without the owner's explicit instruction.
 
 ---
 
