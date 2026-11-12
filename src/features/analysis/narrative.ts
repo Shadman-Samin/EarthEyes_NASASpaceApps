@@ -56,7 +56,9 @@ export async function generateNarrative(opts: {
 }): Promise<Narrative> {
   const { ctx, diff, earlierImageUrl, laterImageUrl } = opts
   const base = template(ctx, diff)
-  if (!groqConfigured()) return base
+  const visionModel = groqVisionModel()
+  // Keep text-model quota for user-triggered Argus chat; summaries use AI only when vision is configured.
+  if (!groqConfigured() || !visionModel || !earlierImageUrl || !laterImageUrl) return base
   const facts = {
     place: ctx.placeName,
     area: ctx.areaLabel,
@@ -75,7 +77,6 @@ export async function generateNarrative(opts: {
   const system = 'You are an earth-observation analyst explaining satellite SAR imagery to non-experts and judges. Use ONLY the provided facts and what you can see in the images. Never invent numbers, causes, or certainty. Be specific to this place and dates. Distinguish observation from interpretation. Keep it short (3-6 sentences). Output strict JSON: {"headline":"...","summary":"...","limits":["...","..."]}.'
   const userText = `Facts (computed in real time from pulled archive data, do not contradict):\n${JSON.stringify(facts, null, 2)}\n\nExplain what a viewer sees and what changed between the earlier and later radar preview for this exact location. If images are provided, describe visible patterns (darker=smoother/water, brighter=rough/vegetation/ice texture) and relate them to the computed diff stats. Be relevant to this place and dates. State limits honestly.`
   const textModel = groqModel()
-  const visionModel = groqVisionModel()
   const cacheKey = groqCacheKey({ facts, images: Boolean(visionModel && earlierImageUrl && laterImageUrl) })
 
   const request = async (model: string, content: string | Array<Record<string, unknown>>) => {
