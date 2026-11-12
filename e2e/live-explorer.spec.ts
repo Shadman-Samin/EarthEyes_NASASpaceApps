@@ -24,6 +24,15 @@ test("the development explorer loads its map worker from a valid JavaScript URL"
   } finally { await server.close() }
 })
 
+test("the production explorer loads its map worker from a JavaScript asset", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium", "Canonical production-worker regression")
+  const workerResponse = page.waitForResponse((response) => response.url().includes("maplibre-gl-worker"), { timeout: 20000 })
+  await page.goto("/explore/kuakata-bangladesh")
+  const response = await workerResponse
+  expect(response.ok()).toBe(true)
+  expect(response.headers()["content-type"]).toMatch(/javascript/)
+})
+
 test("the existing explorer loads real NISAR source images and keeps its comparison controls", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === "mobile", "Desktop workspace journey")
   await page.goto("/explore/kuakata-bangladesh?module=coastal&view=compare&mode=swipe")

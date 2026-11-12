@@ -4,15 +4,19 @@ import {
   type GeoJSONSource,
   Map as MapLibreMap,
   NavigationControl,
+  setWorkerUrl,
   type StyleSpecification,
   type MapLayerMouseEvent,
 } from "maplibre-gl"
+import mapLibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url"
 import type { CatalogueBounds, CatalogueItem } from "../../domain/catalogue"
 import type { LayerDefinition, ModuleId, Observation, Place } from "../../domain/models"
 import { prefersLowBandwidth } from "../../shared/network"
 import { DataBadge, Icon } from "../../shared/ui"
 import { getDataOrigin } from "../../data/repository"
 import { catalogueMapGeometry } from "./catalogueGeometry"
+
+setWorkerUrl(mapLibreWorkerUrl)
 
 const baseStyle: StyleSpecification = {
   version: 8,
