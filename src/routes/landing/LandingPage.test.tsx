@@ -17,11 +17,11 @@ describe("LandingPage", () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     render(<QueryClientProvider client={client}><MemoryRouter><LandingPage /></MemoryRouter></QueryClientProvider>)
     const player = screen.getByTitle("EarthEyes project walkthrough")
-    expect(player).toHaveAttribute("src", "https://www.youtube.com/embed/Z79QX64rM4w?si=TPwG5YWCkilhLh4e")
+    expect(player).toHaveAttribute("src", "https://www.youtube.com/embed/vzeL2bBZ5Sk?si=z0kcsW6NWYHp3Sgq")
     expect(player).toHaveAttribute("loading", "lazy")
     expect(player).toHaveAttribute("referrerpolicy", "strict-origin-when-cross-origin")
     expect(player).toHaveAttribute("allowfullscreen")
-    expect(screen.getByRole("link", { name: /watch on youtube/i })).toHaveAttribute("href", "https://www.youtube.com/watch?v=Z79QX64rM4w")
+    expect(screen.getByRole("link", { name: /watch on youtube/i })).toHaveAttribute("href", "https://www.youtube.com/watch?v=vzeL2bBZ5Sk")
   })
 
   it("provides a muted local background clip with a poster", () => {

@@ -4,7 +4,7 @@ import { expect, test } from "./live-fixtures"
 test("Home embeds the supplied walkthrough with a keyboard-accessible fallback", async ({ page }) => {
   await page.goto("/")
   const player = page.getByTitle("EarthEyes project walkthrough")
-  await expect(player).toHaveAttribute("src", "https://www.youtube.com/embed/Z79QX64rM4w?si=TPwG5YWCkilhLh4e")
+  await expect(player).toHaveAttribute("src", "https://www.youtube.com/embed/vzeL2bBZ5Sk?si=z0kcsW6NWYHp3Sgq")
   await expect(player).toHaveAttribute("loading", "lazy")
   await expect(player).toHaveAttribute("referrerpolicy", "strict-origin-when-cross-origin")
   await expect(player).toHaveAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share")
@@ -12,7 +12,7 @@ test("Home embeds the supplied walkthrough with a keyboard-accessible fallback",
   await page.getByRole("link", { name: "Watch the walkthrough", exact: true }).click()
   await expect(player).toBeInViewport()
   const fallback = page.getByRole("link", { name: "Watch on YouTube" })
-  await expect(fallback).toHaveAttribute("href", "https://www.youtube.com/watch?v=Z79QX64rM4w")
+  await expect(fallback).toHaveAttribute("href", "https://www.youtube.com/watch?v=vzeL2bBZ5Sk")
   await fallback.focus()
   await expect(fallback).toBeFocused()
 })

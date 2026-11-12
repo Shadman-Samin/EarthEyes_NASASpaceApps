@@ -37,9 +37,9 @@ export function LandingPage() {
       </section>
 
       <section id="walkthrough" className="walkthrough editorial-section" aria-labelledby="walkthrough-title">
-        <div className="walkthrough__copy"><span className="section-kicker">01 / Project walkthrough</span><h2 id="walkthrough-title">See the investigation<br /><em>take shape.</em></h2><p>A guided look at EarthEyes. Use the live workspace to inspect the selected acquisitions, their source records, and the limits of a visual comparison.</p><a className="text-link" href="https://www.youtube.com/watch?v=Z79QX64rM4w" target="_blank" rel="noreferrer">Watch on YouTube <Icon name="external" size={16} /></a></div>
+        <div className="walkthrough__copy"><span className="section-kicker">01 / Project walkthrough</span><h2 id="walkthrough-title">See the investigation<br /><em>take shape.</em></h2><p>A guided look at EarthEyes. Use the live workspace to inspect the selected acquisitions, their source records, and the limits of a visual comparison.</p><a className="text-link" href="https://www.youtube.com/watch?v=vzeL2bBZ5Sk" target="_blank" rel="noreferrer">Watch on YouTube <Icon name="external" size={16} /></a></div>
         <figure className="walkthrough__player">
-          <iframe src="https://www.youtube.com/embed/Z79QX64rM4w?si=TPwG5YWCkilhLh4e" title="EarthEyes project walkthrough" loading="lazy" referrerPolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
+          <iframe src="https://www.youtube.com/embed/vzeL2bBZ5Sk?si=z0kcsW6NWYHp3Sgq" title="EarthEyes project walkthrough" loading="lazy" referrerPolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
           <figcaption>Project video / YouTube loads third-party content. If playback is unavailable, use the direct link.</figcaption>
         </figure>
       </section>
