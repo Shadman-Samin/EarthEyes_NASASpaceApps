@@ -15,6 +15,6 @@ module.exports = {
         "resource-summary:script:size": ["warn", { maxNumericValue: 650000 }],
       },
     },
-    upload: { target: "temporary-public-storage" },
+    upload: { target: "filesystem", outputDir: "./.lighthouseci/reports" },
   },
 }

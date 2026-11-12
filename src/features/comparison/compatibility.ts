@@ -28,7 +28,7 @@ export function getCompatibility(left?: Observation, right?: Observation): Compa
     left.alignmentQuality == null || right.alignmentQuality == null ||
     !left.imageUrl || !right.imageUrl
   ) {
-    return { level: "review", message: "Required comparison metadata or imagery is unavailable. Available images may be reviewed visually; quantitative difference is blocked." }
+    return { level: "review", message: "Some orbit, resolution, or overlap metadata was not reported. The computed visual difference is still shown, but treat it as exploratory — not a calibrated measurement." }
   }
   if (
     left.orbitDirection !== right.orbitDirection ||

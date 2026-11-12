@@ -39,24 +39,10 @@ test("mobile explorer exposes controls through a bottom sheet", async ({ page },
   await expect(page.getByText("Auto analysis")).toBeVisible()
 })
 
-test("Argus docks, minimizes, and keeps contextual safety language", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "chromium", "Canonical desktop Argus journey")
-  await page.goto("/explore/imja-tsho-nepal?module=glof")
-  await page.getByRole("button", { name: /Ask Argus/ }).click()
-  const argus = page.getByLabel("Argus evidence guide")
-  await expect(argus).toBeVisible()
-  await argus.getByRole("button", { name: "Right" }).click()
-  await expect(argus.getByRole("button", { name: "Right" })).toHaveAttribute("aria-pressed", "true")
-  await argus.getByRole("button", { name: "Why is this not proof?" }).click()
-  await expect(argus.getByText(/not an automatic public warning/i)).toBeVisible()
-  await argus.getByRole("button", { name: "Minimize Argus" }).click()
-  await expect(page.getByRole("button", { name: /Argus \/ docked-right/ })).toBeVisible()
-})
-
 test("GroundLine separates authority notices from review candidates", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "Canonical GroundLine journey")
   await page.goto("/groundline")
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Warnings should reach")
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Before a warning")
   await expect(page.getByText("Authority-issued demo records")).toBeVisible()
   await page.getByRole("tab", { name: "Review candidates" }).click()
   await expect(page.getByText("Internal review only")).toBeVisible()

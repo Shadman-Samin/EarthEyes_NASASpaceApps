@@ -37,9 +37,20 @@ export function isNisarCollection(item: CatalogueItem) {
 }
 
 export function acquisitionGroup(item: CatalogueItem) {
+  // NISAR ids carry the repeat cycle (023, 024, …) before the track; grouping must ignore it
+  // so that repeated passes over the same track/frame land in one comparable series.
   return item.id.match(/^OPERA_L2_RTC-S1_(T\d+-\d+-IW[123])_/)?.[1]
+    ?? item.id.match(/^NISAR_L2_PR_GCOV_\d+_(\d+_[AD]_\d+)_/)?.[1]
     ?? item.id.match(/^(NISAR_L2_PR_GCOV_.*)_\d{8}T/)?.[1]
     ?? item.id
+}
+
+export function acquisitionGroupLabel(group: string) {
+  const nisar = group.match(/^(\d+)_([AD])_(\d+)$/)
+  if (nisar) return `Track ${nisar[1]} · Frame ${nisar[3]} · ${nisar[2] === "A" ? "Ascending" : "Descending"}`
+  const opera = group.match(/^(T\d+)-(\d+)-(IW[123])$/)
+  if (opera) return `${opera[1]} · Burst ${opera[2]} · ${opera[3]}`
+  return group
 }
 
 export type NisarPolarization = "HHHH" | "HVHV"
@@ -66,9 +77,10 @@ export function catalogueObservation(
   const previews = item.assets.filter((asset) => asset.access === "public" && asset.roles.some((role) => ["browse", "thumbnail"].includes(role)))
   const nisar = isNisarCollection(item)
   const nisarPreviewAsset = nisar ? nisarPreview(previews, polarization) : null
-  if (nisar && !nisarPreviewAsset) throw new Error("The selected NISAR record has no published browse image.")
+  // A record without the requested polarization must not break the whole imported series;
+  // fall back to any published browse render and leave the image absent if none exists.
   const preview = nisar
-    ? nisarPreviewAsset!.asset
+    ? nisarPreviewAsset?.asset ?? previews.find((asset) => /_NATIVE\.png(?:\?|$)/i.test(asset.href)) ?? previews[0]
     : previews.find((asset) => /_BROWSE_low-res\.png(?:\?|$)/i.test(asset.href))
       ?? previews.find((asset) => /_BROWSE_thumbnail\.png(?:\?|$)/i.test(asset.href))
   const nisarPolarization = nisarPreviewAsset?.asset.href.match(/_NATIVE_[AB]_([HV]{4})\.png(?:\?|$)/i)?.[1]

@@ -19,9 +19,13 @@ The name search offers reference places, not a global geocoder. Any valid worldw
 
 Share links capture the selected bounds, dates, footprint and acquisition IDs. If a shared record is outside the loaded pages, the explorer asks you to load more or explicitly choose available records instead of silently showing a different scene.
 
+Argus appears only in Explore as a compact, fixed chat window. It receives the same loaded acquisitions, selected footprint, dates and computed preview statistics as the evidence drawer. Questions use the existing optional Groq configuration, with clearly labelled data-based answers if AI is unavailable. Context changes cancel pending answers and clear the old thread; closing and reopening preserves the current conversation. Argus does not inspect images or issue warnings.
+
+Home includes a muted, looping eight-second orbital background clip (`public/orbit-hero.mp4`, 1280x720 at 24 fps, about 167 KiB), trimmed from the supplied `nasa_svs_5615_orbit_1080p60.mp4`. Reduced-motion and low-bandwidth preferences use `orbit-hero.jpg` instead. The separate YouTube project walkthrough remains available below the hero.
+
 The app starts without waiting for a mock service worker. Reference pages and GroundLine still use the existing repository; MSW is used for tests. `VITE_API_BASE_URL` configures that separate full-repository boundary, not the live imagery catalogue. Do not set `VITE_DATA_ORIGIN=live` merely to relabel fixture records.
 
-For a static hosted build, set `VITE_CATALOGUE_API_BASE_URL=https://YOUR-WORKER.workers.dev/api/catalog` at build time and allow the exact frontend origin in the Worker. Vite's local API is not deployed with static assets. No cloud deployment has been performed; an unconfigured hosted catalogue reports an error rather than returning fixtures.
+Vercel serves the catalogue on the same origin through `api/index.ts`. For other static hosts, set `VITE_CATALOGUE_API_BASE_URL=https://YOUR-WORKER.workers.dev/api/catalog` at build time and allow the exact frontend origin in the Worker. An unconfigured static host reports an error rather than returning fixtures.
 
 ## Verification
 

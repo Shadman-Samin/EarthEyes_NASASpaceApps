@@ -13,7 +13,7 @@ export default defineConfig({
   },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+    { name: "firefox", workers: 1, use: { ...devices["Desktop Firefox"] } },
     { name: "mobile", use: { ...devices["Pixel 5"], viewport: { width: 360, height: 800 } } },
   ],
   webServer: {

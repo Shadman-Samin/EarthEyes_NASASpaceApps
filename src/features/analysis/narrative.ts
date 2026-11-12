@@ -1,4 +1,5 @@
 import type { RealtimeContext } from "./realtime"
+import { askGroq, groqCacheKey, groqConfigured, groqModel, groqVisionModel } from "../ai/groq"
 
 export type Narrative = { headline: string; summary: string; limits: string[]; source: "groq-vision" | "groq" | "template" }
 
@@ -34,12 +35,12 @@ function template(ctx: RealtimeContext, diff?: { changedPct: number; brighterPct
     if (!ctx.acquisitionCount) {
       return { headline: `No acquisitions for ${ctx.placeName}`, summary: `No radar records found for ${ctx.areaLabel} in this window. Try a wider date range or a different area.`, limits: ["No imagery available to analyze."], source: "template" }
     }
-    return { headline: `${ctx.acquisitionCount} radar acquisitions over ${ctx.placeName}`, summary: `Loaded ${ctx.acquisitionCount} real acquisitions for ${ctx.areaLabel}${ctx.dateWindow ? ` (${ctx.dateWindow.start}–${ctx.dateWindow.end})` : ""}. Select or wait for two previews to analyze visual change.`, limits: ["At least two acquisitions with images are needed for a visual comparison."], source: "template" }
+    return { headline: `${ctx.footprintAcquisitionCount} radar acquisitions over ${ctx.placeName}`, summary: `Loaded ${ctx.footprintAcquisitionCount} acquisition dates in the selected footprint (${ctx.acquisitionCount} records across ${ctx.groupCount} footprints) for ${ctx.areaLabel}${ctx.dateWindow ? ` (${ctx.dateWindow.start}–${ctx.dateWindow.end})` : ""}. Select or wait for two previews to analyze visual change.`, limits: ["At least two acquisitions with images are needed for a visual comparison."], source: "template" }
   }
   if (diff) {
     return {
       headline: `${ctx.placeName}: ~${diff.changedPct}% of preview shows change (${pair.from} → ${pair.to})`,
-      summary: `${diff.headline}. ${diff.detail} Computed in real time by comparing pulled radar preview images over ${ctx.areaLabel} (${ctx.productLabel}). ${ctx.acquisitionCount} acquisitions in this footprint.`,
+      summary: `${diff.headline}. ${diff.detail} Computed in real time by comparing pulled radar preview images over ${ctx.areaLabel} (${ctx.productLabel}). ${ctx.footprintAcquisitionCount} acquisition dates in this footprint; ${ctx.acquisitionCount} records loaded across ${ctx.groupCount} footprints.`,
       limits: ["Exploratory: based on browse preview images, not a calibrated or georeferenced measurement.", "Brightness change can reflect water, moisture, roughness, season, or imaging conditions — not only permanent change.", "Not a hazard warning."],
       source: "template",
     }
@@ -54,16 +55,16 @@ export async function generateNarrative(opts: {
   laterImageUrl?: string
 }): Promise<Narrative> {
   const { ctx, diff, earlierImageUrl, laterImageUrl } = opts
-  const apiKey = import.meta.env.VITE_GROQ_API_KEY as string | undefined
   const base = template(ctx, diff)
-  if (!apiKey) return base
+  if (!groqConfigured()) return base
   const facts = {
     place: ctx.placeName,
     area: ctx.areaLabel,
     bounds: ctx.bounds,
     product: ctx.productLabel,
     window: ctx.dateWindow,
-    acquisitions: ctx.acquisitionCount,
+    recordsLoaded: ctx.acquisitionCount,
+    acquisitionDatesInFootprint: ctx.footprintAcquisitionCount,
     footprints: ctx.groupCount,
     orbits: ctx.orbits,
     polarizations: ctx.polarizations,
@@ -73,19 +74,22 @@ export async function generateNarrative(opts: {
   }
   const system = 'You are an earth-observation analyst explaining satellite SAR imagery to non-experts and judges. Use ONLY the provided facts and what you can see in the images. Never invent numbers, causes, or certainty. Be specific to this place and dates. Distinguish observation from interpretation. Keep it short (3-6 sentences). Output strict JSON: {"headline":"...","summary":"...","limits":["...","..."]}.'
   const userText = `Facts (computed in real time from pulled archive data, do not contradict):\n${JSON.stringify(facts, null, 2)}\n\nExplain what a viewer sees and what changed between the earlier and later radar preview for this exact location. If images are provided, describe visible patterns (darker=smoother/water, brighter=rough/vegetation/ice texture) and relate them to the computed diff stats. Be relevant to this place and dates. State limits honestly.`
-  const textModel = (import.meta.env.VITE_GROQ_MODEL as string | undefined) || "qwen/qwen3.8-27b"
-  const visionModel = import.meta.env.VITE_GROQ_VISION_MODEL as string | undefined
+  const textModel = groqModel()
+  const visionModel = groqVisionModel()
+  const cacheKey = groqCacheKey({ facts, images: Boolean(visionModel && earlierImageUrl && laterImageUrl) })
 
   const request = async (model: string, content: string | Array<Record<string, unknown>>) => {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({ model, messages: [{ role: "system", content: system }, { role: "user", content }], temperature: 0.2, max_tokens: 450, response_format: { type: "json_object" } }),
+    const result = await askGroq({
+      system,
+      messages: [{ role: "user", content }],
+      model,
+      json: true,
+      temperature: 0.2,
+      maxTokens: 450,
+      cacheKey: `${cacheKey}|${model}`,
     })
-    if (!res.ok) throw new Error(String(res.status))
-    const data = await res.json()
-    const raw = data?.choices?.[0]?.message?.content
-    const parsed = typeof raw === "string" ? JSON.parse(raw) : raw
+    if (!result) throw new Error("unavailable")
+    const parsed = JSON.parse(result.text)
     if (!parsed?.headline || !parsed?.summary) throw new Error("invalid narrative")
     return {
       headline: String(parsed.headline),

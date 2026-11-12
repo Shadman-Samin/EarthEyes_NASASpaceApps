@@ -42,8 +42,8 @@ test("the existing explorer loads real NISAR source images and keeps its compari
   await page.getByLabel("Explorer controls").getByRole("button", { name: "Side by side", exact: true }).click()
   await expect(page.getByRole("heading", { name: "SAR browse previews" })).toBeVisible()
   await page.getByLabel("Explorer controls").getByText("Advanced options (optional)", { exact: true }).click()
-  await page.getByRole("combobox", { name: "Footprint", exact: true }).selectOption("NISAR_L2_PR_GCOV_023_091_D_077_2005_DHDH_M")
-  await expect(viewer.locator('img[src*="023_091_D_077_2005_DHDH_M"]')).toHaveCount(2)
+  await page.getByRole("combobox", { name: "Footprint", exact: true }).selectOption("091_D_077")
+  await expect(viewer.locator('img[src*="091_D_077"]')).toHaveCount(2)
   await expect(page.getByRole("link", { name: "Live catalogue", exact: true })).toHaveCount(0)
 })
 

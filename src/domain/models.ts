@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const moduleIdSchema = z.enum(["coastal", "ice", "glof"])
+export const moduleIdSchema = z.enum(["coastal", "flood", "ice", "glof"])
 export const dataClassSchema = z.enum([
   "observed",
   "derived",

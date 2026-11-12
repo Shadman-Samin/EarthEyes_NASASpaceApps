@@ -5,6 +5,7 @@ import type { AcquisitionSeriesPoint, RealtimeContext } from "../analysis/realti
 import type { BrowseComparison } from "../comparison/useBrowseComparison"
 import { generateNarrative, type Narrative } from "../analysis/narrative"
 import { formatDate, formatDateTime } from "../../shared/formatting"
+import { acquisitionGroupLabel } from "../../data/live-explorer"
 import { DataBadge, Icon, StatePanel } from "../../shared/ui"
 
 function DiffCanvas({ result }: { result: NonNullable<BrowseComparison["result"]> }) {
@@ -21,7 +22,9 @@ function DiffCanvas({ result }: { result: NonNullable<BrowseComparison["result"]
 
 function SummaryTab({ place, ctx, compared, browse, series }: { place: Place; ctx: RealtimeContext; compared: { left: Observation; right: Observation } | null; browse: BrowseComparison; series: AcquisitionSeriesPoint[] }) {
   const [narrativeState, setNarrativeState] = useState<{ key: string; value: Narrative | null }>({ key: "", value: null })
-  const pairKey = compared ? `${compared.left.id}|${compared.right.id}|${browse.status}|${browse.summary?.changedPct ?? ""}` : "none"
+  const pairKey = compared
+    ? `${compared.left.id}|${compared.right.id}|${browse.status}|${browse.summary?.changedPct ?? ""}`
+    : `acq-${series.length}-${ctx.dateWindow?.start ?? ""}-${ctx.dateWindow?.end ?? ""}`
   const loadingNarrative = narrativeState.key !== pairKey
   const narrative = narrativeState.key === pairKey ? narrativeState.value : null
   useEffect(() => {
@@ -33,60 +36,84 @@ function SummaryTab({ place, ctx, compared, browse, series }: { place: Place; ct
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pairKey])
 
+  const first = series[0]
+  const last = series[series.length - 1]
+  const noComparison = !compared
+
   return (
     <div className="evidence-summary realtime-evidence">
       <div className="evidence-summary__place">
         <span className="section-kicker">Real-time analysis</span>
         <h2>{place.name}</h2>
-        <p>Generated now from {series.length} pulled acquisitions over {ctx.areaLabel}.</p>
+        <p>Generated now from {series.length} pulled acquisition{series.length === 1 ? "" : "s"} over {ctx.areaLabel} · {acquisitionGroupLabel(ctx.groupLabel)} ({ctx.acquisitionCount} records loaded across {ctx.groupCount} footprints).</p>
       </div>
 
-      {compared ? (
-        <article className="realtime-summary-card">
-          <div className="realtime-summary-card__head">
-            <DataBadge value="derived" />
-            <span className="section-kicker">{browse.status === "ready" ? "Visual analysis (computed from pulled images)" : "Analyzing pulled images…"}</span>
-          </div>
-          <h3>{narrative?.headline ?? (browse.summary?.headline || `Comparing ${ctx.comparedPair?.from} → ${ctx.comparedPair?.to}`)}</h3>
-          <p className="realtime-lead">{loadingNarrative ? "Interpreting pulled imagery and computed change…" : (narrative?.summary ?? browse.summary?.detail ?? "Computing visual change from the pulled preview images.")}</p>
-          {narrative?.source && <small className="narrative-source">Interpretation: {narrative.source === "groq-vision" ? "Groq vision (from imagery + facts)" : narrative.source === "groq" ? "Groq (from facts)" : "computed summary"}</small>}
+      <article className="realtime-summary-card">
+        <div className="realtime-summary-card__head">
+          <DataBadge value={compared ? "derived" : "observed"} />
+          <span className="section-kicker">
+            {compared
+              ? browse.status === "ready" ? "Visual comparison (computed from pulled images)" : "Preparing visual comparison…"
+              : "Acquisition overview — comparison needs 2 or more dates"}
+          </span>
+        </div>
+        <h3>{narrative?.headline ?? (browse.summary?.headline || (compared ? `Comparing ${ctx.comparedPair?.from} → ${ctx.comparedPair?.to}` : `${series.length} acquisition${series.length === 1 ? "" : "s"} for ${place.name}`))}</h3>
+        <p className="realtime-lead">{loadingNarrative ? "Interpreting the pulled data…" : (narrative?.summary ?? browse.summary?.detail ?? (compared ? "Computing visual change from the pulled preview images." : "Showing the pulled acquisition record. A before/after view appears when at least two dates are available."))}</p>
+        {narrative?.source && <small className="narrative-source">Interpretation: {narrative.source === "groq-vision" ? "Groq vision (imagery + facts)" : narrative.source === "groq" ? "Groq (from live facts)" : "computed summary"}</small>}
 
-          <div className="realtime-visual-grid">
-            <figure>
-              {compared.left.imageUrl ? <img src={compared.left.imageUrl} alt={`Earlier radar preview ${formatDateTime(compared.left.acquiredAt)}`} loading="lazy" /> : <div className="realtime-img-missing">No preview</div>}
-              <figcaption>Earlier · {formatDate(compared.left.acquiredAt)}</figcaption>
-            </figure>
-            <figure>
-              {compared.right.imageUrl ? <img src={compared.right.imageUrl} alt={`Later radar preview ${formatDateTime(compared.right.acquiredAt)}`} loading="lazy" /> : <div className="realtime-img-missing">No preview</div>}
-              <figcaption>Later · {formatDate(compared.right.acquiredAt)}</figcaption>
-            </figure>
-            <figure className="realtime-diff-figure">
-              {browse.status === "ready" && browse.result ? <DiffCanvas result={browse.result} /> : <div className="realtime-img-missing">{browse.status === "loading" ? "Computing difference…" : browse.status === "error" ? (browse.error || "Analysis unavailable") : "No comparable previews"}</div>}
-              <figcaption>Computed difference (warm = brighter later, teal = darker later)</figcaption>
-            </figure>
-          </div>
-
-          {browse.summary && (
-            <div className="realtime-metrics" aria-label="Computed change metrics">
-              <div className="realtime-metric"><strong>{browse.summary.changedPct}%</strong><span>visibly changed</span></div>
-              <div className="realtime-metric"><strong>{browse.summary.brighterPct}%</strong><span>brighter later</span></div>
-              <div className="realtime-metric"><strong>{browse.summary.darkerPct}%</strong><span>darker later</span></div>
-              <div className="realtime-metric"><strong>{series.length}</strong><span>acquisitions</span></div>
+        {compared ? (
+          <>
+            <div className="realtime-visual-grid">
+              <figure>
+                {compared.left.imageUrl ? <img src={compared.left.imageUrl} alt={`Earlier radar preview ${formatDateTime(compared.left.acquiredAt)}`} loading="lazy" /> : <div className="realtime-img-missing">No preview</div>}
+                <figcaption>Earlier · {formatDate(compared.left.acquiredAt)}</figcaption>
+              </figure>
+              <figure>
+                {compared.right.imageUrl ? <img src={compared.right.imageUrl} alt={`Later radar preview ${formatDateTime(compared.right.acquiredAt)}`} loading="lazy" /> : <div className="realtime-img-missing">No preview</div>}
+                <figcaption>Later · {formatDate(compared.right.acquiredAt)}</figcaption>
+              </figure>
+              <figure className="realtime-diff-figure">
+                {browse.status === "ready" && browse.result ? <DiffCanvas result={browse.result} /> : <div className="realtime-img-missing">{browse.status === "loading" ? "Computing difference…" : browse.status === "error" ? (browse.error || "Analysis unavailable") : "No comparable previews"}</div>}
+                <figcaption>Computed difference (warm = brighter later, teal = darker later)</figcaption>
+              </figure>
             </div>
-          )}
 
-          <details className="realtime-limits">
-            <summary>What this means &amp; limits</summary>
-            <ul>{(narrative?.limits ?? ["Exploratory comparison of pulled preview images, not a calibrated measurement."]).map((l, i) => <li key={i}>{l}</li>)}</ul>
-          </details>
-        </article>
-      ) : (
-        <StatePanel compact title={ctx.acquisitionCount ? "Loading comparison" : "No acquisitions found"} message={ctx.acquisitionCount ? "Pulled acquisitions are ready; visual comparison will appear once two preview images are available." : `No radar records were returned for ${ctx.areaLabel} in this window. Try a wider date range or a different area.`} icon={ctx.acquisitionCount ? "calendar" : "alert"} />
-      )}
+            {browse.summary && (
+              <div className="realtime-metrics" aria-label="Computed change metrics">
+                <div className="realtime-metric"><strong>{browse.summary.changedPct}%</strong><span>visibly changed</span></div>
+                <div className="realtime-metric"><strong>{browse.summary.brighterPct}%</strong><span>brighter later</span></div>
+                <div className="realtime-metric"><strong>{browse.summary.darkerPct}%</strong><span>darker later</span></div>
+                <div className="realtime-metric"><strong>{series.length}</strong><span>acquisitions</span></div>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="realtime-single">
+            <dl className="realtime-facts">
+              <div><dt>Acquisition dates</dt><dd>{series.length || 0}</dd></div>
+              <div><dt>Records loaded</dt><dd>{ctx.acquisitionCount} across {ctx.groupCount} footprint{ctx.groupCount === 1 ? "" : "s"}</dd></div>
+              <div><dt>Date range</dt><dd>{first && last ? `${formatDate(first.acquiredAt)} → ${formatDate(last.acquiredAt)}` : ctx.dateWindow ? `${ctx.dateWindow.start} → ${ctx.dateWindow.end}` : "No dates loaded"}</dd></div>
+              <div><dt>Product</dt><dd>{ctx.productLabel}</dd></div>
+              <div><dt>Footprint</dt><dd>{acquisitionGroupLabel(ctx.groupLabel)}</dd></div>
+              <div><dt>Source maturity</dt><dd>{ctx.sourceMaturity}</dd></div>
+            </dl>
+            {series.length === 0 ? (
+              <StatePanel compact title="No radar records in this window" message={`Nothing was returned for ${ctx.areaLabel}. Widen the dates or move the map, then the timeline and summary will fill in automatically.`} icon="calendar" />
+            ) : (
+              <p className="realtime-hint"><Icon name="info" size={15} /> One acquisition is enough for the timeline and metadata. It is not enough for a before/after difference; load more records or widen the date window.</p>
+            )}
+          </div>
+        )}
+
+        <details className="realtime-limits" open={noComparison && series.length === 0}>
+          <summary>What this means &amp; limits</summary>
+          <ul>{(narrative?.limits ?? ["Exploratory comparison of pulled preview images, not a calibrated measurement."]).map((l, i) => <li key={i}>{l}</li>)}</ul>
+        </details>
+      </article>
 
       {series.length > 0 && (
         <div className="realtime-acq-list">
-          <span className="section-kicker">Pulled acquisitions ({series.length})</span>
+          <span className="section-kicker">Latest {Math.min(series.length, 8)} of {series.length} acquisition dates</span>
           <ul>{series.slice(-8).map((p) => <li key={p.id}><strong>{p.date}</strong> · {p.platform} · {p.polarization}</li>)}</ul>
         </div>
       )}
@@ -95,7 +122,7 @@ function SummaryTab({ place, ctx, compared, browse, series }: { place: Place; ct
 }
 
 function ChartTab({ series, compared, browse }: { series: AcquisitionSeriesPoint[]; compared: { left: Observation; right: Observation } | null; browse: BrowseComparison }) {
-  if (!series.length) return <StatePanel compact title="No acquisitions" message="No pulled data in this window. Widen the date range or move the area." icon="calendar" />
+  if (!series.length) return <div className="chart-shell realtime-chart"><StatePanel compact title="No acquisitions in this window" message="Nothing was pulled for this area and date range. Widen the dates or move the map; this chart fills in automatically when records arrive." icon="calendar" /></div>
   const byDay = [...series].sort((a, b) => a.acquiredAt.localeCompare(b.acquiredAt))
   const minT = new Date(byDay[0].acquiredAt).getTime()
   const maxT = new Date(byDay[byDay.length - 1].acquiredAt).getTime()
@@ -129,6 +156,7 @@ function ChartTab({ series, compared, browse }: { series: AcquisitionSeriesPoint
         <thead><tr><th>Date</th><th>Sensor</th><th>Polarization</th><th>Orbit</th></tr></thead>
         <tbody>{byDay.map((p) => <tr key={p.id} className={comparedIds.has(p.id) ? "row-active" : ""}><td>{p.date}</td><td>{p.platform}</td><td>{p.polarization}</td><td>{p.orbit}</td></tr>)}</tbody>
       </table>
+      {series.length < 2 && <p className="chart-note"><strong>Only {series.length} acquisition is loaded.</strong> The timeline works with one record, but a change comparison needs two or more dates. Widen the date window or use Load more.</p>}
       <p className="chart-note">Chart shows acquisition availability over time from real pulled data. Change bars are computed from preview-image comparison (exploratory), not calibrated geophysical measurement.</p>
     </div>
   )
@@ -141,8 +169,9 @@ function ContextTab({ ctx, moduleId }: { ctx: RealtimeContext; moduleId: ModuleI
       <article><h3>Data pulled (real-time)</h3><ul>
         <li>Product: {ctx.productLabel}</li>
         <li>Window: {ctx.dateWindow ? `${ctx.dateWindow.start} to ${ctx.dateWindow.end}` : "n/a"}</li>
-        <li>Acquisitions loaded: {ctx.acquisitionCount} ({ctx.groupCount} footprints)</li>
-        <li>Footprint: {ctx.groupLabel}</li>
+        <li>Acquisition dates here: {ctx.footprintAcquisitionCount} (selected footprint)</li>
+        <li>Records loaded: {ctx.acquisitionCount} across {ctx.groupCount} footprints</li>
+        <li>Footprint: {acquisitionGroupLabel(ctx.groupLabel)}</li>
         <li>Orbit(s): {ctx.orbits.join(", ") || "not reported"}</li>
         <li>Polarization: {ctx.polarizations.join(", ") || "see acquisition"}</li>
         <li>Source maturity: {ctx.sourceMaturity}</li>

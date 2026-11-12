@@ -73,8 +73,8 @@ export const catalogueQuerySchema = z.strictObject({
   cursor: z.string().min(1).max(4096).regex(/^[A-Za-z0-9_-]+$/).optional(),
 }).superRefine((query, ctx) => {
   const days = (Date.parse(query.end) - Date.parse(query.start)) / 86_400_000 + 1
-  if (days < 1 || days > 366) {
-    ctx.addIssue({ code: "custom", path: ["end"], message: "Choose 1 to 366 calendar days, inclusive" })
+  if (days < 1) {
+    ctx.addIssue({ code: "custom", path: ["end"], message: "The end date must not precede the start date" })
   }
   if (query.cursor && query.bbox[0] > query.bbox[2]) {
     ctx.addIssue({ code: "custom", path: ["cursor"], message: "A continuation must use its returned longitude partition" })

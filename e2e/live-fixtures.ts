@@ -54,6 +54,13 @@ function nisarItems(bbox: number[]): CatalogueItem[] {
 
 export const test = base.extend<{ liveArchive: void }>({
   liveArchive: [async ({ page }, use) => {
+    // Browser verification must not spend an account's AI quota or send live credentials.
+    await page.route("https://api.groq.com/**", (route) => route.abort())
+    // Verify our embed contract without depending on YouTube availability or its changing UI.
+    await page.route("https://www.youtube.com/embed/**", (route) => route.fulfill({
+      contentType: "text/html",
+      body: '<!doctype html><html lang="en"><head><title>Walkthrough player test boundary</title></head><body><main><p>YouTube player placeholder for deterministic browser tests.</p></main></body></html>',
+    }))
     await page.route("**/api/catalog/search?*", (route) => {
       const params = new URL(route.request().url()).searchParams
       const bbox = params.get("bbox")!.split(",").map(Number)

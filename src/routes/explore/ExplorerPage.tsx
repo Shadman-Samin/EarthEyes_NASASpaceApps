@@ -1,5 +1,5 @@
 import * as Dialog from "@radix-ui/react-dialog"
-import { lazy, Suspense, useMemo, useRef, useState, type FormEvent } from "react"
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type FormEvent } from "react"
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import { Group, Panel, Separator } from "react-resizable-panels"
 import { useParams, useSearchParams } from "react-router-dom"
@@ -8,11 +8,12 @@ import { catalogueBoundsSchema, catalogueProductIdSchema, catalogueQuerySchema, 
 import { moduleRegistry } from "../../domain/module-registry"
 import { usePlace } from "../../data/queries"
 import { catalogueItemKey, fetchCatalogue } from "../../data/catalogue"
-import { acquisitionGroup, catalogueObservation, nisarSource, operaSource, type NisarPolarization, type NisarProductKey } from "../../data/live-explorer"
+import { acquisitionGroup, acquisitionGroupLabel, catalogueObservation, nisarSource, operaSource, type NisarPolarization, type NisarProductKey } from "../../data/live-explorer"
 import { bestGroup, buildRealtimeContext, buildSeries, pickBestPair } from "../../features/analysis/realtime"
 import { useBrowseComparison } from "../../features/comparison/useBrowseComparison"
 import { ComparisonViewer } from "../../features/comparison/ComparisonViewer"
 import { EvidenceDrawer } from "../../features/evidence/EvidenceDrawer"
+import { Argus } from "../../features/argus/Argus"
 import { ExplorerControls } from "../../features/explorer/ExplorerControls"
 import { useExplorerState } from "../../features/explorer/useExplorerState"
 import { PlaceSearch } from "../../features/search/PlaceSearch"
@@ -47,12 +48,18 @@ function ExplorerWorkspace({ place }: { place: Place }) {
     queryKey: ["explorer-catalogue", query], enabled: query !== null,
     initialPageParam: [] as CatalogueSearchResult["next"],
     queryFn: ({ pageParam, signal }) => {
-      if (!query) throw new Error("Choose valid bounds and a date window of 1 to 366 days.")
+      if (!query) throw new Error("Choose valid bounds and a start date before the end date.")
       return Promise.all((pageParam.length ? pageParam.map((partition) => ({ ...query, ...partition })) : [query]).map((request) => fetchCatalogue(request, signal)))
     },
     getNextPageParam: (pages) => { const next = pages.flatMap((page) => page.next); return next.length ? next : undefined },
     retry: false, refetchOnWindowFocus: false, refetchOnReconnect: false, refetchOnMount: false, staleTime: 300_000,
   })
+  const autoPageCount = archive.data?.pages.length ?? 0
+  useEffect(() => {
+    // Pull a few pages automatically so a place has several dates to compare, not just the first page.
+    if (!archive.hasNextPage || archive.isFetching || autoPageCount >= 3) return
+    void archive.fetchNextPage()
+  }, [archive, autoPageCount])
   const pages = useMemo(() => archive.data?.pages.flat() ?? [], [archive.data])
   const items = useMemo(() => [...new Map(pages.flatMap((page) => page.items).map((item) => [catalogueItemKey(item), item])).values()], [pages])
   const groups = useMemo(() => [...new Set(items.map(acquisitionGroup))], [items])
@@ -61,10 +68,21 @@ function ExplorerWorkspace({ place }: { place: Place }) {
   const autoGroup = useMemo(() => bestGroup(items), [items])
   const group = requestedGroup ?? (requestedItem ? acquisitionGroup(requestedItem) : autoGroup || groups[0] || "")
   const groupItems = useMemo(() => items.filter((item) => acquisitionGroup(item) === group).sort((a, b) => a.acquiredAt.localeCompare(b.acquiredAt)), [items, group])
-  const observations = useMemo(() => groupItems.map((item) => catalogueObservation(item, place.id, moduleId, { polarization })), [groupItems, place.id, moduleId, polarization])
+  const observations = useMemo(() => {
+    // One comparable observation per acquisition day; duplicate products on the same pass
+    // must not become a fake "before/after" pair. Prefer the record that has a preview.
+    const byDay = new Map<string, ReturnType<typeof catalogueObservation>>()
+    for (const item of groupItems) {
+      const observation = catalogueObservation(item, place.id, moduleId, { polarization })
+      const day = observation.acquiredAt.slice(0, 10)
+      const existing = byDay.get(day)
+      if (!existing || (!existing.imageUrl && observation.imageUrl)) byDay.set(day, observation)
+    }
+    return [...byDay.values()]
+  }, [groupItems, place.id, moduleId, polarization])
   const layers: LayerDefinition[] = useMemo(() => [
     { id: "acquisition-footprint", moduleId, label: "Acquisition footprints", description: "Loaded acquisition areas.", classification: "observed", quality: "validated", sourceId: activeSource.id, unit: null, color: "#3ca9ad", defaultEnabled: true },
-    { id: "sar-preview", moduleId, label: "Selected SAR preview", description: "Official browse image, shown separately from the georeferenced map.", classification: "observed", quality: "validated", sourceId: activeSource.id, unit: null, color: "#c8e56b", defaultEnabled: true },
+    { id: "sar-preview", moduleId, label: "SAR browse overlay", description: "Official browse image draped over the acquisition footprint (approximate placement, not georeferenced).", classification: "observed", quality: "validated", sourceId: activeSource.id, unit: null, color: "#c8e56b", defaultEnabled: true },
   ], [moduleId, activeSource.id])
   const [mobileSheet, setMobileSheet] = useState<MobileSheet>(null)
   const mobileSheetTrigger = useRef<HTMLButtonElement | null>(null)
@@ -97,7 +115,7 @@ function ExplorerWorkspace({ place }: { place: Place }) {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
     const parsed = catalogueQuerySchema.safeParse({ product: form.get("product") ?? product, bbox: String(form.get("bbox")).split(",").map((value) => value.trim() ? Number(value) : NaN), start: form.get("start"), end: form.get("end"), limit: 20 })
-    if (!parsed.success) { setFormError("Enter valid bounds and a date window of 1 to 366 days."); return }
+    if (!parsed.success) { setFormError("Enter valid bounds and a start date before the end date."); return }
     setFormError("")
     void queryClient.resetQueries({ queryKey: ["explorer-catalogue", parsed.data], exact: true })
     setSearchParams((current) => {
@@ -134,8 +152,16 @@ function ExplorerWorkspace({ place }: { place: Place }) {
       onPlaceChange={state.setPlace} onModuleChange={state.setModule} onModeChange={state.setMode} onPairChange={state.setPair} onToggleLayer={state.toggleLayer}
       archive={(
         <section className="control-rail__section archive-search">
-          <h2 className="control-label"><Icon name="globe" size={16} /> Live radar data</h2>
-          <p><strong>Best options auto-selected.</strong> {items.length ? `${items.length} acquisitions loaded. Visual analysis runs automatically.` : "Pulling real satellite data for this area…"}</p>
+          <div className="archive-search__head">
+            <h2 className="control-label"><Icon name="globe" size={16} /> Live radar data</h2>
+            <span className={`archive-pill ${items.length ? "archive-pill--live" : "archive-pill--waiting"}`}><i /> {items.length ? `${items.length} records` : "pulling"}</span>
+          </div>
+          <p className="archive-search__source"><strong>{activeSource.name}</strong><br />{query ? `${query.start} → ${query.end}` : "Waiting for a valid area"}</p>
+          <p className="archive-search__hint">
+            {items.length
+              ? `${observations.length} acquisition date${observations.length === 1 ? "" : "s"} in the selected footprint (${items.length} records across ${groups.length} footprints). Summary, chart and comparison update automatically.`
+              : "Pulling real NASA satellite records for this area. No demo data is substituted."}
+          </p>
           <details className="archive-search__filters">
             <summary>Advanced options (optional)</summary>
             <form key={`${place.bounds.join(",")}/${query?.start}/${query?.end}/${product}`} onSubmit={submitArchive}>
@@ -145,10 +171,19 @@ function ExplorerWorkspace({ place }: { place: Place }) {
               <label>Area (W,S,E,N)<input name="bbox" required defaultValue={place.bounds.join(",")} /></label>
               <Button type="submit" size="small" disabled={archive.isFetching}>{archive.isFetching ? "Searching…" : "Apply"}</Button>
             </form>
-            {(groups.length > 0 || requestedGroup) && <label>Footprint<select value={group} onChange={(event) => setSearchParams((current) => { const next = new URLSearchParams(current); next.set("burst", event.target.value); next.delete("left"); next.delete("right"); return next })}>{!groups.includes(group) && <option value={group}>Requested</option>}{groups.map((id) => <option key={id} value={id}>{items.filter((item) => acquisitionGroup(item) === id).length} records</option>)}</select></label>}
+            {(groups.length > 1 || (requestedGroup && !groups.includes(requestedGroup))) && (
+              <>
+                <label>Footprint<select value={group} onChange={(event) => setSearchParams((current) => { const next = new URLSearchParams(current); next.set("burst", event.target.value); next.delete("left"); next.delete("right"); return next })}>{!groups.includes(group) && <option value={group}>Requested footprint</option>}{groups.map((id) => {
+                  const gi = items.filter((item) => acquisitionGroup(item) === id)
+                  const dates = new Set(gi.map((item) => item.acquiredAt.slice(0, 10))).size
+                  return <option key={id} value={id}>{acquisitionGroupLabel(id)} — {dates} date{dates === 1 ? "" : "s"}</option>
+                })}</select></label>
+                <small>Footprints are grouped by track and frame so before/after dates cover the same ground.</small>
+              </>
+            )}
           </details>
           {formError && <p role="alert">{formError}</p>}
-          {archive.hasNextPage && <Button tone="secondary" size="small" disabled={archive.isFetching} onClick={() => { void archive.fetchNextPage() }}>Load more</Button>}
+          {archive.hasNextPage && <Button tone="secondary" size="small" disabled={archive.isFetching} onClick={() => { void archive.fetchNextPage() }}>Load more dates</Button>}
           {archive.isError && <p role="alert">{archive.error.message}</p>}
         </section>
       )}
@@ -227,6 +262,7 @@ function ExplorerWorkspace({ place }: { place: Place }) {
       {!waiting && !missingSelection && observations.length > 0 && (
         <ObservationTimeline observations={observations} selectedId={pairRight?.id ?? state.rightId} events={[]} onSelect={state.selectObservation} dataOrigin="live" />
       )}
+      <Argus context={{ view: rtContext, acquisitions: series, comparison: { status: browse.status, summary: missingSelection ? null : browse.summary }, catalogueStatus: waiting ? "loading" : failed ? "error" : "ready", hasMore: Boolean(archive.hasNextPage), missingSelection }} />
     </main>
   )
 }
@@ -241,7 +277,7 @@ export function ExplorerPage() {
     if (!bounds.success) return <main id="main-content"><StatePanel title="Invalid map area" message="Use west,south,east,north bounds in valid WGS84 coordinates." icon="alert" /></main>
     const [west, south, east, north] = bounds.data
     const centerLongitude = (west + (east < west ? east + 360 : east)) / 2
-    return <ExplorerWorkspace place={{ id: "selected-area", name: "Selected map area", country: "", kind: "area", center: [centerLongitude > 180 ? centerLongitude - 360 : centerLongitude, (south + north) / 2], bounds: bounds.data, description: "Real-time analysis from pulled satellite data for this area.", moduleIds: ["coastal", "ice", "glof"], coverage: [] }} />
+    return <ExplorerWorkspace place={{ id: "selected-area", name: "Selected map area", country: "", kind: "area", center: [centerLongitude > 180 ? centerLongitude - 360 : centerLongitude, (south + north) / 2], bounds: bounds.data, description: "Real-time analysis from pulled satellite data for this area.", moduleIds: ["flood", "coastal", "ice", "glof"], coverage: [] }} />
   }
   if (placeQuery.isLoading) return <main id="main-content" className="route-loading"><Skeleton lines={8} /></main>
   if (placeQuery.isError) return <main id="main-content"><StatePanel title="Place unavailable" message="Could not load this place." icon="alert" /></main>

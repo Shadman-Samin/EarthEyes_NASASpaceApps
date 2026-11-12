@@ -17,8 +17,11 @@ export const places = placesSchema.parse([
     center: [90.1196, 21.8167],
     bounds: [90.02, 21.73, 90.23, 21.91],
     description: "A low-lying Bay of Bengal coast where shoreline and temporary surface-water signals require tide, surge, and settlement context.",
-    moduleIds: ["coastal"],
-    coverage: [{ moduleId: "coastal", start: "2024-01-01", end: "2026-10-18", sceneCount: 18, state: "available" }],
+    moduleIds: ["coastal", "flood"],
+    coverage: [
+      { moduleId: "coastal", start: "2024-01-01", end: "2026-10-18", sceneCount: 18, state: "available" },
+      { moduleId: "flood", start: "2024-01-01", end: "2026-10-18", sceneCount: 18, state: "available" },
+    ],
     storySlug: "kuakata-changing-coast",
   },
   {
@@ -29,8 +32,11 @@ export const places = placesSchema.parse([
     center: [90.3535, 22.701],
     bounds: [90.16, 22.54, 90.54, 22.84],
     description: "A riverine district used to connect inundation observations with settlement exposure and last-mile communication.",
-    moduleIds: ["coastal"],
-    coverage: [{ moduleId: "coastal", start: "2024-01-01", end: "2026-09-29", sceneCount: 14, state: "limited" }],
+    moduleIds: ["flood", "coastal"],
+    coverage: [
+      { moduleId: "flood", start: "2024-01-01", end: "2026-09-29", sceneCount: 14, state: "available" },
+      { moduleId: "coastal", start: "2024-01-01", end: "2026-09-29", sceneCount: 14, state: "limited" },
+    ],
     storySlug: "barishal-water-land",
   },
   {

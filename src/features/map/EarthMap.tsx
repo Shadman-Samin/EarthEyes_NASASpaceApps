@@ -98,7 +98,7 @@ export function EarthMap({
         source: "study-point",
         paint: {
           "circle-radius": 8,
-          "circle-color": initialModuleId.current === "coastal" ? "#39a9ad" : initialModuleId.current === "ice" ? "#cbe870" : "#eb7658",
+          "circle-color": initialModuleId.current === "coastal" ? "#39a9ad" : initialModuleId.current === "flood" ? "#4f9ff0" : initialModuleId.current === "ice" ? "#cbe870" : "#eb7658",
           "circle-stroke-color": "#19312d",
           "circle-stroke-width": 3,
         },
@@ -147,6 +147,37 @@ export function EarthMap({
     return () => { map.off("click", "live-acquisition-fill", select) }
   }, [mapReady, onObservationSelect])
 
+  // Overlay the selected acquisition's official browse image over its footprint so the
+  // satellite picture and the map are seen together (approximate placement, not a georeferenced raster).
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !mapReady) return
+    const sourceId = "sar-overlay"
+    const layerId = "sar-overlay-raster"
+    if (map.getLayer(layerId)) map.removeLayer(layerId)
+    if (map.getSource(sourceId)) map.removeSource(sourceId)
+    const item = catalogueItems?.find((candidate) => candidate.id === selectedObservation?.id)
+    const url = selectedObservation?.imageUrl
+    if (!activeLayers.includes("sar-preview") || !url || !item) return
+    const [west, south, east, north] = item.bbox
+    const eastUnwrapped = east < west ? east + 360 : east
+    try {
+      map.addSource(sourceId, {
+        type: "image",
+        url,
+        coordinates: [[west, north], [eastUnwrapped, north], [eastUnwrapped, south], [west, south]],
+      })
+      map.addLayer({
+        id: layerId,
+        type: "raster",
+        source: sourceId,
+        paint: { "raster-opacity": 0.78, "raster-fade-duration": 0 },
+      }, map.getLayer("study-fill") ? "study-fill" : undefined)
+    } catch {
+      // A failed overlay must never take down the base map; the preview panel remains available.
+    }
+  }, [selectedObservation?.id, selectedObservation?.imageUrl, catalogueItems, activeLayers, mapReady])
+
   const visibleLayers = layerDefinitions.filter((layer) => activeLayers.includes(layer.id))
 
   return (
@@ -173,7 +204,7 @@ export function EarthMap({
         <details className="earth-map__preview" open>
           <summary>Selected SAR image</summary>
           {lowBandwidth ? <p>Image paused in low-bandwidth mode.</p> : selectedObservation.imageUrl && failedPreview !== selectedObservation.imageUrl ? <img src={selectedObservation.imageUrl} alt={`Official SAR browse image acquired ${selectedObservation.acquiredAt}`} onError={() => setFailedPreview(selectedObservation.imageUrl)} /> : <p>Source preview unavailable.</p>}
-          <p>Official browse image, not a georeferenced map layer. Open Compare for the full view.</p>
+          <p>Official browse image, now overlaid on the map at its footprint (approximate placement). Dark = smooth or wet; bright = rough, built-up or vegetated. Open Compare for the full view.</p>
         </details>
       )}
 

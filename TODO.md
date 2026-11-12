@@ -101,12 +101,11 @@ All realtime output stays labelled exploratory: pulled preview images are uncali
 georeferenced, and not a hazard warning. The calibrated bundles under `public/analysis/**` remain
 reproducible but are no longer read by the explorer.
 
-### 0.6 Active handoff: full editorial UI overhaul (audit complete; implementation not started)
+### 0.6 Active handoff: full editorial UI overhaul (implemented; browser verification in progress)
 
 The owner requested a high-quality redesign of every public editorial page and the shared shell,
-plus an on-page project video. A read-only route/content/style/test audit is complete. **No source
-or style file was changed during this planning pass.** The next agent can begin implementation
-directly from this section.
+plus an on-page project video. The approved route/content/style audit has now been implemented.
+The execution record below tracks verification against this brief; unrelated backlog is unchanged.
 
 #### Required outcome
 
@@ -122,7 +121,7 @@ directly from this section.
 
 #### Page-by-page implementation plan
 
-- [ ] **UI.1 Shared shell and visual language**
+- [x] **UI.1 Shared shell and visual language**
   - Rework `src/app/AppShell.tsx`, `src/styles/tokens.css`, `src/styles/base.css` and
     `src/styles/shell.css` as a clear Earth-observation field-journal system: strong editorial type,
     disciplined grid, high-contrast forest/paper surfaces, and aqua/lime/coral used as data signals.
@@ -132,7 +131,7 @@ directly from this section.
   - Keep one `h1` per route, visible keyboard focus, reduced-motion support, 44 px touch targets and
     readable metadata (12 px minimum unless truly decorative).
 
-- [ ] **UI.2 Home (`src/routes/landing/LandingPage.tsx`)**
+- [x] **UI.2 Home (`src/routes/landing/LandingPage.tsx`)**
   - Lead with the concrete product: choose a bounded area, pull real SAR acquisition metadata and
     official browse previews, compare compatible dates, and read an exploratory interpretation.
   - Do not claim the four-place name search is a worldwide geocoder. Worldwide discovery currently
@@ -151,7 +150,7 @@ directly from this section.
     the current false "Velocity / boundary / elevation" preview claim with facts the live explorer
     actually exposes.
 
-- [ ] **UI.3 Methodology (`src/routes/methodology/MethodologyPage.tsx`)**
+- [x] **UI.3 Methodology (`src/routes/methodology/MethodologyPage.tsx`)**
   - Describe the current live pipeline, not an aspirational calibrated pipeline: catalogue query;
     footprint/product grouping; earliest/latest usable browse selection; Canvas normalization capped
     at 1600 px; RGB luminance difference; threshold `26`; changed/brighter/darker shares; metadata-
@@ -162,7 +161,7 @@ directly from this section.
   - Keep the calibrated offline bundle workflow clearly separate and identify it as reproducible but
     not connected to the explorer UI.
 
-- [ ] **UI.4 Data Sources and source detail**
+- [x] **UI.4 Data Sources and source detail**
   - Redesign `src/routes/data-sources/DataSourcesPage.tsx` around source roles rather than nine
     identical cards: observation archives, independent context, derived processing, and responsible
     authority records.
@@ -171,7 +170,7 @@ directly from this section.
   - Redesign `DataSourceDetailPage.tsx` with a strong provenance hierarchy and useful return path.
     Do not invent product versions, licenses, freshness or acquisitions absent from the typed record.
 
-- [ ] **UI.5 GroundLine (`src/routes/groundline/GroundLinePage.tsx`)**
+- [x] **UI.5 GroundLine (`src/routes/groundline/GroundLinePage.tsx`)**
   - Keep the existing five-stage safety gate and interactive tabs, but make "demonstration" visible
     before any notice. Review candidates must remain visually and semantically separate from
     authority-issued demo records.
@@ -179,7 +178,7 @@ directly from this section.
     explicit statements that no data is transmitted or stored. Do not imply real SMS, voice,
     localization, subscription or warning operations.
 
-- [ ] **UI.6 About and guided stories**
+- [x] **UI.6 About and guided stories**
   - Rebuild `src/routes/about/AboutPage.tsx` around the NASA Space Apps challenge, problem, shipped
     system, scientific boundaries, open-source repository and current prototype state.
   - Do not invent team names, affiliations, awards, operational partners or deployment status. Add
@@ -209,7 +208,49 @@ directly from this section.
 
 #### Test and acceptance plan
 
-- [ ] **UI.7 Unit and route coverage**
+Execution record (UI overhaul, baseline `86684ca`):
+
+- Baseline: `npm test` passed, 145 tests in 12 files.
+- Ruling: continue in the requested local `development` checkout; no extra worktree or new design plan.
+- Ruling: section 0.6 is the approved scope. Its UI.1-UI.9 checkboxes and the harness todo list are the
+  execution ledger; unrelated deployment, pipeline and explorer-logic backlog stays out of this pass.
+- Shared-interface check: shell height/tokens also affect Explorer and Argus. Keep the 72 px header
+  contract and verify both alongside editorial routes. Source and alert records remain typed repository data.
+- UI.1-UI.6 implemented. Shell/video/factual/safety tests were run failing before their implementations;
+  the full unit suite now passes 159 tests in 14 files, and TypeScript passes.
+- Ruling: the OTP demo now has an explicit confirmation button and focus moves to the new step; it
+  still accepts any six digits locally. E.164, consent, preferences and unsubscribe remain simulated.
+- Ruling: the local Chrome harness could not start a supported browser. Use the installed Playwright
+  browsers for screenshots and interaction checks instead; no external browser account is needed.
+- Owner revision: the interim floating cube was rejected and removed, including its physics and tests.
+  Argus is now a fixed 350x420 px chat window, only in Explore; no dragging, docking or expansion.
+- Argus receives the actual `RealtimeContext`, selected acquisition series, computed browse summary,
+  loading/error state, pagination and missing-selection state directly from `ExplorerWorkspace`.
+  It supports free-text questions through the existing Groq demo configuration, with a labelled
+  deterministic data fallback. It never invents zero change for unavailable data or analyzes a
+  substitute for a missing linked selection. Context changes abort pending answers and reset the
+  thread; closing/reopening preserves the current thread. Public AI deployment still needs a proxy.
+- Owner revision: Home uses the first eight seconds of the supplied NASA orbital video as its
+  muted, looping hero background. The encoded H.264 clip is 170,761 bytes, 1280x720 at 24 fps, with
+  no audio. Pause/play and a static poster for reduced motion or low bandwidth are implemented.
+  The supplied original file is unchanged and the separate YouTube walkthrough remains embedded.
+- Current verification: 167 unit tests in 15 files; 90 backend tests in 4 files; lint, typecheck,
+  production build and Storybook build pass. Six dedicated Argus browser journeys pass across
+  Chromium, Firefox and mobile; Home video playback/pause/reduced-motion checks pass on both
+  Chromium desktop and mobile. Full final E2E verification is recorded below when complete.
+- Final review: the initial whole-change review found low-contrast focus on dark surfaces. A two-tone
+  focus indicator now keeps a light ring around the dark outline, visible on both paper and forest.
+- Ruling: serialize the Firefox project after concurrent cold starts exceeded its 30-second timeout;
+  isolated Firefox checks passed. Keep the timeout and assertions unchanged, accepting less parallelism.
+- Ruling: keep Lighthouse reports in gitignored local storage rather than the previous public upload
+  target; verification must not publish reports or credentials. E2E also blocks live Groq requests.
+- Lighthouse baseline (three runs): representative performance 49, accessibility 100, best practices
+  92, SEO 100. Accessibility assertions pass; performance and script-size budgets remain warnings
+  (about 1.05 MB of scripts including third-party content). Reports are in `.lighthouseci/reports`.
+  These warnings and the existing MapLibre chunk warning remain performance follow-up work, not a
+  claim of a production performance pass. Live provider/Groq service health was not certified by mocks.
+
+- [x] **UI.7 Unit and route coverage**
   - Update `src/routes/landing/LandingPage.test.tsx` for the new primary CTA and video iframe.
   - Add focused render/semantics tests for Methodology, Data Sources, GroundLine and About where they
     protect important factual/safety copy; avoid brittle tests for purely decorative text.

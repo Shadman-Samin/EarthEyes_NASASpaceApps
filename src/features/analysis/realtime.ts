@@ -20,6 +20,7 @@ export type RealtimeContext = {
   productLabel: string
   dateWindow: { start: string; end: string } | null
   acquisitionCount: number
+  footprintAcquisitionCount: number
   groupCount: number
   groupLabel: string
   orbits: string[]
@@ -34,10 +35,10 @@ export function bestGroup(items: CatalogueItem[]): string {
   if (!groups.length) return ""
   const scored = groups.map((g) => {
     const gi = items.filter((i) => acquisitionGroup(i) === g)
-    const dates = new Set(gi.map((i) => i.acquiredAt)).size
+    const dates = new Set(gi.map((i) => i.acquiredAt.slice(0, 10))).size
     return { g, dates, count: gi.length }
   })
-  scored.sort((a, b) => b.dates - a.dates || b.count - a.count)
+  scored.sort((a, b) => b.dates - a.dates || b.count - a.count || a.g.localeCompare(b.g))
   return scored[0].g
 }
 
@@ -86,6 +87,7 @@ export function buildRealtimeContext(args: {
     productLabel: query?.product ?? "SAR archive",
     dateWindow: query ? { start: query.start, end: query.end } : null,
     acquisitionCount: items.length,
+    footprintAcquisitionCount: observations.length,
     groupCount: new Set(items.map(acquisitionGroup)).size,
     groupLabel: group || "all footprints",
     orbits,

@@ -2,11 +2,12 @@ import { expect, test } from "./live-fixtures"
 
 test("landing page visual baseline", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium", "Desktop visual baseline")
+  await page.emulateMedia({ reducedMotion: "reduce" })
   await page.goto("/")
   await page.getByRole("heading", { level: 1 }).waitFor()
   await page.getByRole("heading", { name: "Kuakata", exact: true }).waitFor()
   await page.evaluate(() => document.fonts.ready)
-  await expect(page).toHaveScreenshot("landing-desktop.png", { fullPage: true, animations: "disabled" })
+  await expect(page).toHaveScreenshot("landing-desktop.png", { fullPage: true, animations: "disabled", mask: [page.getByTitle("EarthEyes project walkthrough")], maskColor: "#102824" })
 })
 
 test("mobile explorer visual baseline", async ({ page }, testInfo) => {

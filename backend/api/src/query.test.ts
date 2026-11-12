@@ -27,6 +27,14 @@ describe("catalogue query boundary", () => {
     expect(result.end).toBe("2024-12-31")
   })
 
+  it("accepts multi-year windows so a place can be compared across seasons", () => {
+    const result = parseCatalogueQuery(new URLSearchParams({
+      ...parameters, start: "2023-01-01", end: "2026-11-12",
+    }))
+    expect(result.start).toBe("2023-01-01")
+    expect(result.end).toBe("2026-11-12")
+  })
+
   it.each<Record<string, string>>([
     { bbox: "181,20,182,22" },
     { bbox: "-181,20,10,22" },
@@ -46,7 +54,7 @@ describe("catalogue query boundary", () => {
     { start: "2023-02-29" },
     { end: "2024-13-01" },
     { start: "2024-06-01" },
-    { start: "2024-01-01", end: "2025-01-01" },
+    { start: "2025-01-01", end: "2024-01-01" },
     { start: "2024-05-01T00:00:00Z" },
     { limit: "0" },
     { limit: "21" },

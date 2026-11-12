@@ -3,14 +3,15 @@
   --font-display: "Manrope Variable", "Arial Narrow", sans-serif;
   --font-sans: "DM Sans Variable", Arial, sans-serif;
   --font-mono: "DM Mono", Consolas, monospace;
+  --font-editorial: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
 
-  --paper: #f4f3ed;
-  --paper-2: #ebeae2;
+  --paper: #f4f1e8;
+  --paper-2: #eae7dc;
   --white: #fffefa;
   --ink: #172a27;
   --ink-2: #243a35;
   --muted: #35463f;
-  --line: #dcded5;
+  --line: #d6d9cd;
   --green: #c8e56b;
   --green-deep: #527247;
   --orange: #ee7656;
@@ -53,4 +54,7 @@
   --radius-sm: 3px;
   --radius-md: 6px;
   --radius-lg: 10px;
+  --page-gutter: clamp(20px, 5vw, 80px);
+  --page-width: 1440px;
+  --on-forest-muted: #c5d5ce;
 }

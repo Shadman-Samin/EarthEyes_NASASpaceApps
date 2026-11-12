@@ -75,6 +75,25 @@
 .archive-search input, .archive-search select { width: 100%; min-width: 0; min-height: 38px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--panel); padding: 7px; color: var(--forest-900); font-size: 11px; }
 .archive-search__dates { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
 .archive-search [role="alert"] { color: var(--coral-dark); }
+.archive-search__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.archive-search__head .control-label { margin: 0; }
+.archive-pill { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; padding: 3px 8px; font: 500 9px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+.archive-pill i { width: 6px; height: 6px; border-radius: 50%; }
+.archive-pill--live { background: rgb(36 117 122 / 14%); color: #1c5f63; }
+.archive-pill--live i { background: #24757a; }
+.archive-pill--waiting { background: rgb(203 232 112 / 30%); color: #4a5a18; }
+.archive-pill--waiting i { background: #8aa42a; animation: archive-pulse 1.2s ease-in-out infinite; }
+@keyframes archive-pulse { 50% { opacity: .25; } }
+.archive-search__source { margin: 8px 0 0; color: var(--forest-900) !important; }
+.archive-search__source strong { font-size: 0.98rem; }
+.archive-search__hint { margin: 6px 0 8px; }
+.realtime-single { display: grid; gap: 10px; }
+.realtime-facts { display: grid; gap: 6px; margin: 0; }
+.realtime-facts > div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(25, 49, 45, 0.1); padding-bottom: 6px; }
+.realtime-facts dt { color: #35463f; font: 500 0.8rem var(--font-mono); text-transform: uppercase; letter-spacing: .04em; }
+.realtime-facts dd { margin: 0; color: #102824; font-size: 0.95rem; font-weight: 600; text-align: right; }
+.realtime-hint { display: flex; align-items: flex-start; gap: 7px; margin: 0; border-left: 2px solid var(--gold); padding: 7px 10px; background: rgba(25, 49, 45, 0.05); border-radius: 6px; color: #1f332e; font-size: 0.95rem; line-height: 1.45; }
+@media (prefers-reduced-motion: reduce) { .archive-pill--waiting i { animation: none; } }
 .shared-selection-notice { margin: 65px 16px 16px; }
 .explorer-no-coverage .shared-selection-notice { margin: 0; }
 .earth-map__search-area { position: absolute; z-index: 10; top: 63px; left: 12px; min-height: 35px; border: 1px solid rgb(255 255 255 / 25%); border-radius: 3px; background: var(--forest-950); padding: 7px 10px; color: white; font-size: 11px; font-weight: 700; }

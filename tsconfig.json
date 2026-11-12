@@ -19,5 +19,5 @@
     "strict": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "backend/api", "vite.config.ts", "vitest.config.ts"]
+  "include": ["src", "backend/api", "api", "vite.config.ts", "vitest.config.ts"]
 }
