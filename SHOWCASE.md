@@ -48,14 +48,10 @@
 
 ## 5) Production Plan
 **Pre-record (stage once, saves retakes)**
-- **Groq-powered Argus (for the showcase take):** run locally (
-pm run dev) with .env set:
-  - VITE_GROQ_API_KEY=<provided Groq key>
-  - VITE_GROQ_MODEL=llama-3.3-70b-versatile
-  .env is gitignored. Argus now calls Groq and includes the current live page URL plus loaded explorer context (place, area, footprint, dates, comparison, catalogue state) so answers match what’s shown. **Do not deploy this key**—VITE_ values are embedded in the client bundle; public production needs a server-side proxy.
-- Verify Kuakata loads =2 comparable NISAR dates and comparison renders before recording; open Argus once to preload/warm context.
-- Browser 1920×1080, 100% zoom, clean profile (no bookmarks/devtools/notifications), cursor highlight on, reduce desktop clutter.
-- Close heavy apps/tabs for smooth map/WebGL; have exact question ready: What changed between these dates?
+- **Groq-powered Argus (for the showcase take):** run locally with `npm run dev`; `.env` must contain `VITE_GROQ_API_KEY=<provided Groq key>` and `VITE_GROQ_MODEL=qwen/qwen3.8-27b`. Argus sends Groq the current page URL and loaded explorer context so answers match what is shown. `.env` is gitignored; `VITE_` values are public in client builds.
+- Verify Kuakata loads at least 2 comparable NISAR dates and the comparison renders; open Argus once to warm it up.
+- Browser 1920x1080, 100% zoom, clean profile (no bookmarks/devtools/notifications), cursor highlight on, and minimal desktop clutter.
+- Close heavy apps/tabs for smooth map/WebGL; have the exact question ready: `What changed between these dates?`
 
 **Capture**
 - Record screen at 60 fps; move cursor slowly and pause ~1s on key reveals (footprints, mid-swipe, evidence labels, Argus answer).
@@ -64,13 +60,13 @@ pm run dev) with .env set:
 **Edit (keep minimal)**
 - Hard cuts to 58s; subtle zoom/callouts only on dates, swipe handle, and Exploratory & uncalibrated label.
 - Light background music optional at low volume under VO; ensure text contrast/readability.
-- End card holds 2–3s with live URL.
+- End card holds 2-3s with live URL.
 
 ## 6) On-Screen Accuracy & Compliance Checklist
 - [ ] State/show: uses **real acquisitions** and **public browse previews** (NISAR/OPERA context as shown).
 - [ ] Keep visible or voiced: insights are **exploratory and uncalibrated** (not georeferenced measurements).
 - [ ] Do **not** claim direct sea-level measurement, calibrated hazard extent, or public warning capability.
-- [ ] If Groq unavailable, Argus/evidence fallbacks are deterministic—still label outputs as data-based/exploratory.
+- [ ] If Groq unavailable, Argus/evidence fallbacks are deterministic; still label outputs as data-based/exploratory.
 - [ ] End with working URL: https://eartheyes.vercel.app.
 
 ## 7) Fallbacks (if live demo hiccups)

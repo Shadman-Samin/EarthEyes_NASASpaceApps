@@ -7,7 +7,10 @@ const context: ArgusContext = {
   comparison: { status: "ready", summary: { changedPct: 12, brighterPct: 7, darkerPct: 5, headline: "Visual difference", detail: "Display pixels only" } },
   catalogueStatus: "ready", hasMore: true, missingSelection: false,
 }
-beforeEach(() => vi.stubEnv("VITE_GROQ_API_KEY", ""))
+beforeEach(() => {
+  vi.stubEnv("VITE_GROQ_API_KEY", "")
+  vi.stubEnv("VITE_GROQ_MODEL", "")
+})
 afterEach(() => { vi.unstubAllEnvs(); vi.restoreAllMocks() })
 const ask = (question: string, facts = context) => answerArgus(question, facts, [], new AbortController().signal)
 
@@ -40,6 +43,7 @@ describe("Argus current-view answers", () => {
     const fetcher = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content: "The current preview has 12% changed display pixels, not changed land area." } }] })))
     expect((await ask("What changed?")).source).toBe("groq")
     const payload = JSON.parse(String(fetcher.mock.calls[0][1]?.body))
+    expect(payload.model).toBe("qwen/qwen3.8-27b")
     expect(payload.messages.at(-1).content).toContain("What changed?")
     expect(payload.messages[0].content).toContain('"changedPct":12')
     expect(payload.messages[0].content).toContain('"acquisitionCount":4')

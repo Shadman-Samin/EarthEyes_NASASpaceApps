@@ -19,7 +19,7 @@ export type GroqRequest = {
   signal?: AbortSignal
 }
 
-const DEFAULT_MODEL = "llama-3.3-70b-versatile"
+const DEFAULT_MODEL = "qwen/qwen3.8-27b"
 const DEFAULT_TTL = 1000 * 60 * 60 * 6
 const MIN_GAP_MS = 1100
 const PREFIX = "eartheyes:groq:"
