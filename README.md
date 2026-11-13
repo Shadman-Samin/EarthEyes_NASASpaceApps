@@ -265,8 +265,11 @@ EarthEyes is deployed on **Vercel** at **https://eartheyes.vercel.app**.
 - **Production branch:** `development` — the default and only active development branch.
 - **Archived branch:** `legacy/main` preserves the original `main` history. It is not deployed.
 - **API:** `api/index.ts` serves the catalogue on the same origin as the frontend.
-- **Automatic deployments:** Vercel builds production from `development` on every push.
 - **Guards:** `vercel.json` disables deployments from `main` and `legacy/main`.
+
+> **Sync checklist:** keep the Vercel project's **Settings → Git → Production Branch** set to
+> `development`. The repository default branch is already `development`; that dashboard setting is the
+> remaining link between a push and a production release.
 
 The original GitHub Pages workflow has been removed. The live deployment is Vercel; GitHub Pages is not enabled for this repository.
 
