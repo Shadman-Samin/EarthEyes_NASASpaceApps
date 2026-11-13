@@ -1,10 +1,10 @@
-name: Verify worldwide catalogue
+name: Verify EarthEyes
 
 on:
   push:
     branches: [development]
   pull_request:
-    branches: [main, development]
+    branches: [development]
 
 permissions:
   contents: read
