@@ -11,7 +11,7 @@ A map-first SAR field atlas built for the **NASA Space Apps Challenge 2026** —
 [![Live app](https://img.shields.io/badge/Live-eartheyes.vercel.app-2ea44f?style=for-the-badge&logo=vercel&logoColor=white)](https://eartheyes.vercel.app)
 [![NASA Space Apps](https://img.shields.io/badge/NASA%20Space%20Apps-2026-0B3D91?style=for-the-badge&logo=nasa&logoColor=white)](https://www.spaceappschallenge.org/)
 
-[Live app](https://eartheyes.vercel.app) · [Explorer](https://eartheyes.vercel.app/explore) · [Walkthrough](https://www.youtube.com/watch?v=vzeL2bBZ5Sk) · [Methodology](https://eartheyes.vercel.app/methodology) · [Roadmap](TODO.md)
+[Live app](https://eartheyes.vercel.app) · [Explorer](https://eartheyes.vercel.app/explore) · [Walkthrough](https://www.youtube.com/watch?v=vzeL2bBZ5Sk) · [Methodology](https://eartheyes.vercel.app/methodology) · [About](https://eartheyes.vercel.app/about)
 
 <br />
 
@@ -315,7 +315,7 @@ See [`tools/analysis/README.md`](tools/analysis/README.md) for authentication, R
 
 ## Roadmap and known limits
 
-Open work is tracked in [`TODO.md`](TODO.md). Current boundaries:
+Known boundaries and open work:
 
 - A public AI deployment still needs a server-side proxy and quota controls.
 - The catalogue Worker has not been deployed to a public Cloudflare account.

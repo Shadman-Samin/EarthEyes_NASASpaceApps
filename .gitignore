@@ -23,3 +23,8 @@ yarn-debug.log*
 pnpm-debug.log*
 tools/analysis/cache/
 __pycache__/
+
+# Local-only planning notes
+SHOWCASE.md
+TODO.md
+plan.md
