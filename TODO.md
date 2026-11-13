@@ -26,7 +26,7 @@ Read section 0 and section 1 before touching anything. Sections are ordered by p
 | NISAR GCOV L2 live loading in the explorer (product + HV/HH polarization switch) | Done |
 | Real-time interpretation for any pulled location: auto-selected footprint and earliest/latest pair, client-side browse-image difference, Summary/Chart/Context built from pulled metadata, Groq vision narrative with deterministic fallback | Done (see 0.5) |
 | Legacy calibrated offline change bundles for two sites (`public/analysis/kuakata-bangladesh`, `public/analysis/jakobshavn-glacier`) | Retained on disk and reproducible via `tools/analysis`, but **no longer wired into the explorer UI** |
-| GitHub Pages deploy workflow + CI workflow | Written; **CI on GitHub has never been observed, Pages has never received the new build** |
+| Vercel production deployment + CI workflow | Vercel builds production from `development`; CI runs on `development`; the unused GitHub Pages workflow has been removed |
 
 ### 0.2 Verified baseline (reproduce before changing anything)
 
@@ -308,32 +308,20 @@ Execution record (UI overhaul, baseline `86684ca`):
 
 ---
 
-## 2. P0 — Publish the current build (the live site is still the old app)
+## 2. Deployed on Vercel
 
-The public GitHub Pages site currently serves `main` = the pre-restructure app. Nothing built in the last
-two weeks is visible to a judge or a user.
+Production is **https://eartheyes.vercel.app**. Vercel builds production from `development`; `legacy/main`
+preserves the old `main` history and is not deployed. The catalogue is served on the same origin by
+`api/index.ts`, so the Vercel site does not need a separately deployed Worker.
 
-- [ ] **2.1** Fast-forward `main` onto `development` and push it. This is the only step that triggers
-  `.github/workflows/deploy.yml`:
-
-  ```sh
-  git checkout main
-  git merge --ff-only development     # fast-forward only; if this fails, STOP and ask
-  git push origin main
-  ```
-
-  Do **not** force-push `main`, and do not rewrite `83d39cd`.
-
-- [ ] **2.2** Repo → **Settings → Pages → Source: GitHub Actions**. If it says "Deploy from a branch",
-  switch it to GitHub Actions; otherwise the workflow will build but not publish.
-- [ ] **2.3** Watch the **Deploy EarthEyes to GitHub Pages** run to green. The workflow runs
-  `npm run lint && npm run typecheck && npm test` before building, so a red build means a real regression.
-- [ ] **2.4** Smoke-test the deployed site at
-  `https://shadman-samin.github.io/EarthEyes_NASASpaceApps/`:
+- [x] **2.1** Consolidate the repository on `development` and make it the default branch.
+- [x] **2.2** Preserve `main` as `legacy/main`, remove the unused GitHub Pages workflow, and disable
+  deployments from retired branches in `vercel.json`.
+- [ ] **2.3** Confirm the next push to `development` creates a **production** deployment, not only a preview.
+- [ ] **2.4** Smoke-test the deployed site:
 
   - [ ] Landing page loads, one `h1`, primary "Open the explorer" CTA works.
-  - [ ] Deep link `…/explore/jakobshavn-glacier` survives a **hard reload** (proves the `404.html` SPA fallback
-        built by the `github-pages-spa-fallback` Vite plugin).
+  - [ ] Deep link `…/explore/jakobshavn-glacier` survives a **hard reload**.
   - [ ] Explorer opens, place search works, footprint selection works, date/polarization switch works.
   - [ ] Explorer loads pulled NISAR acquisitions and shows a real-time Summary (thumbnails, computed diff,
         metrics), Chart (acquisition timeline + change bars) and Context (pulled metadata) that update with
@@ -344,14 +332,11 @@ two weeks is visible to a judge or a user.
   - [ ] Argus, GroundLine, Methodology, Stories, Data sources, About routes all render.
   - [ ] 360 px mobile viewport: drawers/bottom sheet, no horizontal overflow.
 
-- [ ] **2.5** Decide the hosted **catalogue API** story (see 2.6) and, if the Worker is deployed, set
-  `VITE_CATALOGUE_API_BASE_URL=https://<worker>.workers.dev/api/catalog` as a repository
-  Actions variable so the Pages build picks it up. Without it the hosted build reports a catalogue error
-  instead of fixture data — that is intentional, but it must be a decision, not an accident.
-- [ ] **2.6** Known hosting limitation: `npm run dev` serves a local metadata API through the Vite
-  `catalogueApi()` plugin, but **Vite's local API is not deployed with static assets**. The hosted site
-  therefore has no catalogue backend until the Worker is deployed (section 3.2). Either deploy the Worker
-  or make sure the hosted UI states the catalogue as unavailable rather than looking broken.
+- [ ] **2.5** If a separate static host is added later, deploy the catalogue Worker (section 3.2) and set
+  `VITE_CATALOGUE_API_BASE_URL=https://<worker>.workers.dev/api/catalog` at build time. An unconfigured
+  static host reports a catalogue error instead of fixture data — that is intentional.
+- [ ] **2.6** Known hosting note: `npm run dev` serves the metadata API through the Vite `catalogueApi()`
+  plugin, while Vercel uses `api/index.ts`. Keep both adapters in sync when the catalogue contract changes.
 
 ---
 
@@ -582,7 +567,7 @@ All of them still run in the full matrix. If you add a project, re-check the ski
 | `public/analysis/<site>/` | Committed manifests + Int16 rasters (~30.9 MB total) |
 | `docs/backend/catalogue-plan.md` | Completed plan for catalogue module 1 + the module 2 direction |
 | `plan.md` | Original design/architecture plan (phases 0–9) |
-| `.github/workflows/deploy.yml` | GitHub Pages build + deploy; triggers on `main` only |
+| `vercel.json` | SPA rewrites and deployment guards; Vercel builds production from `development` |
 | `.github/workflows/backend-checks.yml` | CI for `development` pushes and PRs to `main`/`development` |
 
 ---
@@ -592,7 +577,8 @@ All of them still run in the full matrix. If you add a project, re-check the ski
 - Do not commit `.env.analysis` or any Earthdata token.
 - Do not treat `VITE_GROQ_API_KEY` as secret: `VITE_` values ship in the client bundle. Use a Worker
   proxy before any public production deployment.
-- Do not force-push `main` or rewrite `83d39cd`; `main` is the published branch.
+- Do not recreate `main` or deploy from retired branches; `development` is the default and production branch.
+  `legacy/main` is an archive only.
 - Do not merge `development` into `main` with a merge commit — fast-forward only, so Pages stays deployable.
 - Do not delete or rewrite the `public/analysis` bundles without regenerating them from the pipeline.
 - Do not soften any limitation, uncertainty or "this cannot prove" statement to make a number look better.
