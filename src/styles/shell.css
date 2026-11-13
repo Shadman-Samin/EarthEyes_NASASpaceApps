@@ -4,7 +4,8 @@
 .signal-strip { position: relative; z-index: 201; height: var(--signal-height); background: linear-gradient(90deg, var(--forest-950) 0 55%, var(--aqua) 55% 76%, var(--lime) 76% 92%, var(--coral) 92%); }
 .site-header { position: sticky; z-index: 200; top: 0; display: grid; height: var(--header-height); grid-template-columns: auto minmax(0, 1fr) auto; align-items: stretch; gap: 24px; border-bottom: 1px solid var(--line-strong); background: var(--paper); padding-inline: clamp(16px, 3vw, 48px); }
 .site-brand { display: flex; align-items: center; gap: 10px; }
-.site-brand__mark { position: relative; display: grid; width: 36px; height: 36px; overflow: hidden; place-items: center; border-radius: 50%; background: var(--forest-900); color: var(--lime); }
+.site-brand__mark { display: grid; width: 42px; height: 42px; flex: none; place-items: center; }
+.site-brand__logo { width: 100%; height: 100%; object-fit: contain; }
 .site-brand > span:last-child { display: grid; }
 .site-brand strong { color: var(--forest-950); font: 800 18px/1 var(--font-display); letter-spacing: -.055em; }
 .site-brand em { color: var(--aqua-dark); font-style: normal; }
@@ -22,7 +23,7 @@
 .site-footer { display: grid; grid-template-columns: 1fr auto; gap: 40px 80px; border-top: 1px solid var(--line-strong); padding: 56px var(--page-gutter) calc(96px + env(safe-area-inset-bottom)); }
 .site-footer__brand { display: inline-flex; min-height: 44px; align-items: center; color: var(--forest-950); font: 800 clamp(26px, 3vw, 42px)/1 var(--font-display); letter-spacing: -.055em; }
 .site-footer__brand span { color: var(--aqua-dark); }
-.site-footer__brand svg { margin-left: 16px; }
+.site-footer__logo { width: 64px; height: 64px; margin-right: 16px; object-fit: contain; }
 .site-footer p { max-width: 570px; margin-top: 16px; color: var(--muted); font-size: 14px; line-height: 1.7; }
 .site-footer nav { display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: 8px 32px; }
 .site-footer nav a, .site-footer__colophon a { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; font-size: 14px; font-weight: 650; }

@@ -1,5 +1,13 @@
 import { expect, test } from "./live-fixtures"
 
+test("shared branding uses the main logo and browser icons", async ({ page }) => {
+  await page.goto("/")
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute("href", "/eartheyes-logo.png")
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute("href", "/eartheyes-logo.png")
+  await expect(page.locator(".site-brand__logo")).toHaveAttribute("src", "/eartheyes-logo.png")
+  await expect(page.locator(".site-footer__logo")).toHaveAttribute("src", "/eartheyes-logo.png")
+})
+
 test("the app does not wait for a mock service worker to render", async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator.serviceWorker, "register", { value: () => new Promise(() => {}) })

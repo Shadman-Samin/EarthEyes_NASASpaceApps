@@ -12,6 +12,8 @@ const navigation = [
   ["/about", "About"],
 ] as const
 
+const logo = `${import.meta.env.BASE_URL}eartheyes-logo.png`
+
 export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const menuButton = useRef<HTMLButtonElement>(null)
@@ -31,7 +33,7 @@ export function AppShell() {
         if (!event.currentTarget.contains(event.relatedTarget)) setMobileOpen(false)
       }}>
         <Link to="/" className="site-brand" aria-label="EarthEyes Field Atlas home" onClick={() => setMobileOpen(false)}>
-          <span className="site-brand__mark"><Icon name="globe" size={20} /></span>
+          <span className="site-brand__mark"><img className="site-brand__logo" src={logo} alt="" width={42} height={42} /></span>
           <span><strong>EARTH<em>EYES</em></strong><small>Field atlas</small></span>
         </Link>
         <nav className="site-nav" aria-label="Primary navigation">
@@ -54,7 +56,7 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div className="site-footer__identity">
-        <Link to="/" className="site-footer__brand">EARTH<span>EYES</span><Icon name="globe" size={28} /></Link>
+        <Link to="/" className="site-footer__brand"><img className="site-footer__logo" src={logo} alt="" width={64} height={64} />EARTH<span>EYES</span></Link>
         <p>An Earth-observation field atlas for NASA Space Apps. Real archive discovery, exploratory preview comparison, and a visible boundary between evidence and explanation.</p>
       </div>
       <nav aria-label="Footer navigation"><Link to="/">Home</Link><Link to="/explore">Explore</Link><Link to="/about">About</Link><a href="https://github.com/Shadman-Samin/EarthEyes_NASASpaceApps" target="_blank" rel="noreferrer">Source code <Icon name="external" size={14} /></a></nav>

@@ -12,6 +12,16 @@ function renderShell() {
 }
 
 describe("AppShell navigation", () => {
+  it("uses the main logo in the shared site identity", () => {
+    renderShell()
+    const headerLogo = document.querySelector(".site-brand__logo")
+    const footerLogo = document.querySelector(".site-footer__logo")
+    expect(headerLogo).toHaveAttribute("src", "/eartheyes-logo.png")
+    expect(headerLogo).toHaveAttribute("alt", "")
+    expect(footerLogo).toHaveAttribute("src", "/eartheyes-logo.png")
+    expect(footerLogo).toHaveAttribute("alt", "")
+  })
+
   it("closes the mobile disclosure with Escape and restores focus to its button", async () => {
     const user = userEvent.setup()
     renderShell()
