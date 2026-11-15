@@ -6,8 +6,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-it("reserves text-only Groq requests for user-triggered Argus chat", async () => {
-  vi.stubEnv("VITE_GROQ_API_KEY", "test-key")
+it("keeps the summary deterministic until a vision model is configured", async () => {
   vi.stubEnv("VITE_GROQ_VISION_MODEL", "")
   const fetcher = vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json({
     choices: [{ message: { content: JSON.stringify({ headline: "AI headline", summary: "AI summary", limits: [] }) } }],

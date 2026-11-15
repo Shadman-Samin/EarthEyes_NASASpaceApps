@@ -59,7 +59,7 @@ function SummaryTab({ place, ctx, compared, browse, series }: { place: Place; ct
         </div>
         <h3>{narrative?.headline ?? (browse.summary?.headline || (compared ? `Comparing ${ctx.comparedPair?.from} → ${ctx.comparedPair?.to}` : `${series.length} acquisition${series.length === 1 ? "" : "s"} for ${place.name}`))}</h3>
         <p className="realtime-lead">{loadingNarrative ? "Interpreting the pulled data…" : (narrative?.summary ?? browse.summary?.detail ?? (compared ? "Computing visual change from the pulled preview images." : "Showing the pulled acquisition record. A before/after view appears when at least two dates are available."))}</p>
-        {narrative?.source && <small className="narrative-source">Interpretation: {narrative.source === "groq-vision" ? "Groq vision (imagery + facts)" : narrative.source === "groq" ? "Groq (from live facts)" : "computed summary"}</small>}
+        {narrative?.source && <small className="narrative-source">Interpretation: {narrative.source === "groq-vision" ? "Groq vision (imagery + facts)" : "computed summary"}</small>}
 
         {compared ? (
           <>

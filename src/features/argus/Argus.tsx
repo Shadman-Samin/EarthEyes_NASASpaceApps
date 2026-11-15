@@ -3,6 +3,13 @@ import { useEffect, useRef, useState } from "react"
 import { Icon } from "../../shared/ui"
 import { useMediaQuery } from "../../shared/useMediaQuery"
 import { answerArgus, type ArgusContext, type ChatMessage } from "./answers"
+import { ArgusText } from "./render"
+
+const sourceLabels: Record<NonNullable<ChatMessage["source"]>, string> = {
+  groq: "AI / current data",
+  data: "From loaded data",
+  degraded: "AI unavailable / from loaded data",
+}
 
 export function Argus({ context }: { context: ArgusContext }) {
   const mobile = useMediaQuery("(max-width: 719px)")
@@ -45,6 +52,21 @@ export function Argus({ context }: { context: ArgusContext }) {
       if (!controller.signal.aborted) setConversation((current) => current.key !== contextKey ? current : { ...current, messages: [...current.messages, { role: "assistant", text: "The answer is unavailable. Please try again.", source: "data" }], pending: false })
     }
   }
+  const retry = async () => {
+    const lastUser = [...messages].reverse().find((message) => message.role === "user")
+    if (!lastUser || pending) return
+    const history = messages.at(-1)?.role === "assistant" ? messages.slice(0, -1) : messages
+    const controller = new AbortController()
+    requestRef.current?.abort()
+    requestRef.current = controller
+    setConversation((current) => current.key !== contextKey ? current : { ...current, pending: true })
+    try {
+      const answer = await answerArgus(lastUser.text, context, history, controller.signal)
+      if (!controller.signal.aborted) setConversation((current) => current.key !== contextKey ? current : { ...current, messages: [...current.messages.slice(0, -1), { role: "assistant", ...answer }], pending: false })
+    } catch {
+      if (!controller.signal.aborted) setConversation((current) => current.key !== contextKey ? current : { ...current, pending: false })
+    }
+  }
 
   const launcher = <button ref={launcherRef} type="button" className="argus-launcher" aria-label="Ask Argus evidence guide" aria-expanded={open} aria-controls={open ? "argus-panel" : undefined} hidden={open} onClick={() => setOpen(true)}><Icon name="chat" size={19} /> Argus</button>
   const content = <>
@@ -52,7 +74,13 @@ export function Argus({ context }: { context: ArgusContext }) {
     <div className="argus__context"><span>{context.catalogueStatus === "loading" ? "Loading acquisitions..." : context.catalogueStatus === "error" ? "Catalogue unavailable" : `${context.view.acquisitionCount} loaded / ${context.acquisitions.length} in this footprint`}</span>{context.view.sourceUrl?.startsWith("https://") && <a href={context.view.sourceUrl} target="_blank" rel="noreferrer">Source <Icon name="external" size={12} /></a>}</div>
     <div ref={logRef} className="argus__messages" role="log" aria-live="polite" aria-label="Argus conversation" tabIndex={0}>
       {!messages.length && <p className="argus__intro">Ask about the selected dates, radar data or computed change.</p>}
-      {messages.map((message, index) => <div key={index} className={`argus__message argus__message--${message.role}`}><p>{message.text}</p>{message.source && <small>{message.source === "groq" ? "AI / current data" : "From loaded data"}</small>}</div>)}
+      {messages.map((message, index) => (
+        <div key={index} className={`argus__message argus__message--${message.role}`}>
+          <div className="argus__bubble"><ArgusText text={message.text} /></div>
+          {message.source && <small>{sourceLabels[message.source]}</small>}
+          {message.source === "degraded" && index === messages.length - 1 && <button type="button" className="argus__retry" onClick={() => { void retry() }} disabled={pending}>Retry AI answer</button>}
+        </div>
+      ))}
       {pending && <p className="argus__pending" role="status">Reading the current data...</p>}
     </div>
     {!messages.length && <div className="argus__prompts">{["Summarize", "What changed?", "Limits"].map((prompt) => <button key={prompt} type="button" onClick={() => { void ask(prompt) }}>{prompt}</button>)}</div>}

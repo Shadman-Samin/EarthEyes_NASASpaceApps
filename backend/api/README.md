@@ -52,6 +52,7 @@ satellite providers. Live smoke tests are explicit, separate network checks.
 | `GET /api/health` | Implemented capabilities |
 | `GET /api/catalog/collections` | Product IDs, source maturity and data access requirements |
 | `GET /api/catalog/search` | One bounded page of live metadata per longitude partition |
+| `POST /api/argus` | Optional Groq-backed Argus answer from the facts the browser sends; needs `GROQ_API_KEY` |
 
 Example request:
 
@@ -104,6 +105,23 @@ fails, the whole request fails instead of implying complete coverage.
   metadata, 503 unavailable provider, and 504 provider timeout.
 - Allowed browser clients can read `Retry-After` and `X-EarthEyes-Cache`.
 
+## Argus AI Proxy
+
+`POST /api/argus` keeps the Groq key server-side. The browser sends a bounded JSON
+body: `mode` (`chat` or `summary`), `question` (at most 600 characters), up to eight
+`history` turns, `facts` (at most 12 KB), and at most two base64 data-URL `images`
+(at most 500 KB each). Unknown fields are rejected.
+
+- `GROQ_API_KEY` is required; without it the route returns 503 `ai_unavailable`.
+- `ARGUS_MODEL` defaults to `qwen/qwen3.8-27b`. `ARGUS_VISION_MODEL` is required for
+  `mode: "summary"` with images and must accept image input.
+- Responses are `{ text, cached }`. Identical requests reuse an in-isolate cache for
+  15 minutes, so a repeat question does not spend quota.
+- Each client is limited to 20 requests per minute. The upstream call has a 15-second
+  deadline; 429, 401, 502, and 504 upstream failures map to explicit JSON errors.
+- The model only interprets facts and optional browse previews. It is told not to
+  treat display differences as calibrated measurements or hazards.
+
 ## Authentication And Scientific Scope
 
 Metadata search needs no Earthdata or Microsoft credentials. Downloading the
@@ -127,7 +145,9 @@ the target Cloudflare account and confirm free-plan limits and abuse controls.
 3. Configure appropriate account-level rate limiting and monitor request/CPU
    quotas before opening the endpoint publicly. CORS is not authentication or
    protection against non-browser abuse. A free plan has no availability guarantee.
-4. Run the tests and `npm run check:api`, then deploy with `npm run deploy:api`.
+4. Run the tests and `npm run check:api`. Set the Argus key with
+   `npx wrangler secret put GROQ_API_KEY` (never a plain `vars` entry), then deploy
+   with `npm run deploy:api`.
 5. Run the smoke check against the resulting HTTPS endpoint.
 
 Do not enable paid upgrades automatically. Do not deploy this module as a substitute

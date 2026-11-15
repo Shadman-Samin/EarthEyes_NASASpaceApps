@@ -1,7 +1,7 @@
 import type { RealtimeContext } from "./realtime"
-import { askGroq, groqCacheKey, groqConfigured, groqModel, groqVisionModel } from "../ai/groq"
+import { argusSummaryEnabled, askArgusAI } from "../ai/groq"
 
-export type Narrative = { headline: string; summary: string; limits: string[]; source: "groq-vision" | "groq" | "template" }
+export type Narrative = { headline: string; summary: string; limits: string[]; source: "groq-vision" | "template" }
 
 function toDataUrlFromImageUrl(url: string): Promise<string | null> {
   return new Promise((resolve) => {
@@ -56,9 +56,9 @@ export async function generateNarrative(opts: {
 }): Promise<Narrative> {
   const { ctx, diff, earlierImageUrl, laterImageUrl } = opts
   const base = template(ctx, diff)
-  const visionModel = groqVisionModel()
-  // Keep text-model quota for user-triggered Argus chat; summaries use AI only when vision is configured.
-  if (!groqConfigured() || !visionModel || !earlierImageUrl || !laterImageUrl) return base
+  // Keep the shared text model for user-triggered Argus chat; summaries need a vision model.
+  if (!argusSummaryEnabled() || !earlierImageUrl || !laterImageUrl) return base
+
   const facts = {
     place: ctx.placeName,
     area: ctx.areaLabel,
@@ -71,48 +71,20 @@ export async function generateNarrative(opts: {
     orbits: ctx.orbits,
     polarizations: ctx.polarizations,
     maturity: ctx.sourceMaturity,
-    compared: ctx.comparedPair,
+    comparedPair: ctx.comparedPair,
     computedDiff: diff ?? null,
-  }
-  const system = 'You are an earth-observation analyst explaining satellite SAR imagery to non-experts and judges. Use ONLY the provided facts and what you can see in the images. Never invent numbers, causes, or certainty. Be specific to this place and dates. Distinguish observation from interpretation. Keep it short (3-6 sentences). Output strict JSON: {"headline":"...","summary":"...","limits":["...","..."]}.'
-  const userText = `Facts (computed in real time from pulled archive data, do not contradict):\n${JSON.stringify(facts, null, 2)}\n\nExplain what a viewer sees and what changed between the earlier and later radar preview for this exact location. If images are provided, describe visible patterns (darker=smoother/water, brighter=rough/vegetation/ice texture) and relate them to the computed diff stats. Be relevant to this place and dates. State limits honestly.`
-  const textModel = groqModel()
-  const cacheKey = groqCacheKey({ facts, images: Boolean(visionModel && earlierImageUrl && laterImageUrl) })
-
-  const request = async (model: string, content: string | Array<Record<string, unknown>>) => {
-    const result = await askGroq({
-      system,
-      messages: [{ role: "user", content }],
-      model,
-      json: true,
-      temperature: 0.2,
-      maxTokens: 450,
-      cacheKey: `${cacheKey}|${model}`,
-    })
-    if (!result) throw new Error("unavailable")
-    const parsed = JSON.parse(result.text)
-    if (!parsed?.headline || !parsed?.summary) throw new Error("invalid narrative")
-    return {
-      headline: String(parsed.headline),
-      summary: String(parsed.summary),
-      limits: Array.isArray(parsed.limits) && parsed.limits.length ? parsed.limits.map(String) : base.limits,
-    }
-  }
-
-  if (visionModel && earlierImageUrl && laterImageUrl) {
-    try {
-      const [a, b] = await Promise.all([toDataUrlFromImageUrl(earlierImageUrl), toDataUrlFromImageUrl(laterImageUrl)])
-      const content: Array<Record<string, unknown>> = [{ type: "text", text: userText }]
-      if (a) content.push({ type: "text", text: "Earlier radar preview:" }, { type: "image_url", image_url: { url: a } })
-      if (b) content.push({ type: "text", text: "Later radar preview:" }, { type: "image_url", image_url: { url: b } })
-      if (content.length > 1) return { ...(await request(visionModel, content)), source: "groq-vision" }
-    } catch {
-      // Fall through to a facts-only request with the text model.
-    }
   }
 
   try {
-    return { ...(await request(textModel, userText)), source: "groq" }
+    const [earlier, later] = await Promise.all([toDataUrlFromImageUrl(earlierImageUrl), toDataUrlFromImageUrl(laterImageUrl)])
+    const images = [earlier, later].filter((image): image is string => Boolean(image))
+    if (!images.length) return base
+    const result = await askArgusAI({ mode: "summary", facts, images })
+    if (!result) return base
+    const parsed = JSON.parse(result.text) as { headline?: unknown; summary?: unknown; limits?: unknown }
+    if (typeof parsed?.headline !== "string" || typeof parsed?.summary !== "string") return base
+    const limits = Array.isArray(parsed.limits) && parsed.limits.length ? parsed.limits.map(String) : base.limits
+    return { headline: parsed.headline, summary: parsed.summary, limits, source: "groq-vision" }
   } catch {
     return base
   }

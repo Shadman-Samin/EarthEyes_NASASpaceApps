@@ -197,14 +197,15 @@ Copy `.env.example` to a gitignored `.env` and set only what you need.
 
 | Variable | Purpose |
 | --- | --- |
-| `VITE_GROQ_API_KEY` | Optional Groq key. Without it, Argus and Summary use the deterministic fallback. |
-| `VITE_GROQ_MODEL` | Optional text model override for Argus. |
-| `VITE_GROQ_VISION_MODEL` | Optional vision model for image + facts interpretation. |
+| `GROQ_API_KEY` | Server-side Groq key used by the `/api/argus` proxy and the local Vite proxy. Without it, Argus and Summary use the deterministic fallback. |
+| `ARGUS_MODEL` | Optional server-side text model override for the proxy (default `qwen/qwen3.8-27b`). |
+| `ARGUS_VISION_MODEL` | Optional server-side vision model for image + facts interpretation. |
+| `VITE_GROQ_VISION_MODEL` | Public flag that enables the Summary narrative in the browser. No secret; pair it with `ARGUS_VISION_MODEL`. |
 | `VITE_CATALOGUE_API_BASE_URL` | Deployed catalogue Worker base for non-Vercel static hosts. |
 | `VITE_API_BASE_URL` | Separate full-repository boundary; do not point it at the catalogue-only API. |
 | `VITE_BASE_PATH` | Build-time base path when the app is served under a subpath. |
 
-> **Security note:** `VITE_` values are embedded in the client bundle and are public. For a public production deployment, proxy AI calls through a Worker or another server-side boundary.
+> **Security note:** `VITE_` values are embedded in the client bundle and are public. Groq calls go through the server-side proxy, so the API key never ships to the browser. Set `GROQ_API_KEY` in Vercel (or `wrangler secret`) rather than as a `VITE_` variable.
 
 ## Scripts
 

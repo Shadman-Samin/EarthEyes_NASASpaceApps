@@ -2,7 +2,7 @@ import * as Dialog from "@radix-ui/react-dialog"
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type FormEvent } from "react"
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
 import { Group, Panel, Separator } from "react-resizable-panels"
-import { useParams, useSearchParams } from "react-router-dom"
+import { useLocation, useParams, useSearchParams } from "react-router-dom"
 import { moduleIdSchema, type LayerDefinition, type ModuleId, type Place } from "../../domain/models"
 import { catalogueBoundsSchema, catalogueProductIdSchema, catalogueQuerySchema, type CatalogueBounds, type CatalogueProductId, type CatalogueSearchResult } from "../../domain/catalogue"
 import { moduleRegistry } from "../../domain/module-registry"
@@ -33,6 +33,7 @@ const EarthMap = lazy(() => import("../../features/map/EarthMap").then((module) 
 
 function ExplorerWorkspace({ place }: { place: Place }) {
   const [searchParams, setSearchParams] = useSearchParams()
+  const { pathname } = useLocation()
   const queryClient = useQueryClient()
   const requestedModule = moduleIdSchema.safeParse(searchParams.get("module"))
   const moduleId: ModuleId = requestedModule.success && place.moduleIds.includes(requestedModule.data) ? requestedModule.data : place.moduleIds[0]
@@ -262,7 +263,25 @@ function ExplorerWorkspace({ place }: { place: Place }) {
       {!waiting && !missingSelection && observations.length > 0 && (
         <ObservationTimeline observations={observations} selectedId={pairRight?.id ?? state.rightId} events={[]} onSelect={state.selectObservation} dataOrigin="live" />
       )}
-      <Argus context={{ view: rtContext, acquisitions: series, comparison: { status: browse.status, summary: missingSelection ? null : browse.summary }, catalogueStatus: waiting ? "loading" : failed ? "error" : "ready", hasMore: Boolean(archive.hasNextPage), missingSelection }} />
+      <Argus context={{
+        view: rtContext,
+        acquisitions: series,
+        comparison: { status: browse.status, summary: missingSelection ? null : browse.summary },
+        catalogueStatus: waiting ? "loading" : failed ? "error" : "ready",
+        hasMore: Boolean(archive.hasNextPage),
+        missingSelection,
+        display: {
+          moduleId: state.moduleId,
+          moduleTitle: moduleRegistry[state.moduleId].title,
+          comparisonMode: state.mode,
+          view: state.view,
+          polarization: isNisar ? polarization : null,
+          activeLayers: state.activeLayers,
+          previewsWithImages: observations.filter((observation) => Boolean(observation.imageUrl)).length,
+          previewsMissing: observations.filter((observation) => !observation.imageUrl).length,
+        },
+        page: { path: pathname, title: `${place.name} / ${moduleRegistry[state.moduleId].title}` },
+      }} />
     </main>
   )
 }

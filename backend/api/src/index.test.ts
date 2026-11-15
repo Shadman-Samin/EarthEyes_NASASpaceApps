@@ -115,8 +115,36 @@ describe("catalogue HTTP boundary", () => {
       method: "OPTIONS", headers: { Origin: "https://atlas.test", "Access-Control-Request-Method": "GET" },
     }), environment)
     expect(response.status).toBe(204)
-    expect(response.headers.get("Access-Control-Allow-Methods")).toBe("GET, OPTIONS")
+    expect(response.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST, OPTIONS")
     expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it("handles a permitted Argus POST preflight", async () => {
+    const fetch = upstream()
+    const response = await worker.fetch(new Request("https://api.test/api/argus", {
+      method: "OPTIONS",
+      headers: { Origin: "https://atlas.test", "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "content-type" },
+    }), environment)
+    expect(response.status).toBe(204)
+    expect(response.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST, OPTIONS")
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it("reports Argus as unavailable instead of proxying when no key is configured", async () => {
+    const fetch = upstream()
+    const response = await worker.fetch(new Request("https://api.test/api/argus", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: "What changed?", facts: { place: "Kuakata" } }),
+    }), {})
+    expect(response.status).toBe(503)
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it("rejects GET on the Argus route", async () => {
+    const response = await worker.fetch(new Request("https://api.test/api/argus"), {})
+    expect(response.status).toBe(405)
+    expect(response.headers.get("Allow")).toContain("POST")
   })
 
   it("rejects preflights requesting unsupported methods or headers", async () => {

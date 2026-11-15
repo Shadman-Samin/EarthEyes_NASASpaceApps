@@ -14,9 +14,17 @@
 .argus__messages:focus-visible { outline-offset: -3px; }
 .argus__intro, .argus__pending { color: var(--muted); font-size: 14px; line-height: 1.5; }
 .argus__message { margin-bottom: 12px; }
-.argus__message p { width: fit-content; max-width: 96%; border-radius: 6px; background: var(--panel-muted); padding: 9px 11px; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-wrap; }
-.argus__message--user p { margin-left: auto; background: var(--forest-900); color: white; }
+.argus__bubble { width: fit-content; max-width: 96%; border-radius: 6px; background: var(--panel-muted); padding: 9px 11px; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.argus__bubble p, .argus__bubble ul, .argus__bubble ol { margin: 0; }
+.argus__bubble > * + * { margin-top: 8px; }
+.argus__bubble ul, .argus__bubble ol { padding-left: 18px; }
+.argus__bubble li + li { margin-top: 4px; }
+.argus__bubble a { text-decoration: underline; text-underline-offset: 2px; }
+.argus__bubble code { border-radius: 3px; background: rgb(25 49 45 / 10%); padding: 1px 4px; font: 13px var(--font-mono); }
+.argus__message--user .argus__bubble { margin-left: auto; background: var(--forest-900); color: white; }
 .argus__message small { display: block; margin: 4px 0 0 4px; color: var(--faint); font-size: 12px; }
+.argus__retry { min-height: 44px; margin: 6px 0 0 4px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--panel); padding: 6px 10px; color: var(--forest-900); font-size: 12px; }
+.argus__retry:hover { background: var(--lime-soft); }
 .argus__prompts { display: flex; flex: none; gap: 5px; padding: 0 12px 8px; }
 .argus__prompts button { min-height: 44px; flex: 1; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); padding: 5px; color: var(--forest-900); font-size: 12px; }
 .argus__prompts button:hover { background: var(--lime-soft); }

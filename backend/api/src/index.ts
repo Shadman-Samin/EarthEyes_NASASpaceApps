@@ -1,8 +1,9 @@
 import { catalogueProducts } from "../../../src/domain/catalogue.js"
+import { ArgusError, handleArgus, type ArgusEnvironment } from "./argus.js"
 import { CatalogueError, searchCatalogue } from "./catalogue.js"
 import { parseCatalogueQuery } from "./query.js"
 
-type Environment = { ALLOWED_ORIGINS?: string }
+type Environment = { ALLOWED_ORIGINS?: string } & ArgusEnvironment
 type Context = { waitUntil(promise: Promise<unknown>): void }
 
 function errorResponse(status: number, code: string, message: string, headers?: HeadersInit) {
@@ -37,15 +38,25 @@ export default {
       const method = request.headers.get("Access-Control-Request-Method")
       const headers = (request.headers.get("Access-Control-Request-Headers") ?? "")
         .split(",").map((header) => header.trim().toLowerCase()).filter(Boolean)
-      if (!origin || method !== "GET" || headers.some((header) => !["accept", "content-type"].includes(header))) {
-        return send(errorResponse(405, "method_not_allowed", "Only read-only catalogue requests are supported", { Allow: "GET, OPTIONS" }))
+      if (!origin || !method || !["GET", "POST"].includes(method) || headers.some((header) => !["accept", "content-type"].includes(header))) {
+        return send(errorResponse(405, "method_not_allowed", "Only read-only catalogue requests and Argus questions are supported", { Allow: "GET, POST, OPTIONS" }))
       }
       return send(new Response(null, { status: 204, headers: {
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Accept, Content-Type",
         "Access-Control-Max-Age": "600",
         "Cache-Control": "no-store",
       } }))
+    }
+    if (url.pathname === "/api/argus") {
+      try {
+        return send(await handleArgus(request, env))
+      } catch (error) {
+        if (error instanceof ArgusError) {
+          return send(errorResponse(error.status, error.code, error.message, error.retryAfter ? { "Retry-After": error.retryAfter } : undefined))
+        }
+        return send(errorResponse(502, "ai_unavailable", "Argus could not answer this request"))
+      }
     }
     if (request.method !== "GET") {
       return send(errorResponse(405, "method_not_allowed", "Only GET is supported", { Allow: "GET, OPTIONS" }))

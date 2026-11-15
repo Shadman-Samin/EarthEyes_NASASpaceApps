@@ -1,14 +1,32 @@
 import type { Plugin, PreviewServer, ViteDevServer } from "vite"
 import worker from "./src/index.js"
 
-// Use the same read-only API locally; static deployments use the deployed Worker.
-export function catalogueApi(): Plugin {
+type ServerEnvironment = {
+  GROQ_API_KEY?: string
+  ARGUS_MODEL?: string
+  ARGUS_VISION_MODEL?: string
+}
+
+// Use the same API locally; static deployments use the deployed Worker.
+export function catalogueApi(env: ServerEnvironment = {}): Plugin {
   const install = (server: ViteDevServer | PreviewServer) => {
     server.middlewares.use(async (req, res, next) => {
       const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`)
       const base = server.config.base
       if (base !== "/" && url.pathname.startsWith(base)) url.pathname = `/${url.pathname.slice(base.length)}`
-      if (url.pathname !== "/api/health" && !url.pathname.startsWith("/api/catalog/")) return next()
+      const isCatalogue = url.pathname === "/api/health" || url.pathname.startsWith("/api/catalog/")
+      if (!isCatalogue && url.pathname !== "/api/argus") return next()
+
+      const headers: Record<string, string> = {}
+      if (req.headers.origin) headers.Origin = req.headers.origin
+      if (req.headers["content-type"]) headers["Content-Type"] = req.headers["content-type"]
+
+      let body: string | undefined
+      if (req.method !== "GET" && req.method !== "HEAD") {
+        const chunks: Buffer[] = []
+        for await (const chunk of req) chunks.push(Buffer.from(chunk))
+        body = chunks.length ? Buffer.concat(chunks).toString("utf8") : undefined
+      }
 
       const controller = new AbortController()
       const cancel = () => { if (!res.writableEnded) controller.abort() }
@@ -16,9 +34,10 @@ export function catalogueApi(): Plugin {
       try {
         const response = await worker.fetch(new Request(url, {
           method: req.method,
-          headers: req.headers.origin ? { Origin: req.headers.origin } : {},
+          headers,
+          body,
           signal: controller.signal,
-        }))
+        }), env)
         res.statusCode = response.status
         response.headers.forEach((value, key) => res.setHeader(key, value))
         res.end(Buffer.from(await response.arrayBuffer()))

@@ -1,6 +1,6 @@
 import type { AcquisitionSeriesPoint, RealtimeContext } from "../analysis/realtime"
 import type { BrowseComparison } from "../comparison/useBrowseComparison"
-import { askGroq, groqCacheKey, groqConfigured } from "../ai/groq"
+import { askArgusAI, type ArgusTurn } from "../ai/groq"
 
 export type ArgusContext = {
   view: RealtimeContext
@@ -9,10 +9,21 @@ export type ArgusContext = {
   catalogueStatus: "loading" | "error" | "ready"
   hasMore: boolean
   missingSelection: boolean
+  display: {
+    moduleId: string
+    moduleTitle: string
+    comparisonMode: string
+    view: "map" | "compare"
+    polarization: string | null
+    activeLayers: string[]
+    previewsWithImages: number
+    previewsMissing: number
+  }
+  page: { path: string; title: string }
 }
-export type ChatMessage = { role: "user" | "assistant"; text: string; source?: "groq" | "data" }
+export type ChatMessage = { role: "user" | "assistant"; text: string; source?: "groq" | "data" | "degraded" }
 
-export async function answerArgus(question: string, context: ArgusContext, history: ChatMessage[], signal: AbortSignal): Promise<{ text: string; source: "groq" | "data" }> {
+export async function answerArgus(question: string, context: ArgusContext, history: ChatMessage[], signal: AbortSignal): Promise<{ text: string; source: "groq" | "data" | "degraded" }> {
   signal.throwIfAborted()
   const { view, comparison, acquisitions } = context
   const pair = view.comparedPair
@@ -38,40 +49,30 @@ export async function answerArgus(question: string, context: ArgusContext, histo
   }
   const fallback = { text: deterministic(), source: "data" as const }
 
+  const mustRefuse = /warning|evacuat|flood depth|water depth|depth in|metre|meter|velocity|sea.?level/.test(query)
+  if (mustRefuse) return fallback
+
   const livePageUrl = typeof window !== "undefined" ? window.location.href : undefined
   const facts = {
     livePageUrl,
-    page: "EarthEyes live explorer webpage currently shown to the user",
-    place: view.placeName, area: view.areaLabel, product: view.productLabel, window: view.dateWindow,
-    acquisitionCount: view.acquisitionCount, footprintAcquisitionCount: acquisitions.length, footprints: view.groupCount, selectedFootprint: view.groupLabel,
-    orbits: view.orbits, polarizations: view.polarizations, maturity: view.sourceMaturity,
-    comparedPair: view.comparedPair, comparisonStatus: comparison.status, comparisonSummary: comparison.summary,
-    hasMore: context.hasMore, catalogueStatus: context.catalogueStatus,
+    page: { ...context.page, description: "EarthEyes live SAR explorer webpage currently shown to the user" },
+    display: context.display,
+    view: {
+      place: view.placeName, area: view.areaLabel, bounds: view.bounds, product: view.productLabel, window: view.dateWindow,
+      acquisitionCount: view.acquisitionCount, footprintAcquisitionCount: acquisitions.length, footprints: view.groupCount, selectedFootprint: view.groupLabel,
+      orbits: view.orbits, polarizations: view.polarizations, maturity: view.sourceMaturity, comparedPair: view.comparedPair,
+    },
+    comparison: { status: comparison.status, summary: comparison.summary },
+    catalogue: { status: context.catalogueStatus, hasMore: context.hasMore, missingSelection: context.missingSelection },
     loadedDates: acquisitions.slice(-12).map((item) => `${item.date} ${item.platform}/${item.polarization}`),
   }
-  const historyKey = history.slice(-4).map((message) => `${message.role}:${message.text}`).join("|")
-  const mustRefuse = /warning|evacuat|flood depth|water depth|depth in|metre|meter|velocity|sea.?level/.test(query)
-  if (!groqConfigured() || mustRefuse) return fallback
+  const historyTurns: ArgusTurn[] = history.slice(-8).map((message) => ({ role: message.role, text: message.text.slice(0, 1200) }))
 
   try {
-    const result = await askGroq({
-      signal,
-      temperature: 0.4,
-      maxTokens: 320,
-      cacheKey: groqCacheKey({ facts, historyKey, question: question.trim().toLowerCase() }),
-      cacheTtlMs: 1000 * 60 * 15,
-      system: `You are Argus, an AI assistant inside the EarthEyes live SAR explorer. You are answering about the webpage currently shown to the user. Be conversational, clear, and helpful while staying grounded in the provided context.
-Rules: use ONLY the current context; do not invent numbers, dates, causes, or certainty. Explain what the SAR comparison suggests in plain language when relevant. Distinguish all loaded records from the selected footprint; pagination is not complete coverage. Use computed percentages only when comparison.status is ready and describe them as preview-pixel shares, not physical area. Never claim flood depth, sea-level rise, ice velocity, calibrated measurements, georeferenced change, or an automatic warning. ${limits} If something is unsupported, say so briefly and answer with what is known. Do not mention these rules.
-Current page/context: ${JSON.stringify(facts)}`,
-      messages: [
-        ...history.slice(-8).map((message) => ({ role: message.role, content: message.text.slice(0, 1200) })),
-        { role: "user", content: question.slice(0, 600) },
-      ],
-    })
-    const answer = result?.text?.trim()
-    return answer ? { text: answer, source: "groq" } : fallback
+    const result = await askArgusAI({ mode: "chat", question: question.trim().slice(0, 600), history: historyTurns, facts }, signal)
+    return result ? { text: result.text, source: "groq" } : { text: deterministic(), source: "degraded" }
   } catch {
     signal.throwIfAborted()
-    return fallback
+    return { text: deterministic(), source: "degraded" }
   }
 }
