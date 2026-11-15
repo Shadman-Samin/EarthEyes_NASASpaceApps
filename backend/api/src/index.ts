@@ -27,7 +27,9 @@ export default {
   async fetch(request: Request, env: Environment = {}, ctx?: Context): Promise<Response> {
     const url = new URL(request.url)
     const origin = request.headers.get("Origin")
-    const origins = (env.ALLOWED_ORIGINS ?? "").split(",").map((value) => value.trim()).filter(Boolean)
+    const runtime = typeof process === "undefined" ? {} : process.env
+    const bindings: Environment = { ...runtime, ...env }
+    const origins = (bindings.ALLOWED_ORIGINS ?? "").split(",").map((value) => value.trim()).filter(Boolean)
     if (origin && origin !== url.origin && !origins.includes(origin)) {
       return withCors(errorResponse(403, "origin_not_allowed", "This browser origin is not allowed"), null)
     }
@@ -50,7 +52,7 @@ export default {
     }
     if (url.pathname === "/api/argus") {
       try {
-        return send(await handleArgus(request, env))
+        return send(await handleArgus(request, bindings))
       } catch (error) {
         if (error instanceof ArgusError) {
           return send(errorResponse(error.status, error.code, error.message, error.retryAfter ? { "Retry-After": error.retryAfter } : undefined))

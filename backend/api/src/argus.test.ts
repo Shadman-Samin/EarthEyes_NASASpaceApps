@@ -76,6 +76,20 @@ describe("Argus proxy boundary", () => {
     expect((await handleArgus(post(body), { GROQ_API_KEY: key, ARGUS_VISION_MODEL: "vision-test" })).status).toBe(200)
   })
 
+  it("falls back to process.env when the host passes no bindings", async () => {
+    const fetch = upstream("Answer from process env")
+    const previous = process.env.GROQ_API_KEY
+    process.env.GROQ_API_KEY = key
+    try {
+      const response = await worker.fetch(post({ question: "Host env question", facts: { place: "Env" } }), {})
+      expect(response.status).toBe(200)
+      expect(fetch).toHaveBeenCalledTimes(1)
+    } finally {
+      if (previous === undefined) delete process.env.GROQ_API_KEY
+      else process.env.GROQ_API_KEY = previous
+    }
+  })
+
   it("passes upstream rate limits through with a retry hint", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response("slow down", { status: 429, headers: { "Retry-After": "12" } })))
     const response = await worker.fetch(post({ question: "Rate limit me", facts: baseFacts }), { GROQ_API_KEY: key })
