@@ -1,5 +1,6 @@
 import { useRef, useState } from "react"
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom"
+import { KUAKATA_PILOT_URL } from "../shared/links"
 import { Icon } from "../shared/ui"
 import { RouteAnnouncer } from "./RouteAnnouncer"
 
@@ -41,7 +42,7 @@ export function AppShell() {
         </nav>
         <div className="site-header__status"><span><i /> Research prototype</span><Link to="/explore" className="site-header__cta">Open explorer <Icon name="arrow" size={14} /></Link></div>
         <button ref={menuButton} className="site-menu" type="button" aria-expanded={mobileOpen} aria-controls={mobileOpen ? "mobile-nav" : undefined} aria-label={mobileOpen ? "Close navigation" : "Open navigation"} onClick={() => setMobileOpen((current) => !current)}><Icon name={mobileOpen ? "close" : "menu"} size={20} /></button>
-        {mobileOpen && <nav id="mobile-nav" className="mobile-nav" aria-label="Mobile navigation">{navigation.map(([href, label]) => <NavLink key={href} to={href} end={href === "/"} onClick={() => setMobileOpen(false)}>{label}<Icon name="arrow" size={15} /></NavLink>)}</nav>}
+        {mobileOpen && <nav id="mobile-nav" className="mobile-nav" aria-label="Mobile navigation">{navigation.map(([href, label]) => <NavLink key={href} to={href} end={href === "/"} onClick={() => setMobileOpen(false)}>{label}<Icon name="arrow" size={15} /></NavLink>)}<Link className="mobile-nav__study" to={KUAKATA_PILOT_URL} onClick={() => setMobileOpen(false)}>Inspect the Kuakata study<Icon name="arrow" size={15} /></Link></nav>}
       </header>
       <RouteAnnouncer />
       <div id="route-content" tabIndex={-1}>
@@ -57,10 +58,18 @@ function Footer() {
     <footer className="site-footer">
       <div className="site-footer__identity">
         <Link to="/" className="site-footer__brand"><img className="site-footer__logo" src={logo} alt="" width={64} height={64} />EARTH<span>EYES</span></Link>
-        <p>An Earth-observation field atlas for NASA Space Apps. Real archive discovery, exploratory preview comparison, and a visible boundary between evidence and explanation.</p>
+        <p>An Earth-observation field atlas for NASA Space Apps. Live archive discovery, a published calibrated-source study, exploratory preview comparison, and a visible boundary between evidence and explanation.</p>
       </div>
-      <nav aria-label="Footer navigation"><Link to="/">Home</Link><Link to="/explore">Explore</Link><Link to="/about">About</Link><a href="https://github.com/Shadman-Samin/EarthEyes_NASASpaceApps" target="_blank" rel="noreferrer">Source code <Icon name="external" size={14} /></a></nav>
-      <div className="site-footer__colophon"><span>Research prototype / Not an operational warning service</span><a href="https://nisar.jpl.nasa.gov/" target="_blank" rel="noreferrer">NASA / ISRO NISAR mission <Icon name="external" size={14} /></a></div>
+      <nav aria-label="Footer navigation">
+        <Link to="/">Home</Link>
+        <Link to="/explore">Explore</Link>
+        <Link className="site-footer__study" to={KUAKATA_PILOT_URL}>Kuakata study</Link>
+        <Link to="/methodology">Methodology</Link>
+        <Link to="/data-sources">Data sources</Link>
+        <Link to="/about">About</Link>
+        <a href="https://github.com/Shadman-Samin/EarthEyes_NASASpaceApps" target="_blank" rel="noreferrer">Source code <Icon name="external" size={14} /></a>
+      </nav>
+      <div className="site-footer__colophon"><span>Research prototype / Published study is exploratory / Not an operational warning service</span><a href="https://nisar.jpl.nasa.gov/" target="_blank" rel="noreferrer">NASA / ISRO NISAR mission <Icon name="external" size={14} /></a></div>
     </footer>
   )
 }

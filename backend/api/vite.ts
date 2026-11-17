@@ -15,7 +15,7 @@ export function catalogueApi(env: ServerEnvironment = {}): Plugin {
       const base = server.config.base
       if (base !== "/" && url.pathname.startsWith(base)) url.pathname = `/${url.pathname.slice(base.length)}`
       const isCatalogue = url.pathname === "/api/health" || url.pathname.startsWith("/api/catalog/")
-      if (!isCatalogue && url.pathname !== "/api/argus") return next()
+      if (!isCatalogue && url.pathname !== "/api/argus" && url.pathname !== "/api/analysis") return next()
 
       const headers: Record<string, string> = {}
       if (req.headers.origin) headers.Origin = req.headers.origin

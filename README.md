@@ -112,7 +112,7 @@ The `/explore` workspace is a single investigation surface:
 4. **Read the evidence.** The drawer computes brighter/darker pixel shares and an acquisition timeline from the pulled previews. Summary, Chart, and Context update in real time.
 5. **Ask Argus.** Argus receives the same loaded acquisitions and computed statistics. It can use an optional Groq text model; otherwise it answers from deterministic data-based logic. It does not inspect images or issue warnings.
 
-All real-time interpretation is **exploratory and uncalibrated**. The calibrated NISAR GCOV bundles under `public/analysis/` remain reproducible for the two flagship investigations, but they are not wired into the live explorer UI.
+Live browse comparisons remain **exploratory and uncalibrated**. An exactly matching precomputed study now adds a separate calibrated-source evidence panel, georeferenced analytical overlays, a fixed-footprint time series, and server-owned Argus answers. Source calibration is not validation of the derived result. Use **Open Kuakata pilot** in Summary to select the published bounds, dates and polarization.
 
 ## How it works
 
@@ -189,7 +189,7 @@ Open the Vite URL and select **Open the explorer**. `npm run dev` serves the fro
 
 The explorer defaults to NISAR GCOV (provisional) from January 2026 to today. Kuakata has a known mid-2026 NISAR coverage window. Use **Advanced options (optional)** in Controls to change the window, switch to the OPERA Sentinel-1 2024 archive, choose a footprint, or change polarization (HV recommended).
 
-Only selected public browse images are fetched, never whole protected satellite rasters. The previews are not calibrated change maps or georeferenced image overlays; the map displays actual acquisition footprints.
+The browser fetches selected public previews and compact published overlays, never whole protected satellite rasters. Browse placements remain approximate; the separate precomputed analytical overlays are reprojected from verified numerical grids.
 
 ## Environment variables
 
@@ -255,7 +255,7 @@ Important limits:
 - Brighter or darker pixels can reflect geometry, surface roughness, moisture, vegetation, or processing choices — not only environmental change.
 - NISAR coverage varies by place and date. Empty results are real results, not a cue to substitute demo data.
 - GroundLine is a demonstration of governance steps. It does not send SMS or voice messages and cannot bypass analyst review or authority approval.
-- The calibrated Kuakata and Jakobshavn bundles are reproducible offline artifacts. They are not the same thing as the live, exploratory explorer output.
+- The versioned Kuakata study is computed from calibrated source values, with explicit sensitivity and reference coverage. The legacy Jakobshavn artifact is not in the published v3 index. Neither is a substitute for the live browse pair or ground-truth validation.
 
 Quantitative claims should stay tied to granule IDs, dates, polarization, and stated limitations. NISAR observations must never be presented as direct sea-level measurements, and GLOF candidates must never become public warnings without analyst review and authority approval.
 
@@ -300,16 +300,18 @@ See [`backend/api/README.md`](backend/api/README.md) for requests, limits, and c
 
 ## Offline calibrated analysis
 
-The live explorer interprets pulled data in real time. Separately, calibrated georeferenced bundles for Kuakata and Jakobshavn remain under `public/analysis/<place>/` for reproducibility. They are generated offline by `tools/analysis` from real NISAR GCOV granules; an Earthdata bearer token is required and is never committed.
+The generic offline pipeline reads bounded real NISAR GCOV windows for a bbox, checks every source grid and quality mask, and compares fixed median epochs. Measurements use a common valid footprint and ellipsoidal equal-area pixel weights. It preserves old extraction caches and writes v3 manifests plus compact, versioned WebP display rasters.
 
-The pipeline reads only the needed HDF5 windows, computes calibrated dB change, water-area time series, clusters, and a plain-language story for every date pair, then writes Int16 rasters plus a JSON manifest. Each pair names its own delta raster and its own story, so the prose always matches the selected comparison.
+The Kuakata pilot contains ten acquisitions (June 18 to October 16, 2026). Independent class comparisons cover 10/10 dates with Sentinel-1 and 3/10 with eligible Sentinel-2 imagery. Missing/cloudy dates remain visible. No matching beta or standard-release dates were found for a radiometric release comparison. Results remain **exploratory**, not ground-truth validated; sensitivity ranges are **not confidence intervals**.
+
+`GET /api/analysis` serves a bundled, typed index only when bbox, date window, product and optional polarization match. There is no on-demand job queue or promised worldwide processing coverage. Argus answers published-study questions from server-owned numbers without requiring Groq; it cannot replace those numbers with client claims or generated values.
 
 ```sh
-cd tools/analysis
-python extract.py --site kuakata-bangladesh
-python extract.py --site jakobshavn-glacier
-python analyze.py --site kuakata-bangladesh
-python analyze.py --site jakobshavn-glacier
+python tools/analysis/extract.py --site kuakata-bangladesh --workers 2
+python tools/analysis/analyze.py --site kuakata-bangladesh
+python tools/analysis/validate.py --site kuakata-bangladesh
+python tools/analysis/publish.py --site kuakata-bangladesh
+python -m unittest discover -s tools/analysis -p "test_*.py"
 ```
 
 See [`tools/analysis/README.md`](tools/analysis/README.md) for authentication, ROI, and reproducibility details.
@@ -318,9 +320,9 @@ See [`tools/analysis/README.md`](tools/analysis/README.md) for authentication, R
 
 Known boundaries and open work:
 
-- A public AI deployment still needs a server-side proxy and quota controls.
+- Rotate the previously exposed legacy Groq key and remove old `VITE_GROQ_API_KEY` deployment settings.
 - The catalogue Worker has not been deployed to a public Cloudflare account.
-- Calibrated raster processing and scientific measurements remain a separate offline path.
+- Raster processing stays offline; the published index currently contains one Bangladesh pilot. Additional Bangladesh regions and Jakobshavn need their own completed v3 processing and reference checks.
 - GroundLine is an interface demonstration, not an operational warning system.
 - Reference place search is a small curated list, not a worldwide geocoder.
 

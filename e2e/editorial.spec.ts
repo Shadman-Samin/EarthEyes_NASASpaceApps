@@ -86,17 +86,19 @@ test("GroundLine validates the local simulation and sends no subscription reques
   expect(await page.evaluate(() => JSON.stringify(localStorage))).toBe(storedBefore)
 })
 
-test("Home background video is short, muted, non-interactive and respects reduced motion", async ({ page }, testInfo) => {
+test("Home background video is decorative, muted and respects reduced motion", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === "firefox", "Desktop and mobile video checks")
   await page.goto("/")
   const video = page.locator(".landing-hero video")
   await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.duration)).toBeCloseTo(8, 1)
   await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime)).toBeGreaterThan(0)
   expect(await video.evaluate((element: HTMLVideoElement) => element.muted && element.loop && element.playsInline)).toBe(true)
-  await expect(page.getByRole("button", { name: "Pause background video" })).toHaveCount(0)
+  await expect(page.getByRole("button", { name: /background video/ })).toHaveCount(0)
+  await expect(video).not.toHaveAttribute("controls")
   await page.screenshot({ path: testInfo.outputPath("home-video.png") })
   await page.emulateMedia({ reducedMotion: "reduce" })
   await expect(video).toHaveCount(0)
+  await expect(page.getByRole("button", { name: /background video/ })).toHaveCount(0)
   await expect(page.locator(".landing-hero__media img")).toBeVisible()
   await expect(page.getByRole("button", { name: "Ask Argus evidence guide" })).toHaveCount(0)
 })

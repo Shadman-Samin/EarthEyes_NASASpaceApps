@@ -61,6 +61,7 @@ ul, ol, dl, dd { margin-block: 0; }
 .fatal-error > svg { margin-bottom: 20px; color: var(--coral); }
 .fatal-error h1 { margin-top: 16px; font: 750 clamp(2rem, 5vw, 4rem)/1 var(--font-display); color: var(--forest-900); }
 .fatal-error p { max-width: 650px; margin: 14px 0 24px; color: var(--muted); }
+.fatal-error__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; }
 .toast { position: fixed; z-index: 120; right: 20px; bottom: 20px; display: flex; max-width: min(440px, calc(100vw - 40px)); align-items: center; gap: 18px; border: 1px solid var(--line); border-left: 3px solid var(--lime-dark); background: var(--panel); padding: 14px 16px; box-shadow: var(--shadow-float); color: var(--forest-900); font-size: 13px; font-weight: 650; }
 .toast button { display: grid; width: 28px; height: 28px; flex: none; place-items: center; border: 0; background: transparent; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }

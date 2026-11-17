@@ -9,6 +9,23 @@ PUBLIC = REPO / "public" / "analysis"
 COLLECTION = "NISAR_L2_GCOV_PROVISIONAL_V1"
 COLLECTION_SHORT = "NISAR_L2_GCOV_PROVISIONAL_V1"
 
+COLLECTIONS = {
+    "nisar-gcov-provisional": "NISAR_L2_GCOV_PROVISIONAL_V1",
+    "nisar-gcov-beta": "NISAR_L2_GCOV_BETA_V1",
+    "nisar-gcov": "NISAR_L2_GCOV_V1",
+}
+
+DEFAULTS = {
+    "read_px": 1536,
+    "target_px": 768,
+    "min_dates": 2,
+    "max_dates": 12,
+}
+
+
+def cache_dir(site):
+    return CACHE / site["id"] / "v3" / site.get("product", "nisar-gcov-provisional")
+
 SITES = {
     "kuakata-bangladesh": {
         "label": "Kuakata, Bangladesh",

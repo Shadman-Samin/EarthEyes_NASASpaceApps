@@ -1,8 +1,10 @@
 import type { AcquisitionSeriesPoint, RealtimeContext } from "../analysis/realtime"
 import type { BrowseComparison } from "../comparison/useBrowseComparison"
 import { askArgusAI, type ArgusTurn } from "../ai/groq"
+import type { AnalysisQuery } from "../../domain/analysis"
 
 export type ArgusContext = {
+  analysisQuery?: AnalysisQuery
   view: RealtimeContext
   acquisitions: AcquisitionSeriesPoint[]
   comparison: Pick<BrowseComparison, "status" | "summary">
@@ -15,6 +17,7 @@ export type ArgusContext = {
     comparisonMode: string
     view: "map" | "compare"
     polarization: string | null
+    productId: string
     activeLayers: string[]
     previewsWithImages: number
     previewsMissing: number
@@ -25,6 +28,11 @@ export type ChatMessage = { role: "user" | "assistant"; text: string; source?: "
 
 export async function answerArgus(question: string, context: ArgusContext, history: ChatMessage[], signal: AbortSignal): Promise<{ text: string; source: "groq" | "data" | "degraded" }> {
   signal.throwIfAborted()
+  if (context.analysisQuery) {
+    const result = await askArgusAI({ mode: "chat", question: question.trim().slice(0, 600), facts: {}, analysisQuery: context.analysisQuery }, signal)
+    return result ? { text: result.text, source: result.source }
+      : { text: "The published-analysis service could not answer. The evidence panel still shows the last loaded bundle; I will not substitute preview percentages for its measurements.", source: "degraded" }
+  }
   const { view, comparison, acquisitions } = context
   const pair = view.comparedPair
   const limits = "These previews cannot establish flood depth, sea-level rise, ice velocity or a cause. They are uncalibrated and unregistered, not an automatic public warning."
@@ -59,6 +67,7 @@ export async function answerArgus(question: string, context: ArgusContext, histo
     display: context.display,
     view: {
       place: view.placeName, area: view.areaLabel, bounds: view.bounds, product: view.productLabel, window: view.dateWindow,
+      productId: context.display.productId,
       acquisitionCount: view.acquisitionCount, footprintAcquisitionCount: acquisitions.length, footprints: view.groupCount, selectedFootprint: view.groupLabel,
       orbits: view.orbits, polarizations: view.polarizations, maturity: view.sourceMaturity, comparedPair: view.comparedPair,
     },

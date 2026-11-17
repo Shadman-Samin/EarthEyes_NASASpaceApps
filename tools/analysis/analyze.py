@@ -1,395 +1,185 @@
-"""Compute change analysis from extracted windows and write public bundles."""
+"""Publish reproducible, sensitivity-labeled results from verified GCOV caches."""
 import argparse
+import hashlib
 import json
-import shutil
-import time
-from datetime import datetime
-from pathlib import Path
+from datetime import datetime, timezone
 
 import numpy as np
-from scipy import ndimage
 
 import config
+import render
+import stats
+from extract import resolve_site
 
-INVALID = -32768
-DB_SCALE = 100.0
-MAX_CLUSTERS = 12
-MIN_CLUSTER_M2 = 5000
-WATER_DARK = "dark"
-
-
-def load_date(site_dir, date):
-    data = np.load(site_dir / f"{date}.npz")
-    db = data["db"].astype(np.float32) / DB_SCALE
-    valid = data["db"] != INVALID
-    meta = {
-        "acquired_at": data["acquired_at"].item(),
-        "granule": data["granule"].item(),
-        "source_url": data["source_url"].item(),
-        "polarization": data["polarization"].item(),
-        "epsg": int(data["epsg"]),
-        "spacing_m": float(data["spacing_m"]),
-        "corners": data["corners"],
-        "lookup": data["lookup"],
-        "read_shape": data["read_shape"],
-        "factor": int(data["factor"]),
-    }
-    return db, valid, meta
+K_SIGMA = 2.5
+K_SWEEP = (2.0, 2.5, 3.0)
+ALGORITHM_VERSION = "3.0.0"
 
 
-def otsu_threshold(values, bins=256):
-    if values.size < 10:
-        return float(values.min()) if values.size else -25.0
-    lo, hi = float(np.percentile(values, 1)), float(np.percentile(values, 99))
-    if hi <= lo:
-        return float(values.mean())
-    hist, edges = np.histogram(values, bins=bins, range=(lo, hi))
-    total = int(hist.sum())
-    centers = (edges[:-1] + edges[1:]) / 2
-    sum_total = float((hist * centers).sum())
-    w_b = 0
-    sum_b = 0.0
-    best_t, best_var = float(lo), -1.0
-    for t in range(bins):
-        w_b += int(hist[t])
-        if w_b == 0:
-            continue
-        w_f = total - w_b
-        if w_f == 0:
-            break
-        sum_b += float(hist[t]) * centers[t]
-        mean_b = sum_b / w_b
-        mean_f = (sum_total - sum_b) / w_f
-        var_between = w_b * w_f * (mean_b - mean_f) ** 2
-        if var_between > best_var:
-            best_var = var_between
-            best_t = centers[t]
-    return float(best_t)
+def config_hash(site):
+    return hashlib.sha256(json.dumps(site, sort_keys=True, default=str).encode()).hexdigest()[:16]
 
 
-def water_mask(db, valid):
-    vals = db[valid]
-    t = otsu_threshold(vals)
-    raw = db < t
-    mask = ndimage.binary_opening(raw, structure=np.ones((3, 3)), iterations=1)
-    mask = ndimage.binary_closing(mask, structure=np.ones((5, 5)), iterations=1)
-    mask = mask & valid
-    return mask, t
+def epoch_bounds(dates):
+    size = max(1, min(3, len(dates) // 2))
+    return dates[:size], dates[-size:]
 
 
-def label_clusters(mask, spacing_m, min_area_m2=MIN_CLUSTER_M2):
-    structure = np.ones((3, 3), dtype=int)
-    labeled, count = ndimage.label(mask, structure=structure)
-    if count == 0:
-        return []
-    slices = ndimage.find_objects(labeled)
-    pixel_area = spacing_m * spacing_m
-    clusters = []
-    for i, sl in enumerate(slices, start=1):
-        if sl is None:
-            continue
-        count_px = int((labeled[sl] == i).sum())
-        area_m2 = count_px * pixel_area
-        if area_m2 < min_area_m2:
-            continue
-        yc, xc = ndimage.center_of_mass(mask, labeled, index=i)
-        yslice, xslice = sl
-        clusters.append(
-            {
-                "id": i,
-                "pixels": count_px,
-                "area_km2": round(area_m2 / 1e6, 3),
-                "centroid_px": [round(float(xc), 1), round(float(yc), 1)],
-                "bbox_px": [
-                    int(xslice.start),
-                    int(yslice.start),
-                    int(xslice.stop - 1),
-                    int(yslice.stop - 1),
-                ],
-            }
-        )
-    clusters.sort(key=lambda c: -c["area_km2"])
-    return clusters[:MAX_CLUSTERS]
+def analyze_site(site):
+    site_dir = config.cache_dir(site)
+    wanted = sorted(set(site["dates"]))
+    missing = [day for day in wanted if not (site_dir / f"{day}.npz").exists()]
+    if missing:
+        raise ValueError(f"{site['id']}: incomplete requested series; missing verified dates: {', '.join(missing)}")
+    if len(wanted) < 2:
+        raise ValueError("at least two distinct verified dates are required")
+    loaded = {day: stats.load_date(site_dir, day) for day in wanted}
+    first_entry = loaded[wanted[0]]
+    meta0 = first_entry[3]
+    for day, entry in loaded.items():
+        meta = entry[3]
+        if (entry[0].shape != first_entry[0].shape or meta["grid_signature"] != meta0["grid_signature"]
+                or meta["epsg"] != meta0["epsg"] or not np.array_equal(meta["transform"], meta0["transform"])
+                or not np.array_equal(meta["roi_mask"], meta0["roi_mask"])
+                or not np.allclose(meta["pixel_area_m2"], meta0["pixel_area_m2"], rtol=0, atol=1e-6)):
+            raise ValueError(f"{day}: source grid/measurement footprint differs")
+        if (meta["product"] != site["product"] or meta["polarization"] != site["polarization_label"]
+                or not np.array_equal(meta["roi"], site["roi"]) or not meta["acquired_at"].startswith(day)):
+            raise ValueError(f"{day}: cached product, polarization, bbox or date differs from the request")
+        fields = meta["granule"].split("_")
+        if len(fields) < 14 or tuple(fields[i] for i in (5, 6, 7, 8, 9, 13)) != tuple(
+                meta0["granule"].split("_")[i] for i in (5, 6, 7, 8, 9, 13)):
+            raise ValueError(f"{day}: acquisition mode or processing baseline differs")
+        if meta["processing"] != meta0["processing"]:
+            raise ValueError(f"{day}: source corrections differ within the series")
 
+    spacing, pixel_area, roi_mask = meta0["spacing_m"], meta0["pixel_area_m2"], meta0["roi_mask"]
+    common = np.logical_and.reduce([entry[1] for entry in loaded.values()]) & roi_mask
+    if not common.any():
+        raise ValueError("no valid common footprint across the requested dates")
+    # Every epoch and time-series point uses the same ground, not each date's coverage.
+    entries = {day: (entry[0], common, entry[2]) for day, entry in loaded.items()}
+    first_dates, last_dates = epoch_bounds(wanted)
+    first = stats.composite([entries[day] for day in first_dates])
+    last = stats.composite([entries[day] for day in last_dates])
+    delta, changed, threshold, sigma = stats.change(*first, *last, K_SIGMA)
+    retained = np.zeros_like(common)
+    components, sweep = [], {}
+    for k in K_SWEEP:
+        _, screened, _, _ = stats.change(*first, *last, k)
+        mask = np.zeros_like(common)
+        for sign, kind in ((1, "brighter"), (-1, "darker")):
+            selected = screened & (delta * sign > 0)
+            mask |= stats.cluster_mask(selected, spacing, pixel_area_m2=pixel_area)
+            if k == K_SIGMA:
+                components.extend({**component, "kind": kind} for component in
+                                  stats.clusters(selected, spacing, pixel_area_m2=pixel_area))
+        sweep[str(k)] = stats.mask_area_km2(mask, spacing, pixel_area)
+        if k == K_SIGMA:
+            retained = mask
 
-def lonlat_for_pixel(cluster, meta, width, height):
-    lookup = meta["lookup"]
-    cx, cy = cluster["centroid_px"]
-    u = cx / max(width - 1, 1) * (lookup.shape[1] - 1)
-    v = cy / max(height - 1, 1) * (lookup.shape[0] - 1)
-    r0, c0 = int(np.floor(v)), int(np.floor(u))
-    dr, dc = v - r0, u - c0
-    r0 = min(r0, lookup.shape[0] - 2)
-    c0 = min(c0, lookup.shape[1] - 2)
-    tl = lookup[r0, c0]
-    tr = lookup[r0, c0 + 1]
-    bl = lookup[r0 + 1, c0]
-    br = lookup[r0 + 1, c0 + 1]
-    top = tl * (1 - dc) + tr * dc
-    bottom = bl * (1 - dc) + br * dc
-    lonlat = top * (1 - dr) + bottom * dr
-    return [round(float(lonlat[0]), 5), round(float(lonlat[1]), 5)]
-
-
-def pair_change(db1, valid1, db2, valid2, threshold_db=1.5):
-    common = valid1 & valid2
-    delta = np.full(db1.shape, np.nan, dtype=np.float32)
-    delta[common] = db2[common] - db1[common]
-    gain = common & (delta > threshold_db)
-    loss = common & (delta < -threshold_db)
-    changed = common & (np.abs(delta) > threshold_db)
-    return delta, gain, loss, changed, common
-
-
-def write_raster(path, array_int16):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(array_int16.astype("<i2").tobytes())
-
-
-def analyze_site(site_id, pairs):
-    site = config.SITES[site_id]
-    cache_dir = config.CACHE / site_id
-    public_dir = config.PUBLIC / site_id
+    parameters = {"k_sigma": K_SIGMA, "k_sweep": K_SWEEP, "min_cluster_m2": stats.MIN_CLUSTER_M2,
+                  "water_threshold_offsets_db": [-1, 0, 1], "epoch_size": len(first_dates),
+                  "independent_look_gain_assumed": False, "area_basis": "WGS84 ellipsoidal local equal-area cells"}
+    identity = config_hash({"site": site, "algorithm": ALGORITHM_VERSION, "parameters": parameters,
+                            "inputs": [loaded[day][3]["request_hash"] for day in wanted]})
+    claims = []
+    coastal = site["phenomenon"] == "coastal-water-change"
+    water = {day: stats.water_extent(entries[day], spacing, pixel_area_m2=pixel_area) for day in wanted} if coastal else {}
+    first_water = stats.water_extent(first, spacing, pixel_area_m2=pixel_area) if coastal else None
+    last_water = stats.water_extent(last, spacing, pixel_area_m2=pixel_area) if coastal else None
+    if coastal:
+        claims.append({"id": "water_extent_change", "label": "Water-candidate area change", "unit": "km2",
+                       "value": round(last_water["area_km2"] - first_water["area_km2"], 3),
+                       "method": "Otsu dark-water candidates and morphological filtering on fixed median epochs.",
+                       "sensitivity": {"low": round(last_water["low_km2"] - first_water["high_km2"], 3),
+                                       "high": round(last_water["high_km2"] - first_water["low_km2"], 3),
+                                       "basis": "Each epoch threshold varied independently by +/-1 dB; not a confidence interval."}})
+    claims.extend([
+        {"id": "retained_brightness_change_area", "label": "Area retained by the brightness screen", "unit": "km2",
+         "value": sweep[str(K_SIGMA)], "method": "Same-sign connected components at least 5,000 m2 after a local conditional noise screen. Zero retained area is not proof of no change.",
+         "sensitivity": {"low": min(sweep.values()), "high": max(sweep.values()),
+                         "basis": "k varied from 2 to 3 under a conditional log-Gamma model; not calibrated significance."}},
+        {"id": "median_backscatter_change", "label": "Median brightness change", "value": round(float(np.median(delta[common])), 3),
+         "unit": "dB", "method": "Pixel-wise last-minus-first median epoch difference on the common valid footprint."},
+    ])
+    public_dir = config.PUBLIC / site["id"]
     raster_dir = public_dir / "rasters"
     raster_dir.mkdir(parents=True, exist_ok=True)
-
-    dates = [d for d in site["dates"] if (cache_dir / f"{d}.npz").exists()]
-    loaded = {date: load_date(cache_dir, date) for date in dates}
-    spacing_m = loaded[dates[0]][2]["spacing_m"]
-    db0, valid0, meta0 = loaded[dates[0]]
-    height, width = db0.shape
-
-    # copy calibrated rasters
-    for date, (db, valid, meta) in loaded.items():
-        encoded = np.where(db > -30000, np.clip(np.round(db * DB_SCALE), -32767, 32767), INVALID).astype(np.int16)
-        write_raster(raster_dir / f"{date}.db.i16", encoded)
-
-    # per-date water mapping (kuakata)
-    water = {}
-    if site["phenomenon"] == "coastal-water-change":
-        for date in dates:
-            db, valid, _ = loaded[date]
-            mask, threshold = water_mask(db, valid)
-            water[date] = {
-                "fraction": round(float(mask.sum()) / max(int(valid.sum()), 1), 4),
-                "area_km2": round(float(mask.sum()) * spacing_m * spacing_m / 1e6, 3),
-                "threshold_db": round(threshold, 2),
-            }
-
-    # pair analysis
-    pair_results = {}
-    persistent_changed = np.zeros((height, width), dtype=bool)
-    for pair in pairs:
-        f, t = pair
-        if f not in loaded or t not in loaded:
-            continue
-        db1, valid1, _ = loaded[f]
-        db2, valid2, _ = loaded[t]
-        delta, gain, loss, changed, common = pair_change(db1, valid1, db2, valid2, threshold_db=1.5)
-        persistent_changed |= changed
-
-        gain_clusters = label_clusters(gain, spacing_m)
-        loss_clusters = label_clusters(loss, spacing_m)
-        for cluster in gain_clusters:
-            cluster["kind"] = "gain"
-            cluster["centroid_lonlat"] = lonlat_for_pixel(cluster, meta0, width, height)
-        for cluster in loss_clusters:
-            cluster["kind"] = "loss"
-            cluster["centroid_lonlat"] = lonlat_for_pixel(cluster, meta0, width, height)
-
-        delta_enc = np.where(common & np.isfinite(delta), np.clip(np.round(delta * DB_SCALE), -32767, 32767), INVALID).astype(np.int16)
-        write_raster(raster_dir / f"{f}--{t}.delta.i16", delta_enc)
-
-        changed_fraction = float(changed.sum()) / max(int(common.sum()), 1)
-        changed_area = round(changed_fraction * common.sum() * spacing_m * spacing_m / 1e6, 3)
-        pair_story = build_pair_story(site, f, t, water, changed_fraction, changed_area, gain_clusters, loss_clusters, threshold_db=1.5)
-        pair_results[f"{f}--{t}"] = {
-            "from": f,
-            "to": t,
-            "threshold_db": 1.5,
-            "changed_fraction": round(changed_fraction, 4),
-            "changed_area_km2": changed_area,
-            "gain_area_km2": round(sum(c["area_km2"] for c in gain_clusters), 3),
-            "loss_area_km2": round(sum(c["area_km2"] for c in loss_clusters), 3),
-            "clusters": gain_clusters + loss_clusters,
-            "delta_url": f"rasters/{f}--{t}.delta.i16",
-            "story": pair_story,
-        }
-
-    persistent_clusters = label_clusters(persistent_changed, spacing_m)
-
-    # time series
-    series = []
-    for date in dates:
-        db, valid, _ = loaded[date]
-        vals = db[valid]
-        entry = {"date": date, "mean_db": round(float(vals.mean()), 2)}
-        if date in water:
-            entry["water_fraction"] = water[date]["fraction"]
-        series.append(entry)
-
-    # story
-    story = build_story(site_id, dates, loaded, water, pair_results, persistent_clusters, spacing_m)
-
+    delta_name, water_name = f"{identity}-delta.webp", f"{identity}-water.webp"
+    coordinates = render.delta_image(delta, retained, raster_dir / delta_name, meta0["transform"], meta0["epsg"])
+    if coastal and coordinates:
+        render.water_image(first_water["mask"], last_water["mask"], raster_dir / water_name, meta0["transform"], meta0["epsg"])
+    processing = json.loads(meta0["processing"])
+    fields = meta0["granule"].split("_")
+    area = stats.mask_area_km2(common, spacing, pixel_area)
     manifest = {
-        "site": site_id,
-        "placeId": site_id,
-        "label": site["label"],
-        "module": site["module"],
-        "phenomenon": site["phenomenon"],
-        "generated_at": datetime.utcnow().isoformat() + "Z",
-        "algorithm_version": "1.0.0",
-        "grid": {
-            "width": int(width),
-            "height": int(height),
-            "spacing_m": float(spacing_m),
-            "epsg": int(meta0["epsg"]),
-            "corners": [[round(float(a), 5), round(float(b), 5)] for a, b in meta0["corners"]],
-        },
-        "raster": {
-            "format": "int16_le",
-            "unit": "dB",
-            "scale": 0.01,
-            "invalid": INVALID,
-            "urls": {date: f"rasters/{date}.db.i16" for date in dates},
-        },
-        "dates": [
-            {
-                "date": date,
-                "acquired_at": loaded[date][2]["acquired_at"],
-                "granule": loaded[date][2]["granule"],
-                "source_url": loaded[date][2]["source_url"],
-                "polarization": loaded[date][2]["polarization"],
-                "valid_fraction": float(np.load(cache_dir / f"{date}.npz")["valid_fraction"]),
-                "mean_db": float(np.load(cache_dir / f"{date}.npz")["mean_db"]),
-                "p2_db": float(np.load(cache_dir / f"{date}.npz")["p2_db"]),
-                "p98_db": float(np.load(cache_dir / f"{date}.npz")["p98_db"]),
-            }
-            for date in dates
-        ],
-        "time_series": series,
-        "water": water,
-        "pairs": pair_results,
-        "persistent_clusters": [
-            {
-                **cluster,
-                "kind": "persistent",
-                "centroid_lonlat": lonlat_for_pixel(cluster, meta0, width, height),
-            }
-            for cluster in persistent_clusters
-        ],
-        "story": story,
-        "provenance": {
-            "mission": "NISAR",
-            "collection": config.COLLECTION_SHORT,
-            "product": "L2 GCOV (gamma-0, radiometrically terrain corrected)",
-            "polarization": site["polarization_label"],
-            "dates": dates,
-            "citations": [
-                "NASA ISRO NISAR L2 GCOV Provisional, Alaska Satellite Facility (ASF), via CMR",
-            ],
-        },
+        "schema_version": ALGORITHM_VERSION, "id": f"{site['id']}-{identity}", "status": "exploratory_derived",
+        "site": site["id"], "label": site["label"], "module": site["module"], "phenomenon": site["phenomenon"],
+        "generated_at": datetime.now(timezone.utc).isoformat(), "bbox": list(site["roi"]),
+        "product": site["product"], "polarization": site["polarization_label"],
+        "source_maturity": {"nisar-gcov": "validated", "nisar-gcov-beta": "beta", "nisar-gcov-provisional": "provisional"}[site["product"]],
+        "window": dict(zip(("start", "end"), site["date_window"])),
+        "grid": {"width": int(first_entry[0].shape[1]), "height": int(first_entry[0].shape[0]), "spacing_m": spacing,
+                 "epsg": int(meta0["epsg"]), "transform": meta0["transform"].tolist(), "corners": meta0["corners"].tolist(),
+                 "signature": meta0["grid_signature"], "area_basis": parameters["area_basis"]},
+        "dates": [{"date": day, **{key: loaded[day][3][key] for key in
+                  ("acquired_at", "granule", "source_url", "valid_fraction", "mean_looks", "native_quality_fraction")}}
+                  for day in wanted],
+        "time_series": [{"date": day, "mean_db": round(float(np.mean(entries[day][0][common])), 3),
+                         "valid_area_km2": area, **({"water_km2": water[day]["area_km2"], "water_low_km2": water[day]["low_km2"],
+                                                    "water_high_km2": water[day]["high_km2"]} if coastal else {})} for day in wanted],
+        "epochs": {"first": {"dates": first_dates, "water": {k: v for k, v in first_water.items() if k != "mask"} if coastal else None},
+                   "last": {"dates": last_dates, "water": {k: v for k, v in last_water.items() if k != "mask"} if coastal else None}},
+        "claims": claims,
+        "change": {"k": K_SIGMA, "median_conditional_threshold_db": round(threshold, 3),
+                   "median_conditional_sigma_db": round(sigma, 3), "retained_component_count": len(components),
+                   "retained_components": sorted(components, key=lambda item: -item["area_km2"])[:12],
+                   "sweep_area_km2": sweep, "common_valid_area_km2": area,
+                   "common_valid_fraction": round(float(pixel_area[common].sum() / pixel_area[roi_mask].sum()), 6),
+                   "screen_model": "Conditional log-Gamma from native numberOfLooks; effective independence after geocoding is unknown."},
+        "validation": {"status": "unchecked", "checked_at": None, "references": [], "maturity": None},
+        "provenance": {"algorithm_version": ALGORITHM_VERSION, "config_hash": identity, "collection": site["collection"],
+                       "series": dict(zip(("relative_orbit", "direction", "frame", "mode", "polarization_token", "baseline"),
+                                          [fields[i] for i in (5, 6, 7, 8, 9, 13)])),
+                       "parameters": parameters, "source_processing": processing,
+                       "measurement_quantization_db": 0.01, "geometry_checked_dates": len(wanted),
+                       "citations": ["https://nisar-docs.asf.alaska.edu/gcov/", "https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html"]},
         "limitations": [
-            "Single-polarization amplitude change; not ground deformation or velocity.",
-            "Provisional NISAR calibration; values may shift with reprocessing.",
-            "Radar brightness alone cannot confirm water depth, tide stage, or ice thickness.",
-            "Not a hazard warning; for situational understanding only.",
+            "Source-product maturity and EarthEyes result validation are different. These results remain exploratory.",
+            f"Source noiseCorrectionApplied={processing.get('noiseCorrectionApplied', 'unknown')}; thermal-noise and shadow residuals are not estimated here.",
+            "numberOfLooks is not verified effective independent looks after geocoding. No extra precision is assumed from spatial or temporal averaging.",
+            "Threshold sweeps are sensitivity ranges, not confidence intervals; cluster filtering is not a detection limit.",
+            "Water candidates can include other dark surfaces. Dates, tides and clouds can disagree across sensors; agreement is not ground truth.",
+            "Brightness cannot establish water depth, tide stage, ice velocity, cause, or a public warning.",
         ],
+        "raster": {"format": "webp-rgba", "coordinates": coordinates,
+                   "delta_url": f"/analysis/{site['id']}/rasters/{delta_name}",
+                   "water_change_url": f"/analysis/{site['id']}/rasters/{water_name}" if coastal else None,
+                   "placement": "Nearest-neighbor display reprojection to Web Mercator; all measurements use the native grid."} if coordinates else None,
     }
-    public_dir.mkdir(parents=True, exist_ok=True)
-    (public_dir / "manifest.json").write_text(json.dumps(manifest, indent=2, default=_json_default), encoding="utf-8")
-    print(json.dumps(manifest["story"], indent=2, default=_json_default))
-    print("pairs:", {k: {kk: vv for kk, vv in v.items() if kk != "clusters"} for k, v in pair_results.items()})
-    print("persistent_clusters:", len(persistent_clusters))
-
-
-def _json_default(o):
-    if isinstance(o, np.generic):
-        return float(o)
-    raise TypeError(f"not serializable: {type(o)}")
-
-
-def build_pair_story(site, f, t, water, changed_fraction, changed_area, gain_clusters, loss_clusters, threshold_db=1.5):
-    """Plain-language summary for one date pair, so the prose matches the selection."""
-    pct = changed_fraction * 100
-    clusters = gain_clusters + loss_clusters
-    n_clusters = len(clusters)
-    top = clusters[0] if clusters else None
-    top_txt = f" The largest changed cluster covers {top['area_km2']:.1f} km²." if top else ""
-    if site["phenomenon"] == "coastal-water-change":
-        w_f = water.get(f, {}).get("area_km2", 0)
-        w_t = water.get(t, {}).get("area_km2", 0)
-        dw = w_t - w_f
-        headline = f"Coastal water around {site['label']} changed between {f} and {t}."
-        summary = (
-            f"Dark (radar-absorbing) water covered about {w_f:.1f} km² on {f} and "
-            f"{w_t:.1f} km² on {t} — a {dw:+.1f} km² ({dw / max(w_f, 0.01) * 100:+.0f}%) shift. "
-            f"About {changed_area:.1f} km² ({pct:.0f}%) of the analyzed window changed brightness by more than {threshold_db:g} dB between the two dates, "
-            f"in {n_clusters} clusters.{top_txt}"
-        )
-    else:
-        headline = f"Ice-surface change near {site['label']} between {f} and {t}."
-        summary = (
-            f"About {changed_area:.1f} km² ({pct:.0f}%) of the analyzed window changed radar brightness by more than {threshold_db:g} dB between "
-            f"{f} and {t}, across {n_clusters} clusters.{top_txt}"
-        )
-    return {"headline": headline, "summary": summary}
-
-
-def build_story(site_id, dates, loaded, water, pair_results, persistent_clusters, spacing_m):
-    site = config.SITES[site_id]
-    first, last = dates[0], dates[-1]
-    key = f"{first}--{last}"
-    pair = pair_results.get(key, {})
-    if site["phenomenon"] == "coastal-water-change":
-        w_first = water.get(first, {}).get("area_km2", 0)
-        w_last = water.get(last, {}).get("area_km2", 0)
-        dw = w_last - w_first
-        changed = pair.get("changed_area_km2", 0)
-        pct = pair.get("changed_fraction", 0) * 100
-        n_clusters = len(pair.get("clusters", []))
-        headline = f"Coastal water around {site['label']} between {first} and {last}."
-        summary = (
-            f"Over the full season, dark (radar-absorbing) water covered about {w_first:.1f} km² on {first} and "
-            f"{w_last:.1f} km² on {last} — a {dw:+.1f} km² ({dw / max(w_first, 0.01) * 100:+.0f}%) shift. "
-            f"About {changed:.1f} km² ({pct:.0f}%) of the analyzed window changed brightness between the two dates, "
-            f"in {n_clusters} clusters."
-        )
-        detail = (
-            "This is derived from calibrated NISAR L-band HV backscatter (gamma-0). Calm water absorbs radar and "
-            "appears dark; rougher or vegetated surfaces appear brighter. Brightness change alone cannot tell water "
-            "depth, tide stage, or cause, and NISAR is still provisional, so treat this as situational context, not "
-            "a flood forecast."
-        )
-    else:
-        changed = pair.get("changed_area_km2", 0)
-        pct = pair.get("changed_fraction", 0) * 100
-        n_clusters = len(pair.get("clusters", []))
-        headline = f"Ice-surface change near {site['label']} across {len(dates)} acquisitions."
-        summary = (
-            f"Between {first} and {last}, about {changed:.1f} km² ({pct:.0f}%) of the analyzed window changed radar "
-            f"brightness in {n_clusters} clusters, with {len(persistent_clusters)} clusters changing persistently "
-            "across the season."
-        )
-        detail = (
-            "Derived from calibrated NISAR L-band HH backscatter (gamma-0) on a single ascending orbit track. "
-            "Amplitude change indicates surface change, not ice speed or mass loss. Values are provisional."
-        )
-    return {
-        "headline": headline,
-        "summary": summary,
-        "detail": detail,
-    }
+    path = public_dir / "manifest.json"
+    if path.exists():
+        previous = json.loads(path.read_text(encoding="utf-8"))
+        if previous.get("id") == manifest["id"]:
+            manifest["validation"] = previous["validation"]
+    path.write_text(json.dumps(manifest, indent=2, allow_nan=False), encoding="utf-8")
+    return manifest
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--site", required=True)
-    args = parser.parse_args()
-    site = config.SITES[args.site]
-    dates = site["dates"]
-    pairs = [(dates[i], dates[i + 1]) for i in range(len(dates) - 1)] + [(dates[0], dates[-1])]
-    analyze_site(args.site, pairs)
+    parser.add_argument("--site")
+    parser.add_argument("--bbox")
+    parser.add_argument("--start")
+    parser.add_argument("--end")
+    parser.add_argument("--product", default="nisar-gcov-provisional", choices=sorted(config.COLLECTIONS))
+    parser.add_argument("--label")
+    parser.add_argument("--phenomenon")
+    parser.add_argument("--read-px", type=int)
+    parser.add_argument("--target-px", type=int)
+    manifest = analyze_site(resolve_site(parser.parse_args()))
+    print(json.dumps({"id": manifest["id"], "claims": manifest["claims"], "common_valid_fraction": manifest["change"]["common_valid_fraction"]}, indent=2))
 
 
 if __name__ == "__main__":

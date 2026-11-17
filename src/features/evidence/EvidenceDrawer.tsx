@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react"
+﻿import { useEffect, useRef, useState, type ReactNode } from "react"
 import * as Tabs from "@radix-ui/react-tabs"
 import type { DataSource, LayerDefinition, ModuleId, Observation, Place } from "../../domain/models"
 import type { AcquisitionSeriesPoint, RealtimeContext } from "../analysis/realtime"
@@ -207,6 +207,8 @@ export function EvidenceDrawer({
   series,
   comparedPair,
   browse,
+  publishedAnalysis,
+  hasPublishedAnalysis,
 }: {
   place: Place
   moduleId: ModuleId
@@ -219,6 +221,8 @@ export function EvidenceDrawer({
   series: AcquisitionSeriesPoint[]
   comparedPair: { left: Observation; right: Observation } | null
   browse: BrowseComparison
+  publishedAnalysis?: ReactNode
+  hasPublishedAnalysis?: boolean
 }) {
   void selectedObservation
   return (
@@ -230,7 +234,9 @@ export function EvidenceDrawer({
           <Tabs.Trigger value="context">Context</Tabs.Trigger>
           <Tabs.Trigger value="sources">Sources</Tabs.Trigger>
         </Tabs.List>
-        <Tabs.Content value="summary"><SummaryTab place={place} ctx={realtimeContext} compared={comparedPair} browse={browse} series={series} /></Tabs.Content>
+        <Tabs.Content value="summary">{publishedAnalysis}{hasPublishedAnalysis
+          ? <details className="calibrated-browse-details"><summary>Separate live browse comparison</summary><SummaryTab place={place} ctx={realtimeContext} compared={comparedPair} browse={browse} series={series} /></details>
+          : <SummaryTab place={place} ctx={realtimeContext} compared={comparedPair} browse={browse} series={series} />}</Tabs.Content>
         <Tabs.Content value="chart"><ChartTab series={series} compared={comparedPair} browse={browse} /></Tabs.Content>
         <Tabs.Content value="context"><ContextTab ctx={realtimeContext} moduleId={moduleId} /></Tabs.Content>
         <Tabs.Content value="sources"><SourcesTab sources={sources} observations={observations} /></Tabs.Content>

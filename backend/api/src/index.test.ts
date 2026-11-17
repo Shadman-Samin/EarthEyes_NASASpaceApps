@@ -26,6 +26,16 @@ afterEach(() => {
 })
 
 describe("catalogue HTTP boundary", () => {
+  it("keeps unsupported calibrated requests explicitly unavailable and validates query shape", async () => {
+    const missing = await worker.fetch(new Request("https://api.test/api/analysis?bbox=0,0,1,1&start=2026-01-01&end=2026-02-01&product=nisar-gcov"), {})
+    expect(missing.status).toBe(200)
+    expect(await missing.json()).toMatchObject({ status: "analysis_unavailable" })
+    const invalid = await worker.fetch(new Request("https://api.test/api/analysis?bbox=bad&start=2026-01-01&end=2026-02-01&product=nisar-gcov"), {})
+    expect(invalid.status).toBe(400)
+    const malformed = await worker.fetch(new Request("https://api.test/api/analysis?bbox=0,0,1,1"), {})
+    expect(malformed.status).toBe(400)
+  })
+
   it("reports implemented capabilities without pretending processing is available", async () => {
     const fetch = upstream()
     const response = await worker.fetch(new Request("https://api.test/api/health"), {})
@@ -139,6 +149,26 @@ describe("catalogue HTTP boundary", () => {
     }), {})
     expect(response.status).toBe(503)
     expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it("overrides client-supplied calibrated claims with a server-side exact-match result", async () => {
+    const fetch = vi.fn(async (_url: string, init: RequestInit) => {
+      const payload = JSON.parse(String(init.body))
+      expect(payload.messages[0].content).toContain('"analysisStatus":"analysis_unavailable"')
+      expect(payload.messages[0].content).toContain("No published analysis exactly matches")
+      expect(payload.messages[0].content).not.toContain("client fabricated value")
+      return Response.json({ choices: [{ message: { content: "No matching published analysis is available." } }] })
+    })
+    vi.stubGlobal("fetch", fetch)
+    const response = await worker.fetch(new Request("https://api.test/api/argus", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: "What is the calibrated change?", facts: {
+        analysis: "client fabricated value", analysisStatus: "published_exact_match",
+        view: { bounds: [0, 0, 1, 1], productId: "nisar-gcov", window: { start: "2026-01-01", end: "2026-02-01" } },
+      } }),
+    }), { GROQ_API_KEY: "test" })
+    expect(response.status).toBe(200)
+    expect(fetch).toHaveBeenCalledTimes(1)
   })
 
   it("rejects GET on the Argus route", async () => {

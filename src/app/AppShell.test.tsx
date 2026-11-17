@@ -35,11 +35,18 @@ describe("AppShell navigation", () => {
     expect(screen.getByRole("button", { name: "Open navigation" })).toHaveFocus()
   })
 
-  it("provides a short footer return path and an actual repository link", () => {
+  it("provides a short footer return path, the published study, and an actual repository link", () => {
     renderShell()
     const footer = within(screen.getByRole("contentinfo"))
     expect(footer.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/")
     expect(footer.getByRole("link", { name: "Explore" })).toHaveAttribute("href", "/explore")
+    expect(footer.getByRole("link", { name: /Kuakata study/i })).toHaveAttribute("href", expect.stringContaining("/explore/kuakata-bangladesh?"))
     expect(footer.getByRole("link", { name: /source code/i })).toHaveAttribute("href", "https://github.com/Shadman-Samin/EarthEyes_NASASpaceApps")
+  })
+
+  it("links the skip control to the real focus target", () => {
+    renderShell()
+    expect(screen.getByRole("link", { name: "Skip to main content" })).toHaveAttribute("href", "#route-content")
+    expect(document.getElementById("route-content")).toHaveAttribute("tabindex", "-1")
   })
 })

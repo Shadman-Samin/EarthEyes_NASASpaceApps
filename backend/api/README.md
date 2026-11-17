@@ -5,12 +5,13 @@ It uses the existing NASA/ASF and Microsoft indexes rather than mirroring an arc
 There is no place whitelist. Satellite coverage is not guaranteed for every location,
 date, or product.
 
-This module does not download rasters, obtain access tokens, queue analysis, or
-produce measurements. `/api/health` explicitly reports `processing: false`.
+This runtime does not download rasters, obtain access tokens, queue analysis, or
+compute measurements. It can serve precomputed, checked exploratory bundles.
+`/api/health` still reports `processing: false`.
 The existing `/explore` frontend now consumes this API for live acquisitions and
 public OPERA SAR browse images, with footprints and date comparison in its existing
 workspace. There is no separate catalogue page. Do not point `VITE_API_BASE_URL` at
-this partial API. Calibrated raster processing and measurements remain later work.
+this partial API. Calibrated raster processing runs offline, not in this runtime.
 See `../../docs/backend/worldwide-design.md`.
 
 ## Run And Verify
@@ -52,7 +53,8 @@ satellite providers. Live smoke tests are explicit, separate network checks.
 | `GET /api/health` | Implemented capabilities |
 | `GET /api/catalog/collections` | Product IDs, source maturity and data access requirements |
 | `GET /api/catalog/search` | One bounded page of live metadata per longitude partition |
-| `POST /api/argus` | Optional Groq-backed Argus answer from the facts the browser sends; needs `GROQ_API_KEY` |
+| `GET /api/analysis` | Exact-scope precomputed bundle or explicit `analysis_unavailable` |
+| `POST /api/argus` | Server-grounded study answers, or optional Groq-backed browse answers |
 
 Example request:
 
@@ -107,12 +109,18 @@ fails, the whole request fails instead of implying complete coverage.
 
 ## Argus AI Proxy
 
+For a published study, send `analysisQuery: { bbox, start, end, product, polarization? }`
+alongside `mode: "chat"`, `question` and `facts: {}`. The server resolves its own
+versioned index and returns `{ text, source: "data", cached: false }` from deterministic
+templates. No Groq key or model call is needed, and client numerical claims are ignored.
+Preview-image summaries cannot be used to replace a published study.
+
 `POST /api/argus` keeps the Groq key server-side. The browser sends a bounded JSON
 body: `mode` (`chat` or `summary`), `question` (at most 600 characters), up to eight
 `history` turns, `facts` (at most 12 KB), and at most two base64 data-URL `images`
 (at most 500 KB each). Unknown fields are rejected.
 
-- `GROQ_API_KEY` is required; without it the route returns 503 `ai_unavailable`.
+- `GROQ_API_KEY` is required for the optional model path; without it that path returns 503 `ai_unavailable`.
 - `ARGUS_MODEL` defaults to `qwen/qwen3.8-27b`. `ARGUS_VISION_MODEL` is required for
   `mode: "summary"` with images and must accept image input.
 - Responses are `{ text, cached }`. Identical requests reuse an in-isolate cache for
@@ -121,6 +129,25 @@ body: `mode` (`chat` or `summary`), `question` (at most 600 characters), up to e
   deadline; 429, 401, 502, and 504 upstream failures map to explicit JSON errors.
 - The model only interprets facts and optional browse previews. It is told not to
   treat display differences as calibrated measurements or hazards.
+
+## Published Analysis
+
+```text
+/api/analysis?bbox=90.0575,21.7524,90.2025,21.8876&start=2026-06-01&end=2026-10-31&product=nisar-gcov-provisional&polarization=HV
+```
+
+The response is `{ status: "analysis_available", manifest }` or
+`{ status: "analysis_unavailable", reason }`. Unknown/repeated fields, blank numeric
+coordinates and invalid dates are rejected. Broader/narrower windows or a different
+polarization do not silently inherit a study. The manifest is validated with the
+shared Zod contract and carries source IDs, algorithm/input identity, fixed epochs,
+sensitivity ranges, source processing flags and independent-reference coverage.
+
+Regenerate both indexes with `python tools/analysis/publish.py --site kuakata-bangladesh`.
+This only writes local files. It requires complete source dates, geometry checks,
+reference-attempt accounting and existing versioned rasters. Reference agreement
+does not promote an `exploratory_derived` result to validated. Static assets live
+with the frontend; the API imports JSON and does not rely on a runtime filesystem.
 
 ## Authentication And Scientific Scope
 

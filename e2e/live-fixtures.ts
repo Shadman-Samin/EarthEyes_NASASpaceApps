@@ -56,6 +56,7 @@ export const test = base.extend<{ liveArchive: void }>({
   liveArchive: [async ({ page }, use) => {
     // Browser verification must not spend an account's AI quota or send live credentials.
     await page.route("https://api.groq.com/**", (route) => route.abort())
+    await page.route("**/api/argus", (route) => route.fulfill({ status: 503, json: { error: { code: "ai_unavailable", message: "AI disabled at the browser-test boundary" } } }))
     // Verify our embed contract without depending on YouTube availability or its changing UI.
     await page.route("https://www.youtube.com/embed/**", (route) => route.fulfill({
       contentType: "text/html",

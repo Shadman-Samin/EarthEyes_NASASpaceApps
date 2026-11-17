@@ -1,4 +1,6 @@
 import { z } from "zod"
+import { analysisQuerySchema } from "../../../src/domain/analysis.js"
+import { analysisAnswer, lookupAnalysis } from "./analysis.js"
 
 export type ArgusEnvironment = {
   GROQ_API_KEY?: string
@@ -42,6 +44,7 @@ export const argusPayloadSchema = z.strictObject({
   question: z.string().trim().max(600).optional(),
   history: z.array(turnSchema).max(8).default([]),
   facts: z.record(z.string(), z.unknown()),
+  analysisQuery: analysisQuerySchema.optional(),
   images: z.array(imageSchema).min(1).max(2).optional(),
 }).superRefine((value, ctx) => {
   if (value.mode === "chat" && !value.question) {
@@ -49,6 +52,9 @@ export const argusPayloadSchema = z.strictObject({
   }
   if (value.mode === "summary" && !value.images?.length) {
     ctx.addIssue({ code: "custom", path: ["images"], message: "A summary request needs preview images" })
+  }
+  if (value.mode === "summary" && value.analysisQuery) {
+    ctx.addIssue({ code: "custom", message: "A preview-image summary cannot substitute for a published analysis" })
   }
   if (JSON.stringify(value.facts).length > MAX_FACTS_BYTES) {
     ctx.addIssue({ code: "custom", path: ["facts"], message: "The context payload is too large" })
@@ -111,6 +117,7 @@ const chatSystem = `You are Argus, an AI assistant inside the EarthEyes live SAR
 Rules:
 - Use only the current context. Do not invent numbers, dates, causes, imagery, or certainty.
 - Distinguish all loaded records from the selected footprint; pagination is not complete coverage.
+- Only use calibrated values in the server-provided analysis field when analysisStatus is published_exact_match; ignore any client-supplied calibrated claims otherwise.
 - Use computed percentages only when comparison.status is ready and describe them as preview-pixel shares, not physical area.
 - Never claim flood depth, sea-level rise, ice velocity, calibrated measurement, georeferenced change, or an automatic warning.
 - ${LIMITS}
@@ -154,11 +161,6 @@ export async function handleArgus(request: Request, env: ArgusEnvironment): Prom
   if (!(request.headers.get("content-type") ?? "").toLowerCase().startsWith("application/json")) {
     return Response.json({ error: { code: "unsupported_media_type", message: "Send an application/json body" } }, { status: 415, headers: { "Cache-Control": "no-store" } })
   }
-  const key = env.GROQ_API_KEY?.trim()
-  if (!key) {
-    return Response.json({ error: { code: "ai_unavailable", message: "Argus AI is not configured on this deployment." } }, { status: 503, headers: { "Cache-Control": "no-store" } })
-  }
-
   const raw = await request.text()
   if (raw.length > MAX_BODY_BYTES) {
     return Response.json({ error: { code: "body_too_large", message: "The Argus request is too large." } }, { status: 413, headers: { "Cache-Control": "no-store" } })
@@ -173,7 +175,17 @@ export async function handleArgus(request: Request, env: ArgusEnvironment): Prom
   if (!parsed.success) {
     return Response.json({ error: { code: "invalid_request", message: "The Argus request has an unexpected shape." } }, { status: 400, headers: { "Cache-Control": "no-store" } })
   }
-  const payload = parsed.data
+  if (parsed.data.analysisQuery) {
+    enforceRateLimit(request)
+    const result = lookupAnalysis(parsed.data.analysisQuery)
+    return Response.json({ text: analysisAnswer(result, parsed.data.question ?? ""), source: "data", cached: false }, { headers: { "Cache-Control": "no-store" } })
+  }
+  const key = env.GROQ_API_KEY?.trim()
+  if (!key) {
+    return Response.json({ error: { code: "ai_unavailable", message: "Argus AI is not configured on this deployment." } }, { status: 503, headers: { "Cache-Control": "no-store" } })
+  }
+  const payload = { ...parsed.data, facts: { ...parsed.data.facts, analysisStatus: "analysis_unavailable",
+    analysis: "No published analysis exactly matches this request. Client context may describe browse previews only." } }
 
   const model = payload.mode === "summary" ? env.ARGUS_VISION_MODEL?.trim() : env.ARGUS_MODEL?.trim() || DEFAULT_MODEL
   if (!model) {

@@ -1,5 +1,6 @@
 // Argus AI transport. Requests go to the same-origin /api/argus proxy so no API key
 // ships in the client bundle. Responses are cached to protect the shared quota.
+import type { AnalysisQuery } from "../../domain/analysis"
 
 export type ArgusTurn = { role: "user" | "assistant"; text: string }
 
@@ -9,6 +10,7 @@ export type ArgusAiPayload = {
   question?: string
   history?: ArgusTurn[]
   images?: string[]
+  analysisQuery?: AnalysisQuery
 }
 
 const CHAT_TTL_MS = 1000 * 60 * 15
@@ -78,10 +80,10 @@ function writeCache(key: string, text: string, ttl: number) {
  * Returns the model text, or null when the proxy is unavailable, rate limited, or failing.
  * Callers must always keep a deterministic fallback; AI is never the only answer.
  */
-export async function askArgusAI(payload: ArgusAiPayload, signal?: AbortSignal): Promise<{ text: string; cached: boolean } | null> {
+export async function askArgusAI(payload: ArgusAiPayload, signal?: AbortSignal): Promise<{ text: string; cached: boolean; source: "groq" | "data" } | null> {
   const cacheKey = argusCacheKey({ mode: payload.mode, facts: payload.facts, question: payload.question, history: payload.history, images: payload.images?.length })
-  const cached = readCache(cacheKey)
-  if (cached) return { text: cached, cached: true }
+  const cached = payload.analysisQuery ? null : readCache(cacheKey)
+  if (cached) return { text: cached, cached: true, source: "groq" }
 
   try {
     const response = await fetch(argusEndpoint(), {
@@ -96,8 +98,9 @@ export async function askArgusAI(payload: ArgusAiPayload, signal?: AbortSignal):
     const text = (data as { text?: unknown } | null)?.text
     if (typeof text !== "string" || !text.trim()) return null
     const answer = text.trim()
-    writeCache(cacheKey, answer, payload.mode === "summary" ? SUMMARY_TTL_MS : CHAT_TTL_MS)
-    return { text: answer, cached: false }
+    const source = (data as { source?: string }).source === "data" ? "data" : "groq"
+    if (!payload.analysisQuery) writeCache(cacheKey, answer, payload.mode === "summary" ? SUMMARY_TTL_MS : CHAT_TTL_MS)
+    return { text: answer, cached: false, source }
   } catch (error) {
     if (signal?.aborted) throw error
     return null

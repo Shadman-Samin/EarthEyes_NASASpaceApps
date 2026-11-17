@@ -2,6 +2,7 @@ import { catalogueProducts } from "../../../src/domain/catalogue.js"
 import { ArgusError, handleArgus, type ArgusEnvironment } from "./argus.js"
 import { CatalogueError, searchCatalogue } from "./catalogue.js"
 import { parseCatalogueQuery } from "./query.js"
+import { lookupAnalysis, parseAnalysisQuery } from "./analysis.js"
 
 type Environment = { ALLOWED_ORIGINS?: string } & ArgusEnvironment
 type Context = { waitUntil(promise: Promise<unknown>): void }
@@ -67,6 +68,15 @@ export default {
       return send(Response.json({
         service: "eartheyes-catalogue", capabilities: { catalogue: true, processing: false },
       }, { headers: { "Cache-Control": "no-store" } }))
+    }
+    if (url.pathname === "/api/analysis") {
+      let query
+      try { query = parseAnalysisQuery(url.searchParams) }
+      catch { return send(errorResponse(400, "invalid_analysis_query", "Provide valid product, bbox, calendar dates and optional polarization")) }
+      try {
+        const result = lookupAnalysis(query)
+        return send(Response.json(result, { headers: { "Cache-Control": result.status === "analysis_available" ? "public, max-age=300" : "no-store" } }))
+      } catch { return send(errorResponse(503, "analysis_index_unavailable", "Published analysis could not be loaded")) }
     }
     if (url.pathname === "/api/catalog/collections") {
       return send(Response.json(Object.entries(catalogueProducts).map(([id, product]) => ({ id, ...product })), {

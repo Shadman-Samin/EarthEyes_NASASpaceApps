@@ -1,6 +1,7 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from "react"
-import { createBrowserRouter } from "react-router-dom"
-import { Skeleton, StatePanel } from "../shared/ui"
+import { createBrowserRouter, Link } from "react-router-dom"
+import { KUAKATA_PILOT_URL } from "../shared/links"
+import { Icon, Skeleton } from "../shared/ui"
 import { AppShell } from "./AppShell"
 import { RouteErrorBoundary } from "./ErrorBoundary"
 
@@ -19,6 +20,21 @@ const deferred = (Page: LazyExoticComponent<ComponentType>) => (
   </Suspense>
 )
 
+function NotFoundPage() {
+  return (
+    <main id="main-content" className="content-page not-found">
+      <span className="section-kicker">404 / Route not found</span>
+      <h1>This trail<br /><em>ends here.</em></h1>
+      <p>The page may have moved, or the address may be incomplete. Every real investigation is still reachable from the field atlas.</p>
+      <div className="not-found__actions">
+        <Link className="button button--primary button--medium" to="/">Return home</Link>
+        <Link className="button button--secondary button--medium" to="/explore">Open the explorer</Link>
+        <Link className="text-link" to={KUAKATA_PILOT_URL}>Inspect the Kuakata study <Icon name="arrow" size={16} /></Link>
+      </div>
+    </main>
+  )
+}
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -34,7 +50,7 @@ export const router = createBrowserRouter([
       { path: "data-sources/:sourceId", element: deferred(DataSourceDetailPage) },
       { path: "groundline", element: deferred(GroundLinePage) },
       { path: "about", element: deferred(AboutPage) },
-      { path: "*", element: <main id="main-content" className="content-page"><StatePanel title="Page not found" message="This EarthEyes route does not exist." icon="globe" /></main> },
+      { path: "*", element: <NotFoundPage /> },
     ],
   },
 ], { basename: import.meta.env.BASE_URL })

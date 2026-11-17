@@ -15,6 +15,7 @@ import { prefersLowBandwidth } from "../../shared/network"
 import { DataBadge, Icon } from "../../shared/ui"
 import { getDataOrigin } from "../../data/repository"
 import { catalogueMapGeometry } from "./catalogueGeometry"
+import type { AnalysisManifest } from "../../domain/analysis"
 
 setWorkerUrl(mapLibreWorkerUrl)
 
@@ -46,6 +47,7 @@ export function EarthMap({
   catalogueItems,
   onAreaChange,
   onObservationSelect,
+  analysisOverlay,
 }: {
   place: Place
   moduleId: ModuleId
@@ -55,6 +57,7 @@ export function EarthMap({
   catalogueItems?: CatalogueItem[]
   onAreaChange?: (bounds: CatalogueBounds) => void
   onObservationSelect?: (id: string) => void
+  analysisOverlay?: { id: string; kind: "water" | "delta"; url: string; coordinates: NonNullable<AnalysisManifest["raster"]>["coordinates"] }
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
@@ -65,6 +68,8 @@ export function EarthMap({
   const [failedPreview, setFailedPreview] = useState<string | null>(null)
   const lowBandwidth = prefersLowBandwidth()
   const fixtureData = catalogueItems === undefined && getDataOrigin() === "fixture"
+  const overlayUrl = analysisOverlay?.url
+  const overlayCoordinates = analysisOverlay?.coordinates
 
   useEffect(() => {
     if (!containerRef.current || import.meta.env.MODE === "test" || lowBandwidth) return
@@ -162,7 +167,7 @@ export function EarthMap({
     if (map.getSource(sourceId)) map.removeSource(sourceId)
     const item = catalogueItems?.find((candidate) => candidate.id === selectedObservation?.id)
     const url = selectedObservation?.imageUrl
-    if (!activeLayers.includes("sar-preview") || !url || !item) return
+    if (overlayUrl || !activeLayers.includes("sar-preview") || !url || !item) return
     const [west, south, east, north] = item.bbox
     const eastUnwrapped = east < west ? east + 360 : east
     try {
@@ -180,7 +185,20 @@ export function EarthMap({
     } catch {
       // A failed overlay must never take down the base map; the preview panel remains available.
     }
-  }, [selectedObservation?.id, selectedObservation?.imageUrl, catalogueItems, activeLayers, mapReady])
+  }, [selectedObservation?.id, selectedObservation?.imageUrl, catalogueItems, activeLayers, mapReady, overlayUrl])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !mapReady) return
+    const sourceId = "calibrated-analysis"
+    const layerId = "calibrated-analysis-raster"
+    if (map.getLayer(layerId)) map.removeLayer(layerId)
+    if (map.getSource(sourceId)) map.removeSource(sourceId)
+    if (!overlayUrl || !overlayCoordinates) return
+    map.addSource(sourceId, { type: "image", url: overlayUrl, coordinates: overlayCoordinates })
+    map.addLayer({ id: layerId, type: "raster", source: sourceId,
+      paint: { "raster-opacity": 0.85, "raster-fade-duration": 0, "raster-resampling": "nearest" } }, "study-line")
+  }, [mapReady, overlayUrl, overlayCoordinates])
 
   const visibleLayers = layerDefinitions.filter((layer) => activeLayers.includes(layer.id))
 
@@ -190,7 +208,7 @@ export function EarthMap({
       <div className="earth-map__wash" aria-hidden="true" />
       <div className="earth-map__status">
         <span><span className="live-dot" /> Map / {place.name}</span>
-        <small>{selectedObservation ? `${selectedObservation.platform} / ${selectedObservation.processingLevel}` : "Select an observation"}</small>
+        <small>{analysisOverlay ? "Calibrated source / exploratory result" : selectedObservation ? `${selectedObservation.platform} / ${selectedObservation.processingLevel}` : "Select an observation"}</small>
       </div>
       <div className="earth-map__layer-visuals" data-module={moduleId} aria-hidden="true">
         {fixtureData && visibleLayers.map((layer, index) => (
@@ -204,7 +222,7 @@ export function EarthMap({
         const world = bounds.getEast() - bounds.getWest() >= 360
         onAreaChange([world ? -180 : wrap(bounds.getWest()), Math.max(-90, bounds.getSouth()), world ? 180 : wrap(bounds.getEast()), Math.min(90, bounds.getNorth())])
       }}>Search this map area</button>}
-      {catalogueItems && selectedObservation && activeLayers.includes("sar-preview") && (
+      {!analysisOverlay && catalogueItems && selectedObservation && activeLayers.includes("sar-preview") && (
         <details className="earth-map__preview" open>
           <summary>Selected SAR image</summary>
           {lowBandwidth ? <p>Image paused in low-bandwidth mode.</p> : selectedObservation.imageUrl && failedPreview !== selectedObservation.imageUrl ? <img src={selectedObservation.imageUrl} alt={`Official SAR browse image acquired ${selectedObservation.acquiredAt}`} onError={() => setFailedPreview(selectedObservation.imageUrl)} /> : <p>Source preview unavailable.</p>}
@@ -220,8 +238,16 @@ export function EarthMap({
         </div>
       )}
       <div className="earth-map__legend">
-        <strong>{fixtureData ? "Fixture layer previews" : "Live source layers"}</strong>
-        {visibleLayers.length ? visibleLayers.map((layer) => (
+        <strong>{analysisOverlay ? "Exploratory analytical overlay" : fixtureData ? "Fixture layer previews" : "Live source layers"}</strong>
+        {analysisOverlay ? analysisOverlay.kind === "water" ? <>
+          <span><i style={{ background: "#28aadc" }} />Candidate in first epoch only</span>
+          <span><i style={{ background: "#f050dc" }} />Candidate in last epoch only</span>
+          <span><i style={{ background: "#143c78" }} />Candidate in both epochs</span>
+        </> : <>
+          <span><i style={{ background: "#e67828" }} />Brighter, retained by the screen</span>
+          <span><i style={{ background: "#288cdc" }} />Darker, retained by the screen</span>
+          <span>Transparent: not retained, not proof of no change</span>
+        </> : visibleLayers.length ? visibleLayers.map((layer) => (
           <span key={`${layer.moduleId}-${layer.id}`}><i style={{ background: layer.color }} />{layer.label}<DataBadge value={layer.classification} /></span>
         )) : <span>No analytical layers selected</span>}
       </div>
@@ -231,6 +257,7 @@ export function EarthMap({
         <ul>
           <li>Center: {place.center[1].toFixed(3)}, {place.center[0].toFixed(3)}</li>
           {visibleLayers.map((layer) => <li key={`${layer.moduleId}-${layer.id}`}>{layer.label}: {layer.description}</li>)}
+          {analysisOverlay && <li>Precomputed {analysisOverlay.kind === "water" ? "water-candidate" : "brightness-screen"} overlay, reprojected from a verified source grid. See Summary for fixed epochs, sensitivity and limits. Browse imagery is hidden while this overlay is active.</li>}
         </ul>
         <button type="button" className="earth-map__feature-button" onClick={() => setInspected(`${place.name} study reference`)}>Inspect study reference</button>
       </details>

@@ -1,0 +1,634 @@
+{
+  "schema_version": "3.0.0",
+  "entries": [
+    {
+      "schema_version": "3.0.0",
+      "id": "kuakata-bangladesh-4ee3d9515682ed51",
+      "status": "exploratory_derived",
+      "site": "kuakata-bangladesh",
+      "label": "Kuakata, Bangladesh",
+      "module": "coastal",
+      "phenomenon": "coastal-water-change",
+      "generated_at": "2026-11-16T06:10:52.303121+00:00",
+      "bbox": [
+        90.0575,
+        21.7524,
+        90.2025,
+        21.8876
+      ],
+      "product": "nisar-gcov-provisional",
+      "polarization": "HV",
+      "source_maturity": "provisional",
+      "window": {
+        "start": "2026-06-01",
+        "end": "2026-10-31"
+      },
+      "grid": {
+        "width": 764,
+        "height": 763,
+        "spacing_m": 20.0,
+        "epsg": 32646,
+        "transform": [
+          20.0,
+          0.0,
+          195650.0,
+          0.0,
+          -20.0,
+          2423300.0
+        ],
+        "corners": [
+          [
+            90.05472776818236,
+            21.887565345936117
+          ],
+          [
+            90.202458227905,
+            21.89014353177562
+          ],
+          [
+            90.20513572783082,
+            21.752438008965687
+          ],
+          [
+            90.05754617425164,
+            21.749877660193942
+          ]
+        ],
+        "signature": "ffc267c9ab2b26282fce79bb0b723b328160e41934455336ce5d5ecf2b309aac",
+        "area_basis": "WGS84 ellipsoidal local equal-area cells"
+      },
+      "dates": [
+        {
+          "date": "2026-06-18",
+          "acquired_at": "2026-06-18T23:21:02.000000Z",
+          "granule": "NISAR_L2_PR_GCOV_023_069_A_013_4005_DHDH_A_20260618T232102_20260618T232136_P05023_N_F_J_001",
+          "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_023_069_A_013_4005_DHDH_A_20260618T232102_20260618T232136_P05023_N_F_J_001/NISAR_L2_PR_GCOV_023_069_A_013_4005_DHDH_A_20260618T232102_20260618T232136_P05023_N_F_J_001.h5",
+          "valid_fraction": 1.0,
+          "mean_looks": 5.210899353027344,
+          "native_quality_fraction": 1.0
+        },
+        {
+          "date": "2026-06-30",
+          "acquired_at": "2026-06-30T23:21:01.000000Z",
+          "granule": "NISAR_L2_PR_GCOV_024_069_A_013_4005_DHDH_A_20260630T232101_20260630T232135_P05023_N_F_J_001",
+          "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_024_069_A_013_4005_DHDH_A_20260630T232101_20260630T232135_P05023_N_F_J_001/NISAR_L2_PR_GCOV_024_069_A_013_4005_DHDH_A_20260630T232101_20260630T232135_P05023_N_F_J_001.h5",
+          "valid_fraction": 1.0,
+          "mean_looks": 5.211111545562744,
+          "native_quality_fraction": 1.0
+        },
+        {
+          "date": "2026-07-12",
+          "acquired_at": "2026-07-12T23:21:00.000000Z",
+          "granule": "NISAR_L2_PR_GCOV_025_069_A_013_4005_DHDH_A_20260712T232100_20260712T232135_P05023_N_F_J_001",
+          "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_025_069_A_013_4005_DHDH_A_20260712T232100_20260712T232135_P05023_N_F_J_001/NISAR_L2_PR_GCOV_025_069_A_013_4005_DHDH_A_20260712T232100_20260712T232135_P05023_N_F_J_001.h5",
+          "valid_fraction": 1.0,
+          "mean_looks": 5.211022853851318,
+          "native_quality_fraction": 1.0
+        },
+        {
+          "date": "2026-07-24",
+          "acquired_at": "2026-07-24T23:20:59.000000Z",
+          "granule": "NISAR_L2_PR_GCOV_026_069_A_013_4005_DHDH_A_20260724T232059_20260724T232134_P05023_N_F_J_001",
+          "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_026_069_A_013_4005_DHDH_A_20260724T232059_20260724T232134_P05023_N_F_J_001/NISAR_L2_PR_GCOV_026_069_A_013_4005_DHDH_A_20260724T232059_20260724T232134_P05023_N_F_J_001.h5",
+          "valid_fraction": 1.0,
+          "mean_looks": 5.211049556732178,
+          "native_quality_fraction": 1.0
+        },
+        {
+          "date": "2026-08-17",
+          "acquired_at": "2026-08-17T23:20:58.000000Z",
+          "granule": "NISAR_L2_PR_GCOV_028_069_A_013_4005_DHDH_A_20260817T232058_20260817T232133_P05023_N_F_J_001",
+          "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_028_069_A_013_4005_DHDH_A_20260817T232058_20260817T232133_P05023_N_F_J_001/NISAR_L2_PR_GCOV_028_069_A_013_4005_DHDH_A_20260817T232058_20260817T232133_P05023_N_F_J_001.h5",
+          "valid_fraction": 1.0,
+          "mean_looks": 5.210812091827393,
+          "native_quality_fraction": 1.0
+        },
+        {
+          "date": "2026-08-29",
+          "acquired_at": "2026-08-29T23:20:58.000000Z",
+          "granule": "NISAR_L2_PR_GCOV_029_069_A_013_4005_DHDH_A_20260829T232058_20260829T232133_P05023_N_F_J_001",
+          "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_029_069_A_013_4005_DHDH_A_20260829T232058_20260829T232133_P05023_N_F_J_001/NISAR_L2_PR_GCOV_029_069_A_013_4005_DHDH_A_20260829T232058_20260829T232133_P05023_N_F_J_001.h5",
+          "valid_fraction": 1.0,
+          "mean_looks": 5.211013317108154,
+          "native_quality_fraction": 1.0
+        },
+        {
+          "date": "2026-09-10",
+          "acquired_at": "2026-09-10T23:20:58.000000Z",
+          "granule": "NISAR_L2_PR_GCOV_030_069_A_013_4005_DHDH_A_20260910T232058_20260910T232132_P05023_N_F_J_001",
+          "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_030_069_A_013_4005_DHDH_A_20260910T232058_20260910T232132_P05023_N_F_J_001/NISAR_L2_PR_GCOV_030_069_A_013_4005_DHDH_A_20260910T232058_20260910T232132_P05023_N_F_J_001.h5",
+          "valid_fraction": 1.0,
+          "mean_looks": 5.211042404174805,
+          "native_quality_fraction": 1.0
+        },
+        {
+          "date": "2026-09-22",
+          "acquired_at": "2026-09-22T23:20:58.000000Z",
+          "granule": "NISAR_L2_PR_GCOV_031_069_A_013_4005_DHDH_A_20260922T232058_20260922T232133_P05023_N_F_J_001",
+          "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_031_069_A_013_4005_DHDH_A_20260922T232058_20260922T232133_P05023_N_F_J_001/NISAR_L2_PR_GCOV_031_069_A_013_4005_DHDH_A_20260922T232058_20260922T232133_P05023_N_F_J_001.h5",
+          "valid_fraction": 1.0,
+          "mean_looks": 5.210995197296143,
+          "native_quality_fraction": 1.0
+        },
+        {
+          "date": "2026-10-04",
+          "acquired_at": "2026-10-04T23:20:58.000000Z",
+          "granule": "NISAR_L2_PR_GCOV_032_069_A_013_4005_DHDH_A_20261004T232058_20261004T232133_P05023_N_F_J_001",
+          "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_032_069_A_013_4005_DHDH_A_20261004T232058_20261004T232133_P05023_N_F_J_001/NISAR_L2_PR_GCOV_032_069_A_013_4005_DHDH_A_20261004T232058_20261004T232133_P05023_N_F_J_001.h5",
+          "valid_fraction": 1.0,
+          "mean_looks": 5.210911273956299,
+          "native_quality_fraction": 1.0
+        },
+        {
+          "date": "2026-10-16",
+          "acquired_at": "2026-10-16T23:20:58.000000Z",
+          "granule": "NISAR_L2_PR_GCOV_033_069_A_013_4005_DHDH_A_20261016T232058_20261016T232133_P05023_N_F_J_001",
+          "source_url": "https://nisar.asf.earthdatacloud.nasa.gov/NISAR/NISAR_L2_GCOV_PROVISIONAL_V1/NISAR_L2_PR_GCOV_033_069_A_013_4005_DHDH_A_20261016T232058_20261016T232133_P05023_N_F_J_001/NISAR_L2_PR_GCOV_033_069_A_013_4005_DHDH_A_20261016T232058_20261016T232133_P05023_N_F_J_001.h5",
+          "valid_fraction": 1.0,
+          "mean_looks": 5.210753917694092,
+          "native_quality_fraction": 1.0
+        }
+      ],
+      "time_series": [
+        {
+          "date": "2026-06-18",
+          "mean_db": -20.444,
+          "valid_area_km2": 224.434996,
+          "water_km2": 168.336864,
+          "water_low_km2": 162.911343,
+          "water_high_km2": 172.836812
+        },
+        {
+          "date": "2026-06-30",
+          "mean_db": -20.359,
+          "valid_area_km2": 224.434996,
+          "water_km2": 168.58772,
+          "water_low_km2": 164.376971,
+          "water_high_km2": 172.243196
+        },
+        {
+          "date": "2026-07-12",
+          "mean_db": -20.458,
+          "valid_area_km2": 224.434996,
+          "water_km2": 168.351614,
+          "water_low_km2": 163.899596,
+          "water_high_km2": 172.07541
+        },
+        {
+          "date": "2026-07-24",
+          "mean_db": -20.225,
+          "valid_area_km2": 224.434996,
+          "water_km2": 168.328431,
+          "water_low_km2": 163.897954,
+          "water_high_km2": 172.011884
+        },
+        {
+          "date": "2026-08-17",
+          "mean_db": -19.801,
+          "valid_area_km2": 224.434996,
+          "water_km2": 167.93939,
+          "water_low_km2": 162.768357,
+          "water_high_km2": 172.164508
+        },
+        {
+          "date": "2026-08-29",
+          "mean_db": -20.243,
+          "valid_area_km2": 224.434996,
+          "water_km2": 168.398778,
+          "water_low_km2": 164.378984,
+          "water_high_km2": 171.971569
+        },
+        {
+          "date": "2026-09-10",
+          "mean_db": -20.153,
+          "valid_area_km2": 224.434996,
+          "water_km2": 168.130717,
+          "water_low_km2": 164.304265,
+          "water_high_km2": 171.590873
+        },
+        {
+          "date": "2026-09-22",
+          "mean_db": -20.101,
+          "valid_area_km2": 224.434996,
+          "water_km2": 168.341236,
+          "water_low_km2": 164.597063,
+          "water_high_km2": 172.004309
+        },
+        {
+          "date": "2026-10-04",
+          "mean_db": -19.948,
+          "valid_area_km2": 224.434996,
+          "water_km2": 154.628104,
+          "water_low_km2": 140.93965,
+          "water_high_km2": 166.286409
+        },
+        {
+          "date": "2026-10-16",
+          "mean_db": -19.818,
+          "valid_area_km2": 224.434996,
+          "water_km2": 149.747617,
+          "water_low_km2": 135.867851,
+          "water_high_km2": 162.116255
+        }
+      ],
+      "epochs": {
+        "first": {
+          "dates": [
+            "2026-06-18",
+            "2026-06-30",
+            "2026-07-12"
+          ],
+          "water": {
+            "area_km2": 169.254815,
+            "low_km2": 165.298128,
+            "high_km2": 172.919086,
+            "threshold_db": -17.91
+          }
+        },
+        "last": {
+          "dates": [
+            "2026-09-22",
+            "2026-10-04",
+            "2026-10-16"
+          ],
+          "water": {
+            "area_km2": 163.717033,
+            "low_km2": 153.13526,
+            "high_km2": 170.509514,
+            "threshold_db": -17.75
+          }
+        }
+      },
+      "claims": [
+        {
+          "id": "water_extent_change",
+          "label": "Water-candidate area change",
+          "unit": "km2",
+          "value": -5.538,
+          "method": "Otsu dark-water candidates and morphological filtering on fixed median epochs.",
+          "sensitivity": {
+            "low": -19.784,
+            "high": 5.211,
+            "basis": "Each epoch threshold varied independently by +/-1 dB; not a confidence interval."
+          }
+        },
+        {
+          "id": "retained_brightness_change_area",
+          "label": "Area retained by the brightness screen",
+          "unit": "km2",
+          "value": 0.0,
+          "method": "Same-sign connected components at least 5,000 m2 after a local conditional noise screen. Zero retained area is not proof of no change.",
+          "sensitivity": {
+            "low": 0.0,
+            "high": 0.039945,
+            "basis": "k varied from 2 to 3 under a conditional log-Gamma model; not calibrated significance."
+          }
+        },
+        {
+          "id": "median_backscatter_change",
+          "label": "Median brightness change",
+          "value": 0.38,
+          "unit": "dB",
+          "method": "Pixel-wise last-minus-first median epoch difference on the common valid footprint."
+        }
+      ],
+      "change": {
+        "k": 2.5,
+        "median_conditional_threshold_db": 7.057,
+        "median_conditional_sigma_db": 2.823,
+        "retained_component_count": 0,
+        "retained_components": [],
+        "sweep_area_km2": {
+          "2.0": 0.039945,
+          "2.5": 0.0,
+          "3.0": 0.0
+        },
+        "common_valid_area_km2": 224.434996,
+        "common_valid_fraction": 1.0,
+        "screen_model": "Conditional log-Gamma from native numberOfLooks; effective independence after geocoding is unknown."
+      },
+      "validation": {
+        "status": "attempted",
+        "checked_at": "2026-11-16T04:52:39.180622+00:00",
+        "references": [
+          {
+            "source": "sentinel-2-l2a",
+            "status": "compared",
+            "attempted_dates": 10,
+            "compared_dates": 3,
+            "unique_scenes": 3,
+            "mean_iou": 0.772,
+            "dates": [
+              {
+                "date": "2026-06-18",
+                "status": "no_scene"
+              },
+              {
+                "date": "2026-06-30",
+                "status": "no_scene"
+              },
+              {
+                "date": "2026-07-12",
+                "status": "no_scene"
+              },
+              {
+                "date": "2026-07-24",
+                "status": "no_scene"
+              },
+              {
+                "date": "2026-08-17",
+                "status": "no_scene"
+              },
+              {
+                "date": "2026-08-29",
+                "status": "no_scene"
+              },
+              {
+                "date": "2026-09-10",
+                "scene_date": "2026-09-14",
+                "scene_id": "S2A_MSIL2A_20260914T043231_R133_T46QBK_20260914T091013",
+                "offset_days": 4,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2A_MSIL2A_20260914T043231_R133_T46QBK_20260914T091013",
+                "status": "insufficient_clear_overlap",
+                "coverage": 0.015
+              },
+              {
+                "date": "2026-09-22",
+                "scene_date": "2026-09-27",
+                "scene_id": "S2B_MSIL2A_20260927T042659_R133_T46QBK_20260927T081027",
+                "offset_days": 5,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2B_MSIL2A_20260927T042659_R133_T46QBK_20260927T081027",
+                "status": "compared",
+                "iou": 0.778,
+                "precision": 0.78,
+                "recall": 0.997,
+                "coverage": 0.44
+              },
+              {
+                "date": "2026-10-04",
+                "scene_date": "2026-10-04",
+                "scene_id": "S2A_MSIL2A_20261004T043231_R133_T45QZE_20261004T091653",
+                "offset_days": 0,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2A_MSIL2A_20261004T043231_R133_T45QZE_20261004T091653",
+                "status": "compared",
+                "iou": 0.798,
+                "precision": 0.799,
+                "recall": 0.998,
+                "coverage": 0.395
+              },
+              {
+                "date": "2026-10-16",
+                "scene_date": "2026-10-17",
+                "scene_id": "S2B_MSIL2A_20261017T042749_R133_T46QBK_20261017T081241",
+                "offset_days": 1,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2B_MSIL2A_20261017T042749_R133_T46QBK_20261017T081241",
+                "status": "compared",
+                "iou": 0.74,
+                "precision": 0.742,
+                "recall": 0.996,
+                "coverage": 0.555
+              }
+            ],
+            "method": "S2 metadata-scaled B03/B08 NDWI > 0; SCL classes 4/5/6 only",
+            "limits": [
+              "Nearest eligible scene within 6 calendar days; first of up to three candidates with at least 20% clear common-footprint coverage. Optical scene cloud cover must be below 70%.",
+              "Precision/recall treat the independent sensor classification as reference and NISAR as candidate, not ground truth.",
+              "Cloud-selected subsets, tidal timing and different sensor responses limit agreement; no direct C-band/L-band dB comparison."
+            ]
+          },
+          {
+            "source": "sentinel-1-rtc",
+            "status": "compared",
+            "attempted_dates": 10,
+            "compared_dates": 10,
+            "unique_scenes": 10,
+            "mean_iou": 0.784,
+            "dates": [
+              {
+                "date": "2026-06-18",
+                "scene_date": "2026-06-14",
+                "scene_id": "S1A_IW_GRDH_1SDV_20260614T235627_20260614T235652_064972_083024_rtc",
+                "offset_days": -4,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-1-rtc/items/S1A_IW_GRDH_1SDV_20260614T235627_20260614T235652_064972_083024_rtc",
+                "status": "compared",
+                "iou": 0.581,
+                "precision": 0.582,
+                "recall": 0.997,
+                "coverage": 1.0
+              },
+              {
+                "date": "2026-06-30",
+                "scene_date": "2026-07-01",
+                "scene_id": "S1D_IW_GRDH_1SDV_20260701T120317_20260701T120342_003480_006271_rtc",
+                "offset_days": 1,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-1-rtc/items/S1D_IW_GRDH_1SDV_20260701T120317_20260701T120342_003480_006271_rtc",
+                "status": "compared",
+                "iou": 0.713,
+                "precision": 0.714,
+                "recall": 0.999,
+                "coverage": 1.0
+              },
+              {
+                "date": "2026-07-12",
+                "scene_date": "2026-07-13",
+                "scene_id": "S1D_IW_GRDH_1SDV_20260713T120318_20260713T120343_003655_006865_rtc",
+                "offset_days": 1,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-1-rtc/items/S1D_IW_GRDH_1SDV_20260713T120318_20260713T120343_003655_006865_rtc",
+                "status": "compared",
+                "iou": 0.84,
+                "precision": 0.843,
+                "recall": 0.996,
+                "coverage": 1.0
+              },
+              {
+                "date": "2026-07-24",
+                "scene_date": "2026-07-25",
+                "scene_id": "S1D_IW_GRDH_1SDV_20260725T120319_20260725T120344_003830_006E63_rtc",
+                "offset_days": 1,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-1-rtc/items/S1D_IW_GRDH_1SDV_20260725T120319_20260725T120344_003830_006E63_rtc",
+                "status": "compared",
+                "iou": 0.772,
+                "precision": 0.774,
+                "recall": 0.996,
+                "coverage": 1.0
+              },
+              {
+                "date": "2026-08-17",
+                "scene_date": "2026-08-18",
+                "scene_id": "S1D_IW_GRDH_1SDV_20260818T120320_20260818T120345_004180_007A7E_rtc",
+                "offset_days": 1,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-1-rtc/items/S1D_IW_GRDH_1SDV_20260818T120320_20260818T120345_004180_007A7E_rtc",
+                "status": "compared",
+                "iou": 0.908,
+                "precision": 0.917,
+                "recall": 0.99,
+                "coverage": 1.0
+              },
+              {
+                "date": "2026-08-29",
+                "scene_date": "2026-08-30",
+                "scene_id": "S1D_IW_GRDH_1SDV_20260830T120320_20260830T120345_004355_0080AB_rtc",
+                "offset_days": 1,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-1-rtc/items/S1D_IW_GRDH_1SDV_20260830T120320_20260830T120345_004355_0080AB_rtc",
+                "status": "compared",
+                "iou": 0.788,
+                "precision": 0.79,
+                "recall": 0.997,
+                "coverage": 1.0
+              },
+              {
+                "date": "2026-09-10",
+                "scene_date": "2026-09-11",
+                "scene_id": "S1D_IW_GRDH_1SDV_20260911T120321_20260911T120346_004530_0086C5_rtc",
+                "offset_days": 1,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-1-rtc/items/S1D_IW_GRDH_1SDV_20260911T120321_20260911T120346_004530_0086C5_rtc",
+                "status": "compared",
+                "iou": 0.76,
+                "precision": 0.762,
+                "recall": 0.997,
+                "coverage": 1.0
+              },
+              {
+                "date": "2026-09-22",
+                "scene_date": "2026-09-23",
+                "scene_id": "S1D_IW_GRDH_1SDV_20260923T120321_20260923T120346_004705_008CC4_rtc",
+                "offset_days": 1,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-1-rtc/items/S1D_IW_GRDH_1SDV_20260923T120321_20260923T120346_004705_008CC4_rtc",
+                "status": "compared",
+                "iou": 0.91,
+                "precision": 0.925,
+                "recall": 0.983,
+                "coverage": 1.0
+              },
+              {
+                "date": "2026-10-04",
+                "scene_date": "2026-10-05",
+                "scene_id": "S1D_IW_GRDH_1SDV_20261005T120321_20261005T120346_004880_0092E0_rtc",
+                "offset_days": 1,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-1-rtc/items/S1D_IW_GRDH_1SDV_20261005T120321_20261005T120346_004880_0092E0_rtc",
+                "status": "compared",
+                "iou": 0.773,
+                "precision": 0.774,
+                "recall": 0.999,
+                "coverage": 1.0
+              },
+              {
+                "date": "2026-10-16",
+                "scene_date": "2026-10-17",
+                "scene_id": "S1D_IW_GRDH_1SDV_20261017T120321_20261017T120346_005055_0098F4_rtc",
+                "offset_days": 1,
+                "source_url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-1-rtc/items/S1D_IW_GRDH_1SDV_20261017T120321_20261017T120346_005055_0098F4_rtc",
+                "status": "compared",
+                "iou": 0.794,
+                "precision": 0.794,
+                "recall": 0.999,
+                "coverage": 1.0
+              }
+            ],
+            "method": "S1 calibrated linear intensity converted to dB; Otsu dark-water candidates; VV only",
+            "limits": [
+              "Nearest eligible scene within 6 calendar days; first of up to three candidates with at least 20% clear common-footprint coverage. Optical scene cloud cover must be below 70%.",
+              "Precision/recall treat the independent sensor classification as reference and NISAR as candidate, not ground truth.",
+              "Cloud-selected subsets, tidal timing and different sensor responses limit agreement; no direct C-band/L-band dB comparison."
+            ]
+          }
+        ],
+        "maturity": {
+          "status": "availability_checked",
+          "collections": [
+            {
+              "product": "nisar-gcov-beta",
+              "collection": "NISAR_L2_GCOV_BETA_V1",
+              "matching_dates": 0,
+              "status": "no_matching_dates",
+              "compared_dates": 0
+            },
+            {
+              "product": "nisar-gcov",
+              "collection": "NISAR_L2_GCOV_V1",
+              "matching_dates": 0,
+              "status": "no_matching_dates",
+              "compared_dates": 0
+            }
+          ],
+          "limitation": "Beta is not necessarily newer than provisional. Matching metadata is not a radiometric comparison or a calibration error bar."
+        }
+      },
+      "provenance": {
+        "algorithm_version": "3.0.0",
+        "config_hash": "4ee3d9515682ed51",
+        "collection": "NISAR_L2_GCOV_PROVISIONAL_V1",
+        "series": {
+          "relative_orbit": "069",
+          "direction": "A",
+          "frame": "013",
+          "mode": "4005",
+          "polarization_token": "DHDH",
+          "baseline": "P05023"
+        },
+        "parameters": {
+          "k_sigma": 2.5,
+          "k_sweep": [
+            2.0,
+            2.5,
+            3.0
+          ],
+          "min_cluster_m2": 5000,
+          "water_threshold_offsets_db": [
+            -1,
+            0,
+            1
+          ],
+          "epoch_size": 3,
+          "independent_look_gain_assumed": false,
+          "area_basis": "WGS84 ellipsoidal local equal-area cells"
+        },
+        "source_processing": {
+          "noiseCorrectionApplied": "False",
+          "radiometricTerrainCorrectionApplied": "True",
+          "rtc/outputBackscatterExpressionConvention": "Linear power",
+          "rtc/outputBackscatterNormalizationConvention": "gamma0",
+          "shadowMaskingApplied": "False"
+        },
+        "measurement_quantization_db": 0.01,
+        "geometry_checked_dates": 10,
+        "citations": [
+          "https://nisar-docs.asf.alaska.edu/gcov/",
+          "https://cmr.earthdata.nasa.gov/search/site/docs/search/api.html"
+        ]
+      },
+      "limitations": [
+        "Source-product maturity and EarthEyes result validation are different. These results remain exploratory.",
+        "Source noiseCorrectionApplied=False; thermal-noise and shadow residuals are not estimated here.",
+        "numberOfLooks is not verified effective independent looks after geocoding. No extra precision is assumed from spatial or temporal averaging.",
+        "Threshold sweeps are sensitivity ranges, not confidence intervals; cluster filtering is not a detection limit.",
+        "Water candidates can include other dark surfaces. Dates, tides and clouds can disagree across sensors; agreement is not ground truth.",
+        "Brightness cannot establish water depth, tide stage, ice velocity, cause, or a public warning."
+      ],
+      "raster": {
+        "format": "webp-rgba",
+        "coordinates": [
+          [
+            90.05472776818235,
+            21.890143531775617
+          ],
+          [
+            90.2051524526833,
+            21.890143531775617
+          ],
+          [
+            90.2051524526833,
+            21.74995607245638
+          ],
+          [
+            90.05472776818235,
+            21.74995607245638
+          ]
+        ],
+        "delta_url": "/analysis/kuakata-bangladesh/rasters/4ee3d9515682ed51-delta.webp",
+        "water_change_url": "/analysis/kuakata-bangladesh/rasters/4ee3d9515682ed51-water.webp",
+        "placement": "Nearest-neighbor display reprojection to Web Mercator; all measurements use the native grid."
+      }
+    }
+  ]
+}

@@ -6,7 +6,7 @@ const context: ArgusContext = {
   acquisitions: [{ id: "a", date: "2026-06-18", acquiredAt: "2026-06-18T00:00:00Z", platform: "NISAR", processing: "GCOV", polarization: "HV", orbit: "unknown" }, { id: "b", date: "2026-06-30", acquiredAt: "2026-06-30T00:00:00Z", platform: "NISAR", processing: "GCOV", polarization: "HV", orbit: "unknown" }],
   comparison: { status: "ready", summary: { changedPct: 12, brighterPct: 7, darkerPct: 5, headline: "Visual difference", detail: "Display pixels only" } },
   catalogueStatus: "ready", hasMore: true, missingSelection: false,
-  display: { moduleId: "coastal", moduleTitle: "Coastal change", comparisonMode: "swipe", view: "compare", polarization: "HVHV", activeLayers: ["acquisition-footprint"], previewsWithImages: 2, previewsMissing: 0 },
+  display: { moduleId: "coastal", moduleTitle: "Coastal change", comparisonMode: "swipe", view: "compare", polarization: "HVHV", productId: "nisar-gcov-provisional", activeLayers: ["acquisition-footprint"], previewsWithImages: 2, previewsMissing: 0 },
   page: { path: "/explore/kuakata-bangladesh", title: "Kuakata / Coastal change" },
 }
 beforeEach(() => {
@@ -17,6 +17,16 @@ afterEach(() => { vi.unstubAllEnvs(); vi.restoreAllMocks() })
 const ask = (question: string, facts = context) => answerArgus(question, facts, [], new AbortController().signal)
 
 describe("Argus current-view answers", () => {
+  it("uses server-owned analysis facts even when the live catalogue is unavailable", async () => {
+    const fetcher = vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json({ text: "Median brightness change: 0.38 dB. Exploratory result.", source: "data" }))
+    const analysisQuery = { product: "nisar-gcov-provisional" as const, bbox: [90.0575, 21.7524, 90.2025, 21.8876] as [number, number, number, number], start: "2026-06-01", end: "2026-10-31", polarization: "HV" as const }
+    const answer = await ask("What changed in this pilot?", { ...context, catalogueStatus: "error", analysisQuery })
+    expect(answer.source).toBe("data")
+    expect(answer.text).toContain("0.38")
+    const payload = JSON.parse(String(fetcher.mock.calls[0][1]?.body))
+    expect(payload.analysisQuery).toEqual(analysisQuery)
+    expect(payload.facts).toEqual({})
+  })
   it("answers using actual computed shares without claiming physical change", async () => {
     const answer = await ask("What changed?")
     expect(answer.text).toContain("12%")

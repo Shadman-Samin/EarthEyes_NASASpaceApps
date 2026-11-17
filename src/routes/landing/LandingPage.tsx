@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import { usePlaces } from "../../data/queries"
+import { KUAKATA_PILOT_URL } from "../../shared/links"
 import { Icon, Skeleton, StatePanel } from "../../shared/ui"
 import { prefersLowBandwidth } from "../../shared/network"
 import { useMediaQuery } from "../../shared/useMediaQuery"
@@ -26,14 +27,33 @@ export function LandingPage() {
         <div className="landing-hero__copy">
           <span className="section-kicker">NASA Space Apps / Dancing with the SARs</span>
           <h1 id="landing-title">Read the radar.<br /><em>Question the change.</em></h1>
-          <p>Choose an area. Pull real satellite radar acquisitions and official browse previews. Compare dates, then read an exploratory interpretation of what looks different.</p>
+          <p>Inspect real satellite radar acquisitions and official browse previews. Or open the published Kuakata study to see a calibrated-source analysis with its epochs, sensitivity and reference checks kept in view.</p>
           <div className="landing-hero__actions">
             <Link className="button button--signal button--medium" to="/explore">Open the explorer <Icon name="arrow" size={18} /></Link>
+            <Link className="text-link" to={KUAKATA_PILOT_URL}>Inspect the Kuakata study <Icon name="arrow" size={17} /></Link>
             <a className="text-link" href="#walkthrough"><Icon name="play" size={17} /> Watch the walkthrough</a>
           </div>
-          <p className="landing-hero__note">NISAR L-band / Sentinel-1 C-band<br />Visual screening, not a calibrated change measurement.</p>
+          <p className="landing-hero__note">Kuakata: precomputed NISAR HV / Live archive: browse previews<br />Exploratory results, not a validated change measurement.</p>
         </div>
         <div className="landing-hero__aside"><span>NISAR / orbital view</span><p>Mission visualisation, not live imagery. The explorer's evidence comes from the archive.</p></div>
+      </section>
+
+      <section className="pilot-band editorial-section" aria-label="Published Kuakata study">
+        <div className="pilot-band__copy">
+          <span className="section-kicker">Published study / NISAR HV gamma0</span>
+          <h2>Kuakata,<br /><em>read across ten dates.</em></h2>
+          <p>A bounded coastal pilot with fixed three-date epochs on one common valid footprint. The explorer shows the derived water and brightness evidence, its sensitivity range, and per-date independent reference coverage.</p>
+          <div className="pilot-band__actions">
+            <Link className="button button--signal button--medium" to={KUAKATA_PILOT_URL}>Inspect the evidence <Icon name="arrow" size={17} /></Link>
+            <Link className="text-link" to="/methodology">Read the method <Icon name="arrow" size={16} /></Link>
+          </div>
+        </div>
+        <dl className="pilot-band__facts">
+          <div><dt>Archive</dt><dd>Ten NISAR GCOV acquisitions<br /><small>18 June — 16 October 2026</small></dd></div>
+          <div><dt>Question</dt><dd>Did the water candidate area and brightness differ between fixed epochs?</dd></div>
+          <div><dt>Status</dt><dd>Exploratory derived · provisional source<br /><small>Not a validated flood claim or operational warning</small></dd></div>
+          <div><dt>Check</dt><dd>Cross-sensor class agreement is corroboration, not ground truth.</dd></div>
+        </dl>
       </section>
 
       <section id="walkthrough" className="walkthrough editorial-section" aria-labelledby="walkthrough-title">

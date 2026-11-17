@@ -10,6 +10,7 @@ describe("LandingPage", () => {
     render(<QueryClientProvider client={client}><MemoryRouter><LandingPage /></MemoryRouter></QueryClientProvider>)
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1)
     expect(screen.getByRole("link", { name: "Open the explorer" })).toHaveAttribute("href", "/explore")
+    expect(screen.getByRole("link", { name: /inspect the kuakata study/i })).toHaveAttribute("href", expect.stringContaining("/explore/kuakata-bangladesh?"))
     expect(await screen.findByText("Jakobshavn Glacier")).toBeInTheDocument()
   })
 
@@ -24,7 +25,7 @@ describe("LandingPage", () => {
     expect(screen.getByRole("link", { name: /watch on youtube/i })).toHaveAttribute("href", "https://www.youtube.com/watch?v=vzeL2bBZ5Sk")
   })
 
-  it("provides a muted local background clip with a poster", () => {
+  it("provides a muted decorative background clip without playback controls", () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     const { container } = render(<QueryClientProvider client={client}><MemoryRouter><LandingPage /></MemoryRouter></QueryClientProvider>)
     const video = container.querySelector("video")!
@@ -32,6 +33,16 @@ describe("LandingPage", () => {
     expect(video).toHaveAttribute("poster", "/orbit-hero.jpg")
     expect(video).toHaveAttribute("loop")
     expect(video.muted).toBe(true)
+    expect(video).not.toHaveAttribute("controls")
     expect(screen.queryByRole("button", { name: /background video/i })).not.toBeInTheDocument()
+  })
+
+  it("names the published Kuakata evidence band and its exploratory boundary", () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    render(<QueryClientProvider client={client}><MemoryRouter><LandingPage /></MemoryRouter></QueryClientProvider>)
+    const band = screen.getByRole("region", { name: "Published Kuakata study" })
+    expect(band).toHaveTextContent(/ten NISAR/i)
+    expect(band).toHaveTextContent(/exploratory/i)
+    expect(band).toHaveTextContent(/not a validated flood claim/i)
   })
 })

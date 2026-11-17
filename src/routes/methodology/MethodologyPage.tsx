@@ -15,7 +15,7 @@ export function MethodologyPage() {
     <main id="main-content" className="editorial-page methodology-page">
       <header className="editorial-hero">
         <div><span className="section-kicker">Methodology / Read the fine print</span><h1>What the pixels<br /><em>can tell you.</em></h1><p>A reproducible description of the live explorer, from a catalogue request to a visual difference. No hidden step turns a preview into a scientific measurement.</p></div>
-        <aside className="editorial-hero__note"><span className="eyebrow">Current implementation</span><strong>Browse-image screening</strong><p>The map shows acquisition footprints. Preview images are uncalibrated and unregistered; their pixel percentages are exploratory.</p></aside>
+        <aside className="editorial-hero__note"><span className="eyebrow">Two distinct paths</span><strong>Previews and published studies</strong><p>Live preview percentages are uncalibrated. Matching precomputed studies use calibrated source values, with their own fixed epochs, sensitivity and reference coverage. Both remain exploratory.</p></aside>
       </header>
       <div className="editorial-body method-layout">
         <nav className="method-index" aria-label="Methodology sections"><span className="eyebrow">In this method</span><a href="#live-pipeline">01 / Live pipeline</a><a href="#pixel-statistics">02 / Reading a percentage</a><a href="#offline-workflow">03 / Offline workflow</a><a href="#scientific-boundary">04 / Scientific boundary</a></nav>
@@ -32,8 +32,11 @@ export function MethodologyPage() {
           </section>
           <section id="offline-workflow" className="method-section method-offline" aria-label="Calibrated offline workflow">
             <span className="section-kicker">03 / Separate research workflow</span><h2>Calibrated data lives<br />on a different path.</h2>
-            <p>The repository retains precomputed NISAR GCOV bundles for Kuakata and Jakobshavn. The offline Python tools read selected HDF5 windows and derive gamma-0 backscatter differences, thresholded water or surface-change summaries, and clusters.</p>
-            <p>This calibrated offline workflow is reproducible but <strong>not connected to the explorer UI</strong>. Its rasters, thresholds and statistics are not the browse comparison described above. The NISAR calibration and interpretations remain provisional.</p>
+            <p>A matching precomputed study now appears separately in the explorer. The Kuakata pilot uses ten NISAR GCOV acquisitions, checks every source grid and quality mask, and compares fixed median epochs on the same valid ground. Its numerical results do not come from the browse images above.</p>
+            <p>Areas use ellipsoidal equal-area pixel weights. Dark-water candidates use an Otsu threshold; brightness changes use a conditional log-Gamma screen based on the source look count. No extra independent looks are assumed from averaging. Same-sign clusters are filtered by area, but that filter is not a detection limit.</p>
+            <p><strong>Sensitivity is not confidence.</strong> Threshold sweeps show how estimates move when assumptions change; they are not confidence intervals. Source calibration and source-product maturity do not make an EarthEyes result ground-truth validated.</p>
+            <p>Independent class checks cover ten dates with Sentinel-1 and three with eligible Sentinel-2 imagery. Missing and cloudy dates stay visible; cross-sensor agreement is corroboration, not proof of a change or its cause. No matching beta or standard-release dates were found for a radiometric release comparison.</p>
+            <p>The API requires an exact bbox, date window, product and optional polarization match. Other selections remain browse-only. Map overlays are display reprojections of the numerical result, not approximate browse placements; changing the preview pair does not change a published study's fixed epochs.</p>
             <a className="text-link" href="https://github.com/Shadman-Samin/EarthEyes_NASASpaceApps/tree/development/tools/analysis" target="_blank" rel="noreferrer">Inspect the offline pipeline <Icon name="external" size={16} /></a>
           </section>
           <section id="scientific-boundary" className="method-section" aria-labelledby="boundary-title">

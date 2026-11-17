@@ -19,14 +19,17 @@ function renderRoute(element: ReactNode, path = "/", pattern = "*") {
 }
 
 describe("editorial evidence boundaries", () => {
-  it("distinguishes live preview statistics from the disconnected calibrated workflow", () => {
+  it("distinguishes preview percentages from fixed-epoch calibrated-source studies", () => {
     renderRoute(<MethodologyPage />)
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1)
     const live = screen.getByRole("region", { name: "Current live pipeline" })
     expect(live).toHaveTextContent(/1600/)
     expect(live).toHaveTextContent(/26/)
     expect(screen.getByRole("region", { name: "What the percentages mean" })).toHaveTextContent(/not georeferenced measurements/i)
-    expect(screen.getByRole("region", { name: "Calibrated offline workflow" })).toHaveTextContent(/not connected to the explorer/i)
+    const calibrated = screen.getByRole("region", { name: "Calibrated offline workflow" })
+    expect(calibrated).toHaveTextContent(/fixed median epochs/i)
+    expect(calibrated).toHaveTextContent(/not confidence intervals/i)
+    expect(calibrated).toHaveTextContent(/corroboration, not proof/i)
   })
 
   it("groups source records by role without presenting the directory as live acquisitions", async () => {
