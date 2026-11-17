@@ -79,6 +79,19 @@ test("the OPERA product switch restores the Sentinel-1 C-band archive", async ({
   await expect(viewer.locator('img[src*="T002-000002-IW1"]')).toHaveCount(2)
 })
 
+test("the explorer retries a transient provider timeout", async ({ page }) => {
+  let requests = 0
+  await page.route("**/api/catalog/search?*", (route) => {
+    requests += 1
+    return requests === 1
+      ? route.fulfill({ status: 504, json: { error: { message: "Provider timed out." } } })
+      : route.fallback()
+  })
+  await page.goto("/explore/kuakata-bangladesh")
+  await expect(page.getByLabel("Observation timeline")).toBeVisible()
+  expect(requests).toBeGreaterThan(1)
+})
+
 test("the explorer reports provider failure without falling back to fixture observations", async ({ page }) => {
   await page.route("**/api/catalog/search?*", (route) => route.fulfill({ status: 503, json: { error: { message: "The satellite provider is unavailable." } } }))
   const unavailable = page.waitForResponse((response) => response.url().includes("/api/catalog/search?") && response.status() === 503)
@@ -88,6 +101,7 @@ test("the explorer reports provider failure without falling back to fixture obse
   await expect(page.locator(".explorer-center").getByText("The satellite provider is unavailable.", { exact: true })).toBeVisible()
   await expect(page.getByLabel("Observation timeline")).toHaveCount(0)
   await expect(page.locator('img[src*="unsplash"]')).toHaveCount(0)
+  await expect(page.getByRole("button", { name: "Retry archive", exact: true })).toBeVisible()
 })
 
 test("mobile comparison uses the same live acquisitions", async ({ page }, testInfo) => {

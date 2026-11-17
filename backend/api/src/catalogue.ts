@@ -81,6 +81,9 @@ function searchUrl(query: CatalogueQuery) {
     limit: String(query.limit),
   }).toString()
 
+  // CMR's newest-first index avoids slow scans through broad pre-acquisition windows.
+  if (product.processingFamily === "NISAR-GCOV") url.searchParams.set("sortby", "-datetime")
+
   if (query.cursor) {
     try {
       const bytes = Uint8Array.from(atob(query.cursor.replace(/-/g, "+").replace(/_/g, "/")), (char) => char.charCodeAt(0))

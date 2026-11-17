@@ -46,6 +46,17 @@ afterEach(() => {
 })
 
 describe("bounded live catalogue", () => {
+  it("requests newest NISAR records first and preserves that order across pages", async () => {
+    const upstream = vi.fn(async (url: URL) => page([], [nextLink(url)]))
+    vi.stubGlobal("fetch", upstream)
+    const input = { ...query, product: "nisar-gcov-provisional" as const }
+    const first = await searchCatalogue(input)
+    expect(upstream.mock.calls[0][0].searchParams.get("sortby")).toBe("-datetime")
+    upstream.mockImplementation(async () => page([]))
+    await searchCatalogue({ ...input, ...first.next[0] })
+    expect(upstream.mock.calls[1][0].searchParams.get("sortby")).toBe("-datetime")
+  })
+
   it("queries only metadata and preserves unknown NASA SAR properties", async () => {
     const upstream = vi.fn<(url: URL, init: RequestInit) => Promise<Response>>(async () => page())
     vi.stubGlobal("fetch", upstream)

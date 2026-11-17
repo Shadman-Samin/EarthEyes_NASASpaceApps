@@ -7,7 +7,7 @@ import { moduleIdSchema, type LayerDefinition, type ModuleId, type Place } from 
 import { catalogueBoundsSchema, catalogueProductIdSchema, catalogueQuerySchema, type CatalogueBounds, type CatalogueProductId, type CatalogueSearchResult } from "../../domain/catalogue"
 import { moduleRegistry } from "../../domain/module-registry"
 import { usePlace } from "../../data/queries"
-import { catalogueItemKey, fetchCatalogue } from "../../data/catalogue"
+import { CatalogueRequestError, catalogueItemKey, fetchCatalogue } from "../../data/catalogue"
 import { fetchAnalysis } from "../../data/analysis"
 import type { AnalysisQuery } from "../../domain/analysis"
 import { CalibratedAnalysis, type AnalysisOverlayMode } from "../../features/analysis/CalibratedAnalysis"
@@ -93,12 +93,13 @@ function ExplorerWorkspace({ place }: { place: Place }) {
       return Promise.all((pageParam.length ? pageParam.map((partition) => ({ ...query, ...partition })) : [query]).map((request) => fetchCatalogue(request, signal)))
     },
     getNextPageParam: (pages) => { const next = pages.flatMap((page) => page.next); return next.length ? next : undefined },
-    retry: false, refetchOnWindowFocus: false, refetchOnReconnect: false, refetchOnMount: false, staleTime: 300_000,
+    retry: (failures, error) => failures < 1 && error instanceof CatalogueRequestError && [0, 502, 503, 504].includes(error.status),
+    refetchOnWindowFocus: false, refetchOnReconnect: false, refetchOnMount: false, staleTime: 300_000,
   })
   const autoPageCount = archive.data?.pages.length ?? 0
   useEffect(() => {
     // Pull a few pages automatically so a place has several dates to compare, not just the first page.
-    if (!archive.hasNextPage || archive.isFetching || autoPageCount >= 3) return
+    if (!archive.hasNextPage || archive.isFetching || archive.isError || autoPageCount >= 3) return
     void archive.fetchNextPage()
   }, [archive, autoPageCount])
   const pages = useMemo(() => archive.data?.pages.flat() ?? [], [archive.data])
@@ -242,7 +243,7 @@ function ExplorerWorkspace({ place }: { place: Place }) {
           </details>
           {formError && <p role="alert">{formError}</p>}
           {archive.hasNextPage && <Button tone="secondary" size="small" disabled={archive.isFetching} onClick={() => { void archive.fetchNextPage() }}>Load more dates</Button>}
-          {archive.isError && <p role="alert">{archive.error.message}</p>}
+          {archive.isError && <><p role="alert">{archive.error.message}</p><Button tone="secondary" size="small" disabled={archive.isFetching} onClick={() => { void archive.refetch() }}>Retry archive</Button></>}
         </section>
       )}
     />
